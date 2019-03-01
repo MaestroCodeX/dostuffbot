@@ -1,16 +1,14 @@
 import os
-import sys
-import subprocess
 import time
+import importlib
 import multiprocessing
 from src import bot
 
-COMMAND = 'python src/bot.py'
 WATCH_PATH = '.'
 
 
 def file_filter(name):
-    return  (
+    return (
         not name.startswith(".") and
         not name.endswith(".pyc") and
         not name.endswith(".pyo") and
@@ -37,11 +35,15 @@ def watch_changes():
 
 def run_autoreload():
     while True:
-        process = multiprocessing.Process(target=bot.main, args=tuple())
-        process.start()
+        importlib.reload(bot)
+        p = multiprocessing.Process(target=bot.main, args=tuple())
+        p.daemon = True
+        p.start()
         watch_changes()
-        process.terminate()
+        p.terminate()
         print('Restarting the server.')
+        while p.is_alive():
+            time.sleep(1)
 
 
 def main():
@@ -49,6 +51,7 @@ def main():
         run_autoreload()
     except KeyboardInterrupt:
         pass
+
 
 if __name__ == '__main__':
     main()
