@@ -1,44 +1,36 @@
-import logging
+from telegram import ParseMode
+from telegram.ext import Updater, CommandHandler
 
-from telegram.ext import Updater, CommandHandler, RegexHandler, ConversationHandler
-
-from src import secret
-
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
-logger = logging.getLogger(__name__)
-
-EMAIL = 1
+import env
+from src import logger
 
 
 def start(bot, update):
-    update.message.reply_text('We are still working on it. Send email to get a notification when it\'s ready.')
-    return EMAIL
-
-
-def email(bot, update):
-    msg = update.message
-    bot.send_message(chat_id=secret.ADMIN_ID, text=f'{msg.from_user.id} {msg.from_user.first_name}- {msg.text}')
-    update.message.reply_text('Thanks!')
-
-
-def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    update.message.reply_text(
+        (
+            'Hello, my name is <b>Dostuffbot</b>!\n'
+            'I am a bot for creating and hosting your bots.\n'
+            'I can answer for specific commands that you teach me and send posts to users.\n\n'
+            '<i>Bot commands:</i>\n'
+            '/newbot\n'
+            '/mybots\n\n'
+            '<i>Extra commands:</i>\n'
+            '/help\n'
+            '/about\n'
+            '/support\n'
+        ),
+        parse_mode=ParseMode.HTML,
+    )
 
 
 def main():
-    updater = Updater(secret.TOKEN)
+    updater = Updater(env.TOKEN)
     dp = updater.dispatcher
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={EMAIL: [RegexHandler(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email)]},
-        fallbacks=[],
-    )
+    start_handler = CommandHandler('start', start)
 
-    dp.add_handler(conv_handler)
-    dp.add_error_handler(error)
+    dp.add_handler(start_handler)
+    dp.add_error_handler(logger.error)
     updater.start_polling()
     print('Bot is running.')
     updater.idle()

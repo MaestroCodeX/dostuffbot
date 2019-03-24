@@ -1,8 +1,9 @@
 import os
 import time
+import types
 import importlib
 import multiprocessing
-from src import bot
+import env
 
 WATCH_PATH = '.'
 
@@ -33,10 +34,23 @@ def watch_changes():
         time.sleep(1)
 
 
+def imports(module):
+    for name, val in vars(module).items():
+        if isinstance(val, types.ModuleType):
+            yield val.__name__
+
+
+def reload_module(module):
+    importlib.reload(module)
+    for m_str in imports(module):
+        m = importlib.import_module(m_str)
+        importlib.reload(m)
+
+
 def run_autoreload():
+    module = importlib.import_module(env.MODULE_PATH)
     while True:
-        importlib.reload(bot)
-        p = multiprocessing.Process(target=bot.main, args=tuple())
+        p = multiprocessing.Process(target=module.main, args=tuple())
         p.daemon = True
         p.start()
         watch_changes()
@@ -44,6 +58,7 @@ def run_autoreload():
         print('Restarting the server.')
         while p.is_alive():
             time.sleep(1)
+        reload_module(module)
 
 
 def main():
