@@ -11,7 +11,7 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'src',
+    'main',
 )
 
 SECRET_KEY = env.SECRET_KEY
