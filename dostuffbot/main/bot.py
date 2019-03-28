@@ -1,8 +1,9 @@
 from telegram import ParseMode
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Filters, Updater, CommandHandler, ConversationHandler, MessageHandler
 
 import env
-from src import logger
+from accounts import handlers as accounts_handlers
+from main import logger
 
 
 def start(bot, update):
@@ -28,8 +29,16 @@ def main():
     dp = updater.dispatcher
 
     start_handler = CommandHandler('start', start)
+    new_bot_handler = ConversationHandler(
+        entry_points=[CommandHandler('newbot', accounts_handlers.new_bot)],
+        states={
+            1: [MessageHandler(Filters.text, accounts_handlers.new_bot_token)]
+        },
+        fallbacks=[CommandHandler('cancel', start)],
+    )
 
     dp.add_handler(start_handler)
+    dp.add_handler(new_bot_handler)
     dp.add_error_handler(logger.error)
     updater.start_polling()
     print('Bot is running.')
