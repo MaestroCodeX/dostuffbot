@@ -14,7 +14,7 @@ from accounts.utils import get_user_from_message
 
 def new_bot(bot, update):
     update.message.reply_text(
-        'Send me a token from [https://t.me/BotFather](BotFather) of your bot.',
+        'Send me please your Bot token. You can find it with @BotFather.',
         parse_mode=ParseMode.HTML,
     )
 
