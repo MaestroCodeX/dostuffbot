@@ -8,7 +8,7 @@ application = get_wsgi_application()
 from telegram import ParseMode
 from telegram.ext import ConversationHandler
 
-from accounts.models import Bot
+from bots.models import Bot
 from accounts.utils import get_user_from_message
 
 

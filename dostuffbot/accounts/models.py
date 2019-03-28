@@ -16,8 +16,3 @@ class User(models.Model):
 
         self.dialog_id = message.message_id
         self.save()
-
-
-class Bot(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=100)
