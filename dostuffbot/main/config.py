@@ -1,5 +1,5 @@
 
-from telegram.ext import Filters, Updater, CommandHandler, ConversationHandler, MessageHandler
+from telegram.ext import Filters, Updater, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler
 
 import env
 from accounts import handlers as accounts_handlers
@@ -13,19 +13,21 @@ def main():
     dp = updater.dispatcher
 
     # Set handlers
-    start_handler = CommandHandler('start', bots_handlers.start)
-    new_bot_handler = ConversationHandler(
-        entry_points=[CommandHandler('newbot', accounts_handlers.new_bot)],
+    start_cmd_handler = CommandHandler('start', bots_handlers.start_cmd)
+    add_bot_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(bots_handlers.add_bot, pattern='add_bot')],
         states={
             1: [MessageHandler(Filters.text, accounts_handlers.new_bot_token)]
         },
         fallbacks=[CommandHandler('cancel', bots_handlers.start)],
     )
+    start_handler = CallbackQueryHandler(bots_handlers.start, pattern='start')
     unknown_handler = MessageHandler(Filters.all, main_handlers.unknown)
 
     # Add handlers
+    dp.add_handler(start_cmd_handler)
     dp.add_handler(start_handler)
-    dp.add_handler(new_bot_handler)
+    dp.add_handler(add_bot_handler)
     dp.add_handler(unknown_handler)
     dp.add_error_handler(logger.error)
 
