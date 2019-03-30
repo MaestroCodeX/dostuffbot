@@ -73,7 +73,7 @@ def token(bot, update):
     user = User.objects.get(id=update.message.from_user.id)
     token = update.message.text
 
-    Bot.objects.create(owner=user, token=token)
+    Bot.objects.create(owner=user, token=token, name='@Name')
 
     keyboard = [[
         InlineKeyboardButton('Menu', callback_data='start'),
@@ -98,8 +98,8 @@ def my_bots(bot, update):
     iter_bots = iter(bots)
     for left, right in zip(iter_bots, iter_bots):
         row = [
-            InlineKeyboardButton(left.name, callback_data='bot_detail' + left.id),
-            InlineKeyboardButton(right.name, callback_data='bot_detail' + right.id),
+            InlineKeyboardButton(left.name, callback_data='bot_detail' + str(left.id)),
+            InlineKeyboardButton(right.name, callback_data='bot_detail' + str(right.id)),
         ]
         keyboard.append(row)
 
@@ -107,7 +107,7 @@ def my_bots(bot, update):
         # Add last bot, if the count is odd
         last = bots.last()
         row = [
-            InlineKeyboardButton(last.name, callback_data='bot_detail' + last.id),
+            InlineKeyboardButton(last.name, callback_data='bot_detail' + str(last.id)),
         ]
         keyboard.append(row)
 
