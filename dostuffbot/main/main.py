@@ -17,6 +17,11 @@ def main():
     dp.add_handler(bots_handlers.add_bot_handler)
     dp.add_handler(bots_handlers.my_bots_handler)
     dp.add_handler(bots_handlers.token_handler)
+    dp.add_handler(bots_handlers.settings_handler)
+    dp.add_handler(bots_handlers.help_handler)
+    dp.add_handler(bots_handlers.about_handler)
+    dp.add_handler(bots_handlers.smile_admin_handler)
+    dp.add_handler(bots_handlers.smile_again_handler)
     dp.add_handler(bots_handlers.unknown_handler)
 
     # Log all errors
