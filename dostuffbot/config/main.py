@@ -1,9 +1,10 @@
+import logging
 
 from telegram.ext import Updater
 
 import env
 from bots import handlers as bots_handlers
-from main import logger
+from config import logger
 
 
 def main():
@@ -29,5 +30,5 @@ def main():
 
     # Start bot
     updater.start_polling()
-    print('Bot is running.')
+    logging.info('Bot is running.')
     updater.idle()
