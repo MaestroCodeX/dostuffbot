@@ -4,72 +4,41 @@ from telegram.ext import Filters, CommandHandler, CallbackQueryHandler, MessageH
 from accounts.models import User
 from accounts.utils import get_user_from_message
 from bots.models import Bot
+from bots.keyboards import start_markup, cancel_start_markup, settings_markup, help_markup, about_markup
+from bots.texts import start_text, add_bot_text, help_text, about_text
 
 
 def start_cmd(bot, update):
     """ The start was called with /start """
     message = update.message
     user = get_user_from_message(message)
-    keyboard = [
-        [InlineKeyboardButton('Add bot', callback_data='add_bot')],
-        [InlineKeyboardButton('My bots', callback_data='my_bots')],
-        [
-            InlineKeyboardButton('Settings', callback_data='settings'),
-            InlineKeyboardButton('Help', callback_data='help'),
-            InlineKeyboardButton('About', callback_data='about'),
-        ]
-    ]
-    markup = InlineKeyboardMarkup(keyboard)
 
-    sent_message = message.reply_text(
-        '***Dostuffbot*** is here!\nPlease select what you want to do.',
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=markup,
-    )
+    sent_message = message.reply_text(start_text, parse_mode=ParseMode.MARKDOWN, reply_markup=start_markup)
 
     user.update_dialog(bot, sent_message.message_id)
     message.delete()
 
 
 def start(bot, update):
-    """ The start was called with callback """
+    """ The start was called with inline keyboard """
     query = update.callback_query
-    keyboard = [
-        [InlineKeyboardButton('Add bot', callback_data='add_bot')],
-        [InlineKeyboardButton('My bots', callback_data='my_bots')],
-        [
-            InlineKeyboardButton('Settings', callback_data='settings'),
-            InlineKeyboardButton('Help', callback_data='help'),
-            InlineKeyboardButton('About', callback_data='about'),
-        ]
-    ]
-    markup = InlineKeyboardMarkup(keyboard)
 
     query.answer()
-    query.edit_message_text(
-        '***Dostuffbot*** is here!\nPlease select what you want to do.',
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=markup,
-    )
+    query.edit_message_text(start_text, parse_mode=ParseMode.MARKDOWN, reply_markup=start_markup)
 
 
 def add_bot(bot, update):
+    """ Add bot with inline keyboard """
     query = update.callback_query
-    keyboard = [[
-        InlineKeyboardButton('Cancel', callback_data='start'),
-    ]]
-    markup = InlineKeyboardMarkup(keyboard)
 
     query.answer()
-    query.edit_message_text(
-        'Send me please your bot token.\nYou can find it with @BotFather.',
-        reply_markup=markup,
-    )
+    query.edit_message_text(add_bot_text, reply_markup=cancel_start_markup,)
 
     return 1
 
 
 def token(bot, update):
+    """ Add bot with sent token """
     user = User.objects.get(id=update.message.from_user.id)
     token = update.message.text
 
@@ -90,6 +59,7 @@ def token(bot, update):
 
 
 def my_bots(bot, update):
+    """ Show my bots with inline keyboard """
     query = update.callback_query
     user = User.objects.get(id=query.from_user.id)
     bots = user.bot_set.all()
@@ -126,59 +96,24 @@ def my_bots(bot, update):
 
 
 def settings(bot, update):
+    """ Settings with inline keyboard """
     query = update.callback_query
-    user = User.objects.get(id=query.from_user.id)
 
-    keyboard = [[
-        InlineKeyboardButton('Edit Language', callback_data='edit_lang'),
-        InlineKeyboardButton('Back to menu', callback_data='start'),
-    ]]
-    markup = InlineKeyboardMarkup(keyboard)
+    user = User.objects.get(id=query.from_user.id)
     text = '***Language***: ' + user.lang
-    query.edit_message_text(text=text, reply_markup=markup, parse_mode=ParseMode.MARKDOWN)
+    query.edit_message_text(text=text, reply_markup=settings_markup, parse_mode=ParseMode.MARKDOWN)
 
 
 def help(bot, update):
+    """ Help section with inline keyboard """
     query = update.callback_query
-    keyboard = [[
-        InlineKeyboardButton('FAQs', callback_data='faq'),
-        InlineKeyboardButton('Back to menu', callback_data='start'),
-    ]]
-    markup = InlineKeyboardMarkup(keyboard)
-    text = (
-        'Help section:\n\n'
-        'I am a bot builder that can help you create your bots without any boring coding.\n'
-        'I try to customize every bot for their needs as much as possible.\n\n'
-        '***To start*** go to menu and add your first bot. Then follow the inctructions to manage it.\n\n'
-        'If you still have any question feel free to check out frequently asked questions (FAQs) '
-        'or contact us at @dostuffsupportbot.'
-    )
-    query.edit_message_text(text=text, reply_markup=markup, parse_mode=ParseMode.MARKDOWN)
+    query.edit_message_text(text=help_text, reply_markup=help_markup, parse_mode=ParseMode.MARKDOWN)
 
 
 def about(bot, update):
+    """ About section with inline keyboard """
     query = update.callback_query
-
-    smile_kb = InlineKeyboardButton('Smile to admin', callback_data='smile_admin')
-    if query.data == 'smile_admin':
-        smile_kb = InlineKeyboardButton('He responds with a smile 🙂', callback_data='smile_again')
-    elif query.data == 'smile_again':
-        smile_kb = InlineKeyboardButton('Don\'t embarrass him ☺️', callback_data='about')
-
-    keyboard = [
-        [InlineKeyboardButton('Donate', callback_data='donate'), smile_kb],
-        [InlineKeyboardButton('Back to menu', callback_data='start')],
-    ]
-    markup = InlineKeyboardMarkup(keyboard)
-    text = (
-        'About section:\n\n'
-        'I am bot who lives together with my creator @serhii_beznisko. '
-        'My creator is a typical student who likes to code and drink enormous cups of tea.\n\n'
-        'If you like me you can support my creator by donating a small amout of money. '
-        'He will pay servers and buy better computers so I can work even faster!\n\n'
-        'Feel free to contact him at @dostuffsupportbot.'
-    )
-    query.edit_message_text(text=text, reply_markup=markup)
+    query.edit_message_text(text=about_text, reply_markup=about_markup)
 
 
 def unknown(bot, update):
@@ -187,6 +122,7 @@ def unknown(bot, update):
 
 
 start_cmd_handler = CommandHandler('start', start_cmd)
+
 start_handler = CallbackQueryHandler(start, pattern='start')
 add_bot_handler = CallbackQueryHandler(add_bot, pattern='add_bot')
 my_bots_handler = CallbackQueryHandler(my_bots, pattern='my_bots')
@@ -195,5 +131,6 @@ help_handler = CallbackQueryHandler(help, pattern='help')
 about_handler = CallbackQueryHandler(about, pattern='about')
 smile_admin_handler = CallbackQueryHandler(about, pattern='smile_admin')
 smile_again_handler = CallbackQueryHandler(about, pattern='smile_again')
+
 token_handler = MessageHandler(Filters.regex(r'\d*:.*'), token)
 unknown_handler = MessageHandler(Filters.all, unknown)

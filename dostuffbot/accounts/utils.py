@@ -1,11 +1,4 @@
-# TODO: This is one time solution to work database models.
-import os
-from django.core.wsgi import get_wsgi_application
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-application = get_wsgi_application()
-
-
-from telegram import CallbackQuery, User
+from telegram import User as TelegramUser
 
 from accounts.models import User
 
@@ -28,7 +21,7 @@ def get_user_from_message(message):
 
 
 def get_telegram_user(user):
-    t_user = User(
+    t_user = TelegramUser(
         id=user.id,
         is_bot=user.is_bot,
         first_name=user.first_name,
