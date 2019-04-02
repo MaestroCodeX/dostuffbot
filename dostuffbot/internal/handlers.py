@@ -1,11 +1,10 @@
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Filters, CommandHandler, CallbackQueryHandler, MessageHandler
 
-from accounts.models import User
-from accounts.utils import get_user_from_message
-from bots.models import Bot
-from bots.keyboards import start_markup, cancel_start_markup, settings_markup, help_markup, about_markup
-from bots.texts import start_text, add_bot_text, help_text, about_text
+from internal.models import User, Bot
+from internal.utils import get_user_from_message
+from internal.keyboards import start_markup, cancel_start_markup, settings_markup, help_markup, about_markup
+from internal.texts import start_text, add_bot_text, help_text, about_text
 
 
 def start_cmd(bot, update):

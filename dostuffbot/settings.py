@@ -11,8 +11,8 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'accounts',
-    'bots',
+    'internal',
+    'external',
     'config',
 )
 
