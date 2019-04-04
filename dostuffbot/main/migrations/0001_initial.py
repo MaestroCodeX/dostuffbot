@@ -35,6 +35,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bot',
             name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bot_set', to='internal.User'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bot_set', to='main.User'),
         ),
     ]

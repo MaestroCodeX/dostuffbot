@@ -1,6 +1,6 @@
 from telegram import User as TelegramUser
 
-from internal.models import User
+from main.models import User
 
 
 def get_user_from_message(message):
