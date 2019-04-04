@@ -1,17 +1,19 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from main.utils import e
+
 
 start_kb = [
-    [InlineKeyboardButton('Add bot', callback_data='add_bot')],
-    [InlineKeyboardButton('My bots', callback_data='my_bots')],
+    [InlineKeyboardButton(e('Connect my bot :pushpin:'), callback_data='connect_bot')],
+    [InlineKeyboardButton(e('My bots :closed_book:'), callback_data='my_bots')],
     [
-        InlineKeyboardButton('Settings', callback_data='settings'),
-        InlineKeyboardButton('Help', callback_data='help'),
-        InlineKeyboardButton('About', callback_data='about'),
+        InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
+        InlineKeyboardButton(e('Help :question:'), callback_data='help'),
+        InlineKeyboardButton(e('About me :pencil2:'), callback_data='about'),
     ]
 ]
 cancel_start_kb = [[
-    InlineKeyboardButton('Cancel', callback_data='start'),
+    InlineKeyboardButton(e('Cancel :x:'), callback_data='start'),
 ]]
 settings_kb = [[
     InlineKeyboardButton('Edit Language', callback_data='edit_lang'),

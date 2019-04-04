@@ -13,7 +13,6 @@ DATABASES = {
 INSTALLED_APPS = (
     'config',
     'main',
-    'out',
 )
 
 SECRET_KEY = env.SECRET_KEY

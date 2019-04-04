@@ -20,9 +20,9 @@ def main():
     dp = updater.dispatcher
 
     # Add handlers
-    dp.add_handler(start.start_cmd_handler)
+    dp.add_handler(start.start_command_handler)
     dp.add_handler(start.start_handler)
-    dp.add_handler(connection.add_bot_handler)
+    dp.add_handler(connection.connect_bot_handler)
     dp.add_handler(connection.token_handler)
     dp.add_handler(management.my_bots_handler)
     dp.add_handler(settings.settings_handler)
