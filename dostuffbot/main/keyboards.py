@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from main.utils import e
+from main.utils import e, get_deeplink, call_bot
 
 
 start_kb = [
@@ -36,3 +36,19 @@ cancel_start_markup = InlineKeyboardMarkup(cancel_start_kb)
 settings_markup = InlineKeyboardMarkup(settings_kb)
 help_markup = InlineKeyboardMarkup(help_kb)
 about_markup = InlineKeyboardMarkup(about_kb)
+
+
+def get_profile_markup(bot):
+    profile_kb = [
+        [
+            InlineKeyboardButton('Manage commands', url=get_deeplink(bot.name, 'commands')),
+            InlineKeyboardButton('Notify bot users', url=get_deeplink(bot.name, 'notify')),
+        ],
+        [
+            InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),
+            InlineKeyboardButton('Delete bot', callback_data=call_bot(bot.id, 'delete')),
+        ],
+        [InlineKeyboardButton('Back to menu', callback_data='start')],
+    ]
+
+    return InlineKeyboardMarkup(profile_kb)
