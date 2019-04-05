@@ -13,8 +13,8 @@ start_text = add_header((
 connect_bot_text = e(add_header((
     'To connect your bot:\n\n'
     ':small_blue_diamond: Go to @BotFather.\n'
-    ':small_blue_diamond: Send /mybots and select the bot you want to connect with.\n'
-    ':small_blue_diamond: Click ***Token*** and copy the token\n'
+    ':small_blue_diamond: Send /addbot and set a name for it.\n'
+    ':small_blue_diamond: Copy a token you get if bot is created.\n'
     ':small_blue_diamond: Return to me and send it.\n\n'
     'Example of the token: ```987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM```'
 )))
