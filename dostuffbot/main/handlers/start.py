@@ -18,11 +18,22 @@ def start_command(bot, update):
 
 
 def start(bot, update):
-    ''' The start was called with inline keyboard '''
+    '''
+    The start was called with inline keyboard.
+    Delete old dialog message and send new one
+    so that chat with the bot gets to the top of all chats list.
+    '''
     query = update.callback_query
 
-    query.answer()
-    query.edit_message_text(start_text, parse_mode=ParseMode.MARKDOWN, reply_markup=start_markup)
+    chat_id = update.effective_user.id
+    bot.send_message(
+        chat_id=chat_id,
+        text=start_text,
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=start_markup,
+        disable_notification=True,
+    )
+    query.message.delete()
 
 
 start_command_handler = CommandHandler('start', start_command)
