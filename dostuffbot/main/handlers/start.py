@@ -3,6 +3,7 @@ from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from main.utils import get_user_from_message
 from main.keyboards import start_markup
+from main.models import User
 from main.texts import start_text
 
 
@@ -14,7 +15,7 @@ def start_command(bot, update):
     sent_message = message.reply_text(start_text, parse_mode=ParseMode.MARKDOWN, reply_markup=start_markup)
 
     user.update_dialog(bot, sent_message.message_id)
-    message.delete()
+    update.effective_message.delete()
 
 
 def start(bot, update):
@@ -25,14 +26,9 @@ def start(bot, update):
     '''
     query = update.callback_query
 
-    chat_id = update.effective_user.id
-    bot.send_message(
-        chat_id=chat_id,
-        text=start_text,
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=start_markup,
-        disable_notification=True,
-    )
+    sent_message = query.message.reply_text(start_text, parse_mode=ParseMode.MARKDOWN, reply_markup=start_markup)
+    user = User.objects.get(id=update.effective_user.id)
+    user.update_dialog(bot, sent_message.message_id)
     query.message.delete()
 
 

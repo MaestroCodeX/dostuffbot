@@ -1,9 +1,10 @@
-from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+import telegram
+from telegram import ParseMode
 from telegram.ext import Filters, CallbackQueryHandler, MessageHandler
 
 from main.models import User, Bot
-from main.keyboards import cancel_start_markup
-from main.texts import connect_bot_text
+from main.keyboards import cancel_start_markup, get_profile_markup
+from main.texts import connect_bot_text, token_invalid_text, succesfully_connected_text
 
 
 def connect_bot(bot, update):
@@ -17,20 +18,29 @@ def connect_bot(bot, update):
 
 
 def token(bot, update):
-    ''' Add bot with sent token '''
+    '''
+    Add bot with sent token
+    If token is invalid edit text with error
+    Otherwise save bot to database and return bot profile
+    '''
     user = User.objects.get(id=update.message.from_user.id)
     token = update.message.text
 
-    Bot.objects.create(owner=user, token=token, name='@Name')
+    telegram_bot = telegram.Bot(token)
+    try:
+        bot_user = telegram_bot.get_me()
+    except Exception:
+        text = token_invalid_text
+        markup = cancel_start_markup
+    else:
+        connected_bot = Bot.objects.create(owner=user, token=token, name=bot_user.username)
+        text = succesfully_connected_text
+        markup = get_profile_markup(connected_bot)
 
-    keyboard = [[
-        InlineKeyboardButton('Menu', callback_data='start'),
-    ]]
-    markup = InlineKeyboardMarkup(keyboard)
     bot.edit_message_text(
         chat_id=user.id,
         message_id=user.dialog_id,
-        text='Your bot was succesfully added to the system!',
+        text=text,
         reply_markup=markup,
     )
 

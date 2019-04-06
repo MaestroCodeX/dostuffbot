@@ -18,6 +18,12 @@ connect_bot_text = e(add_header((
     ':small_blue_diamond: Return to me and send it.\n\n'
     'Example of the token: ```987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM```'
 )))
+token_invalid_text = connect_bot_text + e(
+    '\n\nThe token is invalid :heavy_exclamation_mark:'
+)
+succesfully_connected_text = e(
+    'Your bot was succesfully added to the system :bear:'
+)
 help_text = add_header((
     'I am a bot builder that can help you create your bots without any boring coding.\n'
     'I try to customize every bot for their needs as much as possible.\n\n'
