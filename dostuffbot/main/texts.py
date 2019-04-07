@@ -38,3 +38,7 @@ ABOUT = add_header((
     'He will pay servers and buy better computers so I can work even faster!\n\n'
     'Feel free to contact him at @dostuffsupportbot.'
 ))
+DONATE = add_header(
+    'Your help is significant. Select an amount you want to donate or hit custom.'
+)
+def DONATE_CUSTOM(n): return f'{n}$'

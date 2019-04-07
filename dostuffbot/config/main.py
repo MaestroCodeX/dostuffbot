@@ -28,6 +28,11 @@ def main():
     dp.add_handler(settings.settings_handler)
     dp.add_handler(support.help_handler)
     dp.add_handler(support.about_handler)
+    dp.add_handler(support.donate_handler)
+    dp.add_handler(support.donate_custom_handler)
+    dp.add_handler(support.donate_add_handler)
+    dp.add_handler(support.donate_erase_handler)
+    dp.add_handler(support.donate_submit_handler)
     dp.add_handler(maintance.unknown_handler)
 
     # Log all errors

@@ -30,12 +30,42 @@ ABOUT_KB = [
     ],
     [InlineKeyboardButton('Back to menu', callback_data='start')],
 ]
+DONATE_KB = [
+    [
+        InlineKeyboardButton(f'{n}$', callback_data=f'donate_{n}')
+        for n in [1, 2, 5, 10, 50, 100]
+    ],
+    [
+        InlineKeyboardButton('Custom', callback_data='donate_custom'),
+        InlineKeyboardButton('Back to menu', callback_data='about'),
+    ],
+]
+DONATE_CUSTOM_KB = [
+    *[
+        [
+            InlineKeyboardButton(str(x*3+y+1), callback_data=f'donate_add__{x*3+y+1}')
+            for y in range(3)
+        ]
+        for x in range(3)
+    ],
+    [
+        InlineKeyboardButton(' ', callback_data=' '),
+        InlineKeyboardButton('0', callback_data='donate_add__0'),
+        InlineKeyboardButton('<', callback_data='donate_erase'),
+    ],
+    [
+        InlineKeyboardButton('Submit', callback_data='donate_submit'),
+        InlineKeyboardButton('Back', callback_data='donate'),
+    ],
+]
 
 START_M = InlineKeyboardMarkup(START_KB)
 CANCEL_START_M = InlineKeyboardMarkup(CANCEL_START_KB)
 SETTINGS_M = InlineKeyboardMarkup(SETTINGS_KB)
 HTLP_M = InlineKeyboardMarkup(HELP_KB)
 ABOUT_M = InlineKeyboardMarkup(ABOUT_KB)
+DONATE_M = InlineKeyboardMarkup(DONATE_KB)
+DONATE_CUSTOM_M = InlineKeyboardMarkup(DONATE_CUSTOM_KB)
 
 
 def profile_m(bot):
