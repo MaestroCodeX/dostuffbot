@@ -1,7 +1,6 @@
 from telegram.ext import CallbackQueryHandler
 
-from main.keyboards import get_profile_markup
-from main.texts import get_profile_text
+from main import texts, keyboards
 from main.utils import call_bot_regex, get_bot_from_call
 
 
@@ -11,8 +10,8 @@ def bot_profile(bot, update):
     bot = get_bot_from_call(query.data)
 
     query.edit_message_text(
-        text=get_profile_text(bot),
-        reply_markup=get_profile_markup(bot)
+        text=texts.PROFILE(bot),
+        reply_markup=keyboards.profile_m(bot)
     )
 
 

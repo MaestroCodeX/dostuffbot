@@ -3,7 +3,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from main.utils import e, get_deeplink, call_bot
 
 
-start_kb = [
+START_KB = [
     [InlineKeyboardButton(e('Connect my bot :pushpin:'), callback_data='connect_bot')],
     [InlineKeyboardButton(e('My bots :closed_book:'), callback_data='my_bots')],
     [
@@ -12,18 +12,18 @@ start_kb = [
         InlineKeyboardButton(e('About me :pencil2:'), callback_data='about'),
     ]
 ]
-cancel_start_kb = [[
+CANCEL_START_KB = [[
     InlineKeyboardButton(e('Cancel :x:'), callback_data='start'),
 ]]
-settings_kb = [[
+SETTINGS_KB = [[
     InlineKeyboardButton('Edit Language', callback_data='edit_lang'),
     InlineKeyboardButton('Back to menu', callback_data='start'),
 ]]
-help_kb = [[
+HELP_KB = [[
     InlineKeyboardButton('FAQs', callback_data='faq'),
     InlineKeyboardButton('Back to menu', callback_data='start'),
 ]]
-about_kb = [
+ABOUT_KB = [
     [
         InlineKeyboardButton('Donate', callback_data='donate'),
         InlineKeyboardButton('Contact me', url='https://t.me/dostuffsupportbot'),
@@ -31,14 +31,14 @@ about_kb = [
     [InlineKeyboardButton('Back to menu', callback_data='start')],
 ]
 
-start_markup = InlineKeyboardMarkup(start_kb)
-cancel_start_markup = InlineKeyboardMarkup(cancel_start_kb)
-settings_markup = InlineKeyboardMarkup(settings_kb)
-help_markup = InlineKeyboardMarkup(help_kb)
-about_markup = InlineKeyboardMarkup(about_kb)
+START_M = InlineKeyboardMarkup(START_KB)
+CANCEL_START_M = InlineKeyboardMarkup(CANCEL_START_KB)
+SETTINGS_M = InlineKeyboardMarkup(SETTINGS_KB)
+HTLP_M = InlineKeyboardMarkup(HELP_KB)
+ABOUT_M = InlineKeyboardMarkup(ABOUT_KB)
 
 
-def get_profile_markup(bot):
+def profile_m(bot):
     profile_kb = [
         [
             InlineKeyboardButton('Manage commands', url=get_deeplink(bot.name, 'commands')),

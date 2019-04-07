@@ -2,9 +2,8 @@ import telegram
 from telegram import ParseMode
 from telegram.ext import Filters, CallbackQueryHandler, MessageHandler
 
+from main import texts, keyboards
 from main.models import User, Bot
-from main.keyboards import cancel_start_markup, get_profile_markup
-from main.texts import connect_bot_text, token_invalid_text, succesfully_connected_text
 
 
 def connect_bot(bot, update):
@@ -12,7 +11,7 @@ def connect_bot(bot, update):
     query = update.callback_query
 
     query.answer()
-    query.edit_message_text(connect_bot_text, reply_markup=cancel_start_markup, parse_mode=ParseMode.MARKDOWN)
+    query.edit_message_text(texts.BOT_CONNECT, reply_markup=keyboards.CANCEL_START_M, parse_mode=ParseMode.MARKDOWN)
 
     return 1
 
@@ -30,12 +29,12 @@ def token(bot, update):
     try:
         bot_user = telegram_bot.get_me()
     except Exception:
-        text = token_invalid_text
-        markup = cancel_start_markup
+        text = texts.TOKEN_INVALID
+        markup = keyboards.CANCEL_START_M
     else:
         connected_bot = Bot.objects.create(owner=user, token=token, name=bot_user.username)
-        text = succesfully_connected_text
-        markup = get_profile_markup(connected_bot)
+        text = texts.BOT_CONNECTED
+        markup = keyboards.profile_m(connected_bot)
 
     bot.edit_message_text(
         chat_id=user.id,
