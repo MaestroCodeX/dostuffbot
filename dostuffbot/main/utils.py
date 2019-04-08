@@ -36,7 +36,7 @@ def get_telegram_user(user: User) -> TelegramUser:
     return t_user
 
 
-def get_deeplink(bot_name: str, parametr: str = None) -> str:
+def build_deeplink(bot_name: str, parametr: str = None) -> str:
     link = 'https://t.me/' + bot_name
     if parametr:
         link += '?start=' + parametr
@@ -44,7 +44,7 @@ def get_deeplink(bot_name: str, parametr: str = None) -> str:
 
 
 def call_bot(bot_id: int, command: str) -> str:
-    return BOT_CALL_PREFIX + bot_id + '__' + command
+    return BOT_CALL_PREFIX + str(bot_id) + '__' + command
 
 
 def call_bot_regex(command) -> str:

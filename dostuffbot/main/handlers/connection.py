@@ -32,7 +32,12 @@ def token(bot, update):
         text = texts.TOKEN_INVALID
         markup = keyboards.CANCEL_START_M
     else:
-        connected_bot = Bot.objects.create(owner=user, token=token, name=bot_user.username)
+        connected_bot = Bot.objects.create(
+            owner=user,
+            token=token,
+            name=bot_user.name,
+            username=bot_user.username,
+        )
         text = texts.BOT_CONNECTED
         markup = keyboards.profile_m(connected_bot)
 

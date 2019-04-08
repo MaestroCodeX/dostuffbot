@@ -25,6 +25,7 @@ def main():
     dp.add_handler(connection.connect_bot_handler)
     dp.add_handler(connection.token_handler)
     dp.add_handler(management.my_bots_handler)
+    dp.add_handler(management.bot_profile_handler)
     dp.add_handler(settings.settings_handler)
     dp.add_handler(support.help_handler)
     dp.add_handler(support.about_handler)

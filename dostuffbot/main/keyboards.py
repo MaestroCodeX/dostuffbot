@@ -1,10 +1,12 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from main.utils import e, get_deeplink, call_bot
+from main.utils import e, build_deeplink, call_bot
 
+BACK_TO_MENU_BTN = InlineKeyboardButton('« Back to menu', callback_data='start')
+CONNECT_BOT_BTN = InlineKeyboardButton(e('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
 
 START_KB = [
-    [InlineKeyboardButton(e('Connect my bot :pushpin:'), callback_data='connect_bot')],
+    [CONNECT_BOT_BTN],
     [InlineKeyboardButton(e('My bots :closed_book:'), callback_data='my_bots')],
     [
         InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
@@ -17,18 +19,18 @@ CANCEL_START_KB = [[
 ]]
 SETTINGS_KB = [[
     InlineKeyboardButton('Edit Language', callback_data='edit_lang'),
-    InlineKeyboardButton('Back to menu', callback_data='start'),
+    BACK_TO_MENU_BTN,
 ]]
 HELP_KB = [[
     InlineKeyboardButton('FAQs', callback_data='faq'),
-    InlineKeyboardButton('Back to menu', callback_data='start'),
+    BACK_TO_MENU_BTN,
 ]]
 ABOUT_KB = [
     [
         InlineKeyboardButton('Donate', callback_data='donate'),
         InlineKeyboardButton('Contact me', url='https://t.me/dostuffsupportbot'),
     ],
-    [InlineKeyboardButton('Back to menu', callback_data='start')],
+    [BACK_TO_MENU_BTN],
 ]
 DONATE_KB = [
     [
@@ -37,7 +39,7 @@ DONATE_KB = [
     ],
     [
         InlineKeyboardButton('Custom', callback_data='donate_custom'),
-        InlineKeyboardButton('Back to menu', callback_data='about'),
+        InlineKeyboardButton('« Back to about', callback_data='about'),
     ],
 ]
 DONATE_CUSTOM_KB = [
@@ -55,9 +57,12 @@ DONATE_CUSTOM_KB = [
     ],
     [
         InlineKeyboardButton('Submit', callback_data='donate_submit'),
-        InlineKeyboardButton('Back', callback_data='donate'),
+        InlineKeyboardButton('« Back', callback_data='donate'),
     ],
 ]
+CONNECT_BOT_KB = [[
+    CONNECT_BOT_BTN, BACK_TO_MENU_BTN,
+]]
 
 START_M = InlineKeyboardMarkup(START_KB)
 CANCEL_START_M = InlineKeyboardMarkup(CANCEL_START_KB)
@@ -66,19 +71,46 @@ HTLP_M = InlineKeyboardMarkup(HELP_KB)
 ABOUT_M = InlineKeyboardMarkup(ABOUT_KB)
 DONATE_M = InlineKeyboardMarkup(DONATE_KB)
 DONATE_CUSTOM_M = InlineKeyboardMarkup(DONATE_CUSTOM_KB)
+CONNECT_BOT_M = InlineKeyboardMarkup(CONNECT_BOT_KB)
 
 
-def profile_m(bot):
-    profile_kb = [
+def bot_profile_m(bot):
+    keyboard = [
         [
-            InlineKeyboardButton('Manage commands', url=get_deeplink(bot.name, 'commands')),
-            InlineKeyboardButton('Notify bot users', url=get_deeplink(bot.name, 'notify')),
+            InlineKeyboardButton('Manage commands', url=build_deeplink(bot.username, 'commands')),
+            InlineKeyboardButton('Notify bot users', url=build_deeplink(bot.username, 'notify')),
         ],
         [
             InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),
             InlineKeyboardButton('Delete bot', callback_data=call_bot(bot.id, 'delete')),
         ],
-        [InlineKeyboardButton('Back to menu', callback_data='start')],
+        [InlineKeyboardButton('« Back to bots list', callback_data='my_bots')],
     ]
 
-    return InlineKeyboardMarkup(profile_kb)
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_bot_button(bot):
+    return InlineKeyboardButton(bot.full_username, callback_data=call_bot(bot.id, 'profile'))
+
+
+def my_bots_m(bots):
+    keyboard = []
+    iter_bots = iter(bots)
+
+    keyboard = [
+        [
+            get_bot_button(right),
+            get_bot_button(left),
+        ]
+        for left, right in zip(iter_bots, iter_bots)
+    ]
+
+    # Add last bot, if the number of bots is odd
+    if bots.count() % 2 == 1:
+        keyboard.append(
+            [get_bot_button(bots.last())]
+        )
+
+    keyboard.append([BACK_TO_MENU_BTN])
+    return InlineKeyboardMarkup(keyboard)

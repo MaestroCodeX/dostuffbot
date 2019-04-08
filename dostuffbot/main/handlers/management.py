@@ -1,44 +1,40 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ParseMode
 from telegram.ext import CallbackQueryHandler
 
+from main import texts, keyboards
 from main.models import User
+from main.utils import call_bot_regex, get_bot_from_call
 
 
 def my_bots(bot, update):
-    ''' Show my bots with inline keyboard '''
+    ''' Show user bots list with inline keyboard '''
     query = update.callback_query
     user = User.objects.get(id=query.from_user.id)
     bots = user.bot_set.all()
 
-    keyboard = []
-    iter_bots = iter(bots)
-    for left, right in zip(iter_bots, iter_bots):
-        row = [
-            InlineKeyboardButton(left.name, callback_data='bot_detail' + str(left.id)),
-            InlineKeyboardButton(right.name, callback_data='bot_detail' + str(right.id)),
-        ]
-        keyboard.append(row)
+    if bots.count():
+        text = texts.CHOOSE_BOT
+        markup = keyboards.my_bots_m(bots)
+    else:
+        text = texts.NO_BOTS
+        markup = keyboards.CONNECT_BOT_M
 
-    if bots.count() % 2 == 1:
-        # Add last bot, if the count is odd
-        last = bots.last()
-        row = [
-            InlineKeyboardButton(last.name, callback_data='bot_detail' + str(last.id)),
-        ]
-        keyboard.append(row)
-
-    text = 'Choose a bot from list:'
-    if not bots.count():
-        text = 'You don\'t have bots yet.'
-        add_bot_kb = [InlineKeyboardButton('Add bot', callback_data='add_bot')]
-        keyboard.append(add_bot_kb)
-
-    cancel_kb = [InlineKeyboardButton('Cancel', callback_data='start')]
-    keyboard.append(cancel_kb)
-
-    markup = InlineKeyboardMarkup(keyboard)
     query.answer()
     query.edit_message_text(text=text, reply_markup=markup)
 
 
+def bot_profile(bot, update):
+    ''' Show bot profile '''
+    query = update.callback_query
+
+    bot = get_bot_from_call(query.data)
+
+    query.edit_message_text(
+        text=texts.BOT_PROFILE(bot.name),
+        reply_markup=keyboards.bot_profile_m(bot),
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+
 my_bots_handler = CallbackQueryHandler(my_bots, pattern='my_bots')
+bot_profile_handler = CallbackQueryHandler(bot_profile, pattern=call_bot_regex('profile'))

@@ -41,4 +41,11 @@ ABOUT = add_header((
 DONATE = add_header(
     'Your help is significant. Select an amount you want to donate or hit custom.'
 )
+CHOOSE_BOT = add_header('Choose a bot from the list below:')
+NO_BOTS = add_header('You haven\'t connect any bots yet.')
 def DONATE_CUSTOM(n): return f'{n}$'
+def BOT_PROFILE(username):
+    return (
+        '***Bot Name***: ' + username + '\n\n'
+        'Select what you want to do:'
+    )
