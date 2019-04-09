@@ -3,9 +3,10 @@ from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from main import texts, keyboards
 from main.models import User
-from main.utils import get_user_from_message
+from main.utils import get_user_from_message, log_exception
 
 
+@log_exception
 def start_command(bot, update):
     ''' The start was called with /start '''
     message = update.message

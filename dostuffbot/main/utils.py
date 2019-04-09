@@ -1,5 +1,6 @@
 import re
 import emoji
+import logging
 
 from telegram import User as TelegramUser, Message
 
@@ -63,3 +64,13 @@ def get_bot_from_call(call: str) -> Bot:
         raise ValueError('Could not found bot with given ID from call.')
 
     return bot
+
+
+def log_exception(func):
+    def func_wrapper(bot, update):
+        try:
+            return func(bot, update)
+        except Exception as e:
+            logging.error(e)
+
+    return func_wrapper
