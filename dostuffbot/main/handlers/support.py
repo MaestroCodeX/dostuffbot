@@ -50,14 +50,28 @@ def donate_submit(bot, update):
     ''' Handle submit button on the custom donate amount keyboard. '''
     query = update.callback_query
     chat_id = query.message.chat_id
+    price = int(query.message.text[:-1])
+    print(price)
 
+    send_invoice(bot, chat_id, price)
+
+
+def donate_predefined(bot, update):
+    query = update.callback_query
+    chat_id = query.message.chat_id
+    price = int(query.data.split('__')[1])
+
+    send_invoice(bot, chat_id, price)
+
+
+def send_invoice(bot, chat_id, price):
     title = 'Payment Invoice'
-    description = 'Payment invoice to support Dostuff Bot.'
+    description = 'Support Dostuffbot 🤖.'
     payload = 'Support-Donate'
     provider_token = env.PAYMENT_TOKEN
     start_parameter = 'support-payment'
     currency = 'USD'
-    price = int(query.message.text[:-1])
+
     # price * 100 so as to include 2 d.p.
     prices = [LabeledPrice('Support', price * 100)]
 
@@ -73,3 +87,4 @@ donate_custom_handler = CallbackQueryHandler(donate_custom, pattern='donate_cust
 donate_add_handler = CallbackQueryHandler(donate_add, pattern=r'donate_add__\d?')
 donate_erase_handler = CallbackQueryHandler(donate_erase, pattern=r'donate_erase')
 donate_submit_handler = CallbackQueryHandler(donate_submit, pattern=r'donate_submit')
+donate_predefined_handler = CallbackQueryHandler(donate_predefined, pattern=r'^donate__\d*$')

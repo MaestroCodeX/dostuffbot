@@ -16,7 +16,7 @@ BOT_CONNECT = e(add_header((
     ':small_blue_diamond: Send /addbot and set a name for it.\n'
     ':small_blue_diamond: Copy a token you get if bot is created.\n'
     ':small_blue_diamond: Return to me and send it.\n\n'
-    'Example of the token: ```987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM```'
+    'Example of the token: `987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM`'
 )))
 TOKEN_INVALID = BOT_CONNECT + e(
     '\n\nThe token is invalid :heavy_exclamation_mark:'
@@ -43,7 +43,11 @@ DONATE = add_header(
 )
 CHOOSE_BOT = add_header('Choose a bot from the list below:')
 NO_BOTS = add_header('You haven\'t connect any bots yet.')
+BOT_DELETED = 'Bot got forgotten forever.'
+
+
 def DONATE_CUSTOM(n): return f'{n}$'
+def DELETE_BOT(bot): return f'You are about to delete your bot ***I{bot.name}*** {bot.full_username}. Is that correct?'
 def BOT_PROFILE(username):
     return (
         '***Bot Name***: ' + username + '\n\n'

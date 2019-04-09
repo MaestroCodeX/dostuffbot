@@ -36,5 +36,27 @@ def bot_profile(bot, update):
     )
 
 
+def delete_bot(bot, update):
+    query = update.callback_query
+
+    bot = get_bot_from_call(query.data)
+    text = texts.DELETE_BOT(bot)
+    markup = keyboards.confirm_deletion_markup(bot)
+
+    query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
+
+
+def delete_bot_confirm(bot, update):
+    query = update.callback_query
+
+    bot = get_bot_from_call(query.data)
+    bot.delete()
+
+    query.answer(texts.BOT_DELETED)
+    my_bots(bot, update)
+
+
 my_bots_handler = CallbackQueryHandler(my_bots, pattern='my_bots')
 bot_profile_handler = CallbackQueryHandler(bot_profile, pattern=call_bot_regex('profile'))
+delete_bot_handler = CallbackQueryHandler(delete_bot, pattern=call_bot_regex('delete'))
+delete_bot_confirm_handler = CallbackQueryHandler(delete_bot_confirm, pattern=call_bot_regex('delete_confirm'))

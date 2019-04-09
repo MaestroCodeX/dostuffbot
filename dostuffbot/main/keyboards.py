@@ -1,3 +1,5 @@
+import random
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from main.utils import e, build_deeplink, call_bot
@@ -34,7 +36,7 @@ ABOUT_KB = [
 ]
 DONATE_KB = [
     [
-        InlineKeyboardButton(f'{n}$', callback_data=f'donate_{n}')
+        InlineKeyboardButton(f'{n}$', callback_data=f'donate__{n}')
         for n in [1, 2, 5, 10, 50, 100]
     ],
     [
@@ -113,4 +115,17 @@ def my_bots_m(bots):
         )
 
     keyboard.append([BACK_TO_MENU_BTN])
+    return InlineKeyboardMarkup(keyboard)
+
+
+def confirm_deletion_markup(bot):
+    keyboard = [
+        [InlineKeyboardButton('No', callback_data=call_bot(bot.id, 'profile'))],
+        [InlineKeyboardButton('Nope, nevermind', callback_data=call_bot(bot.id, 'profile'))],
+        [InlineKeyboardButton('Yes, delete the bot', callback_data=call_bot(bot.id, 'delete_confirm'))],
+    ]
+    random.shuffle(keyboard)
+    back_to_bot_btn = InlineKeyboardButton('« Back to bots list', callback_data=call_bot(bot.id, 'profile'))
+    keyboard.append([back_to_bot_btn])
+
     return InlineKeyboardMarkup(keyboard)

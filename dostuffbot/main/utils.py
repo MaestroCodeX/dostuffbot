@@ -48,7 +48,7 @@ def call_bot(bot_id: int, command: str) -> str:
 
 
 def call_bot_regex(command) -> str:
-    return BOT_CALL_PREFIX + r'\d*__' + command
+    return '^' + BOT_CALL_PREFIX + r'\d*__' + command + '$'
 
 
 def get_bot_from_call(call: str) -> Bot:
