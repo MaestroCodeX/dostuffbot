@@ -24,7 +24,11 @@ def token(bot, update):
     user = User.objects.get(id=update.effective_user.id)
     token = update.message.text
 
-    bot.send_chat_action(chat_id=user.id, action='typing', timeout=2)
+    bot.edit_message_text(
+        chat_id=user.id,
+        message_id=user.dialog_id,
+        text=texts.SEARCHING_BOT,
+    )
 
     telegram_bot = telegram.Bot(token)
     try:
@@ -50,13 +54,14 @@ def token(bot, update):
         markup = keyboards.bot_profile_m(connected_bot)
 
     try:
-        bot.edit_message_text(
+        sent_message = bot.send_message(
             chat_id=user.id,
             message_id=user.dialog_id,
             text=text,
             reply_markup=markup,
             parse_mode='MARKDOWN'
         )
+        user.update_dialog(bot, sent_message.message_id)
     except Exception:
         pass
 

@@ -6,4 +6,8 @@ def unknown(bot, update):
     update.message.delete()
 
 
+def idle(bot, update):
+    pass
+
+
 unknown_handler = MessageHandler(Filters.all, unknown)

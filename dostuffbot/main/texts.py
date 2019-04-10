@@ -44,6 +44,7 @@ DONATE = add_header(
 CHOOSE_BOT = add_header('Choose a bot from the list below:')
 NO_BOTS = add_header('You haven\'t connect any bots yet.')
 BOT_DELETED = 'Bot got forgotten forever.'
+SEARCHING_BOT = add_header('Searching your bot...')
 
 
 def DONATE_CUSTOM(n): return f'{n}$'
