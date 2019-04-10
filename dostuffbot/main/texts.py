@@ -5,7 +5,7 @@ def add_header(text):
     return HEADER + text
 
 
-HEADER = 'Do stuff bot 🤖\n\n'
+HEADER = 'Dostuff bot 🤖\n\n'
 START = add_header((
     '***Dostuffbot*** is created to help you build your own bots without any coding.'
     'It\'s simple and absolutely free for use.'
@@ -22,7 +22,7 @@ TOKEN_INVALID = BOT_CONNECT + e(
     '\n\nThe token is invalid :heavy_exclamation_mark:'
 )
 BOT_CONNECTED = e(
-    'Your bot was succesfully added to the system :bear:'
+    'Your bot was succesfully added to the system :bear:\n\n'
 )
 HELP = add_header((
     'I am a bot builder that can help you create your bots without any boring coding.\n'

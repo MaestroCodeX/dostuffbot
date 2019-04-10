@@ -23,7 +23,6 @@ def main():
     dp.add_handler(start.start_command_handler)
     dp.add_handler(start.start_handler)
     dp.add_handler(connection.connect_bot_handler)
-    dp.add_handler(connection.token_handler)
     dp.add_handler(management.my_bots_handler)
     dp.add_handler(management.bot_profile_handler)
     dp.add_handler(management.delete_bot_handler)

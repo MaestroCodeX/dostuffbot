@@ -1,4 +1,3 @@
-from telegram import ParseMode
 from telegram.ext import CallbackQueryHandler
 
 from main import texts, keyboards
@@ -32,7 +31,7 @@ def bot_profile(bot, update):
     query.edit_message_text(
         text=texts.BOT_PROFILE(bot.name),
         reply_markup=keyboards.bot_profile_m(bot),
-        parse_mode=ParseMode.MARKDOWN,
+        parse_mode='MARKDOWN',
     )
 
 

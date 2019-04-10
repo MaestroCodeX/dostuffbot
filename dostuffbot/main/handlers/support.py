@@ -1,4 +1,4 @@
-from telegram import ParseMode, LabeledPrice
+from telegram import LabeledPrice
 from telegram.ext import CallbackQueryHandler
 
 import env
@@ -8,7 +8,7 @@ from main import texts, keyboards
 def help(bot, update):
     ''' Help section handler method called with inline keyboard '''
     query = update.callback_query
-    query.edit_message_text(text=texts.HELP, reply_markup=keyboards.HELP_M, parse_mode=ParseMode.MARKDOWN)
+    query.edit_message_text(text=texts.HELP, reply_markup=keyboards.HELP_M, parse_mode='MARKDOWN')
 
 
 def about(bot, update):
@@ -50,21 +50,22 @@ def donate_submit(bot, update):
     ''' Handle submit button on the custom donate amount keyboard. '''
     query = update.callback_query
     chat_id = query.message.chat_id
-    price = int(query.message.text[:-1])
-    print(price)
+    amount = int(query.message.text[:-1])
 
-    send_invoice(bot, chat_id, price)
+    send_invoice(bot, chat_id, amount)
 
 
 def donate_predefined(bot, update):
+    ''' Handle predefined amount button and send a payment invoice. '''
     query = update.callback_query
     chat_id = query.message.chat_id
-    price = int(query.data.split('__')[1])
+    amount = int(query.data.split('__')[1])
 
-    send_invoice(bot, chat_id, price)
+    send_invoice(bot, chat_id, amount)
 
 
-def send_invoice(bot, chat_id, price):
+def send_invoice(bot, chat_id, amount):
+    ''' Send invoice with the given amount to the given chat. '''
     title = 'Payment Invoice'
     description = 'Support Dostuffbot 🤖.'
     payload = 'Support-Donate'
@@ -73,7 +74,7 @@ def send_invoice(bot, chat_id, price):
     currency = 'USD'
 
     # price * 100 so as to include 2 d.p.
-    prices = [LabeledPrice('Support', price * 100)]
+    prices = [LabeledPrice('Support', amount * 100)]
 
     bot.send_invoice(
         chat_id, title, description, payload, provider_token, start_parameter, currency, prices
