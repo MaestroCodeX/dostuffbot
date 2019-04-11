@@ -5,6 +5,22 @@ def add_header(text):
     return HEADER + text
 
 
+def donate_custom(n):
+    return f'{n}$'
+
+
+def delete_bot(bot):
+    return f'You are about to delete your bot ***I{bot.name}*** {bot.full_username}. Is that correct?'
+
+
+def bot_profile(username):
+    return f'***Bot Name***: {username}\n\nSelect what you want to do:'
+
+
+def faq_id(faq):
+    return add_header(f'***{faq.question}***\n\n{faq.answer}\n\nWas it helpful?')
+
+
 HEADER = 'Dostuff bot 🤖\n\n'
 START = add_header((
     '***Dostuffbot*** is created to help you build your own bots without any coding.'
@@ -49,18 +65,3 @@ FAQ = add_header((
     'Here are the most common issues.\n\n'
     '***Not what you\'re looking for?*** Try asking the `Help Community`'
 ))
-
-
-def DONATE_CUSTOM(n): return f'{n}$'
-def DELETE_BOT(bot): return f'You are about to delete your bot ***I{bot.name}*** {bot.full_username}. Is that correct?'
-def BOT_PROFILE(username):
-    return (
-        '***Bot Name***: ' + username + '\n\n'
-        'Select what you want to do:'
-    )
-def FAQ_ID(faq):
-    return add_header((
-        f'***{faq.question}***\n\n'
-        f'{faq.answer}\n\n'
-        'Was it helpful?'
-    ))

@@ -50,7 +50,7 @@ def token(bot, update):
                 name=bot_user.name,
                 username=bot_user.username,
             )
-        text = texts.BOT_CONNECTED + texts.BOT_PROFILE(connected_bot.name)
+        text = texts.BOT_CONNECTED + texts.bot_profile(connected_bot.name)
         markup = keyboards.bot_profile_m(connected_bot)
 
     try:

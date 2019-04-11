@@ -36,7 +36,7 @@ def faq_by_id(bot, update):
     query = update.callback_query
     faq_id = query.data.split('__')[1]
     faq = Faq.objects.get(id=faq_id)
-    query.edit_message_text(text=texts.FAQ_ID(faq), reply_markup=keyboards.faq_id_markup(faq), parse_mode='MARKDOWN')
+    query.edit_message_text(text=texts.faq_id(faq), reply_markup=keyboards.faq_id_markup(faq), parse_mode='MARKDOWN')
 
 
 def donate(bot, update):
@@ -48,7 +48,7 @@ def donate(bot, update):
 def donate_custom(bot, update):
     ''' Donate with custome amount section handler method called with inline keyboard '''
     query = update.callback_query
-    query.edit_message_text(text=texts.DONATE_CUSTOM(0), reply_markup=keyboards.DONATE_CUSTOM_M)
+    query.edit_message_text(text=texts.donate_custom(0), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
 def donate_add(bot, update):
@@ -57,7 +57,7 @@ def donate_add(bot, update):
     current_amount = int(query.message.text[:-1])
     add_number = int(query.data.split('__')[1])
     new_amount = current_amount * 10 + add_number
-    query.edit_message_text(text=texts.DONATE_CUSTOM(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
+    query.edit_message_text(text=texts.donate_custom(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
 def donate_erase(bot, update):
@@ -65,7 +65,7 @@ def donate_erase(bot, update):
     query = update.callback_query
     current_amount = int(query.message.text[:-1])
     new_amount = current_amount // 10
-    query.edit_message_text(text=texts.DONATE_CUSTOM(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
+    query.edit_message_text(text=texts.donate_custom(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
 def donate_submit(bot, update):

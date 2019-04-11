@@ -29,7 +29,7 @@ def bot_profile(bot, update):
     bot = get_bot_from_call(query.data)
 
     query.edit_message_text(
-        text=texts.BOT_PROFILE(bot.name),
+        text=texts.bot_profile(bot.name),
         reply_markup=keyboards.bot_profile_m(bot),
         parse_mode='MARKDOWN',
     )
@@ -39,7 +39,7 @@ def delete_bot(bot, update):
     query = update.callback_query
 
     bot = get_bot_from_call(query.data)
-    text = texts.DELETE_BOT(bot)
+    text = texts.delete_bot(bot)
     markup = keyboards.confirm_deletion_markup(bot)
 
     query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')

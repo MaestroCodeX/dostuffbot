@@ -149,7 +149,10 @@ def confirm_deletion_markup(bot):
 def faq_keyboard_markup():
     issues_queryset = Faq.objects.all()
     issues_keyboard = [
-        [InlineKeyboardButton(e(f':grey_question: {issue.question} :grey_question:'), callback_data='faq__' + str(issue.id))]
+        [InlineKeyboardButton(
+            e(f':grey_question: {issue.question} :grey_question:'),
+            callback_data='faq__' + str(issue.id)
+        )]
         for issue in issues_queryset
     ]
     keyboard = [
