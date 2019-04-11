@@ -2,10 +2,18 @@ import random
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from main.models import Faq
 from main.utils import e, build_deeplink, call_bot
 
-BACK_TO_MENU_BTN = InlineKeyboardButton('« Back to menu', callback_data='start')
+
+def back(section, callback_data=None):
+    return InlineKeyboardButton(f'« Back to {section}', callback_data=callback_data or section)
+
+
+BACK_TO_MENU_BTN = back('menu', 'start')
 CONNECT_BOT_BTN = InlineKeyboardButton(e('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
+CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/dostuffsupportbot')
+
 
 START_KB = [
     [CONNECT_BOT_BTN],
@@ -30,7 +38,7 @@ HELP_KB = [[
 ABOUT_KB = [
     [
         InlineKeyboardButton('Donate', callback_data='donate'),
-        InlineKeyboardButton('Contact me', url='https://t.me/dostuffsupportbot'),
+        CONTACT_ME_BTN,
     ],
     [BACK_TO_MENU_BTN],
 ]
@@ -41,7 +49,7 @@ DONATE_KB = [
     ],
     [
         InlineKeyboardButton('Custom', callback_data='donate_custom'),
-        InlineKeyboardButton('« Back to about', callback_data='about'),
+        back('about'),
     ],
 ]
 DONATE_CUSTOM_KB = [
@@ -59,17 +67,24 @@ DONATE_CUSTOM_KB = [
     ],
     [
         InlineKeyboardButton('Submit', callback_data='donate_submit'),
-        InlineKeyboardButton('« Back', callback_data='donate'),
+        back('donate'),
     ],
 ]
 CONNECT_BOT_KB = [[
     CONNECT_BOT_BTN, BACK_TO_MENU_BTN,
 ]]
+FAQ_ID_KB = [
+    [
+        InlineKeyboardButton(':thumbsup:', callback_data=' '),
+        InlineKeyboardButton(':thumbsdown:', callback_data='faq_rate_up__'),
+        InlineKeyboardButton('<', callback_data='donate_erase'),
+    ]
+]
 
 START_M = InlineKeyboardMarkup(START_KB)
 CANCEL_START_M = InlineKeyboardMarkup(CANCEL_START_KB)
 SETTINGS_M = InlineKeyboardMarkup(SETTINGS_KB)
-HTLP_M = InlineKeyboardMarkup(HELP_KB)
+HELP_M = InlineKeyboardMarkup(HELP_KB)
 ABOUT_M = InlineKeyboardMarkup(ABOUT_KB)
 DONATE_M = InlineKeyboardMarkup(DONATE_KB)
 DONATE_CUSTOM_M = InlineKeyboardMarkup(DONATE_CUSTOM_KB)
@@ -86,7 +101,7 @@ def bot_profile_m(bot):
             InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),
             InlineKeyboardButton('Delete bot', callback_data=call_bot(bot.id, 'delete')),
         ],
-        [InlineKeyboardButton('« Back to bots list', callback_data='my_bots')],
+        [back('bots list', 'my_bots')],
     ]
 
     return InlineKeyboardMarkup(keyboard)
@@ -128,4 +143,30 @@ def confirm_deletion_markup(bot):
     back_to_bot_btn = InlineKeyboardButton('« Back to bots list', callback_data=call_bot(bot.id, 'profile'))
     keyboard.append([back_to_bot_btn])
 
+    return InlineKeyboardMarkup(keyboard)
+
+
+def faq_keyboard_markup():
+    issues_queryset = Faq.objects.all()
+    issues_keyboard = [
+        [InlineKeyboardButton(e(f':grey_question: {issue.question} :grey_question:'), callback_data='faq__' + str(issue.id))]
+        for issue in issues_queryset
+    ]
+    keyboard = [
+        *issues_keyboard,
+        [CONTACT_ME_BTN],
+        [back('help')],
+    ]
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+def faq_id_markup(faq):
+    keyboard = [
+        [
+            InlineKeyboardButton(e(':thumbsup:'), callback_data='faq_rate_up__' + str(faq.id)),
+            InlineKeyboardButton(e(':thumbsdown:'), callback_data='faq_rate_down__' + str(faq.id)),
+        ],
+        [back('FAQs list', 'faq')]
+    ]
     return InlineKeyboardMarkup(keyboard)

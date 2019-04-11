@@ -45,6 +45,10 @@ CHOOSE_BOT = add_header('Choose a bot from the list below:')
 NO_BOTS = add_header('You haven\'t connect any bots yet.')
 BOT_DELETED = 'Bot got forgotten forever.'
 SEARCHING_BOT = add_header('Searching your bot...')
+FAQ = add_header((
+    'Here are the most common issues.\n\n'
+    '***Not what you\'re looking for?*** Try asking the `Help Community`'
+))
 
 
 def DONATE_CUSTOM(n): return f'{n}$'
@@ -54,3 +58,9 @@ def BOT_PROFILE(username):
         '***Bot Name***: ' + username + '\n\n'
         'Select what you want to do:'
     )
+def FAQ_ID(faq):
+    return add_header((
+        f'***{faq.question}***\n\n'
+        f'{faq.answer}\n\n'
+        'Was it helpful?'
+    ))

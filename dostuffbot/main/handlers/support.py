@@ -3,6 +3,7 @@ from telegram.ext import CallbackQueryHandler
 
 import env
 from main import texts, keyboards
+from main.models import Faq
 
 
 def help(bot, update):
@@ -15,6 +16,27 @@ def about(bot, update):
     ''' About section handler method called with inline keyboard '''
     query = update.callback_query
     query.edit_message_text(text=texts.ABOUT, reply_markup=keyboards.ABOUT_M)
+
+
+def faq(bot, update):
+    ''' FAQs section handler method called with inline keyboard '''
+    query = update.callback_query
+    query.edit_message_text(
+        text=texts.FAQ,
+        reply_markup=keyboards.faq_keyboard_markup(),
+        parse_mode='MARKDOWN',
+    )
+
+
+def faq_by_id(bot, update):
+    '''
+    Handler selected faq with inline keyboard.
+    Send full question, answer and propose to rate the issue.
+    '''
+    query = update.callback_query
+    faq_id = query.data.split('__')[1]
+    faq = Faq.objects.get(id=faq_id)
+    query.edit_message_text(text=texts.FAQ_ID(faq), reply_markup=keyboards.faq_id_markup(faq), parse_mode='MARKDOWN')
 
 
 def donate(bot, update):
@@ -83,6 +105,8 @@ def send_invoice(bot, chat_id, amount):
 
 help_handler = CallbackQueryHandler(help, pattern='help')
 about_handler = CallbackQueryHandler(about, pattern='about')
+faq_handler = CallbackQueryHandler(faq, pattern='^faq$')
+faq_by_id_handler = CallbackQueryHandler(faq_by_id, pattern=r'^faq__\d*$')
 donate_handler = CallbackQueryHandler(donate, pattern='^donate$')
 donate_custom_handler = CallbackQueryHandler(donate_custom, pattern='donate_custom')
 donate_add_handler = CallbackQueryHandler(donate_add, pattern=r'donate_add__\d?')
