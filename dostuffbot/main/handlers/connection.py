@@ -51,7 +51,7 @@ def token(bot, update):
                 username=bot_user.username,
             )
         text = texts.BOT_CONNECTED + texts.bot_profile(connected_bot.name)
-        markup = keyboards.bot_profile_m(connected_bot)
+        markup = keyboards.bot_profile_markup(connected_bot)
 
     try:
         sent_message = bot.send_message(

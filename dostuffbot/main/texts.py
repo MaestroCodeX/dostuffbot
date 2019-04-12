@@ -22,6 +22,10 @@ def faq_id(faq):
     return add_header(e(f'***{faq.question}***\n\n{faq.answer}\n\n:thumbsup: ({rates_count})\nWas it helpful?'))
 
 
+def bot_settings(bot):
+    return 'Settings.'
+
+
 HEADER = 'Dostuffbot 🤖\n\n'
 START = add_header((
     '***Dostuffbot*** is created to help you build your own bots without any coding. '

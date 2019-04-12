@@ -93,7 +93,7 @@ DONATE_CUSTOM_M = InlineKeyboardMarkup(DONATE_CUSTOM_KB)
 CONNECT_BOT_M = InlineKeyboardMarkup(CONNECT_BOT_KB)
 
 
-def bot_profile_m(bot):
+def bot_profile_markup(bot):
     keyboard = [
         [
             InlineKeyboardButton('Manage commands', url=build_deeplink(bot.username, 'commands')),
@@ -113,7 +113,7 @@ def get_bot_button(bot):
     return InlineKeyboardButton(bot.full_username, callback_data=call_bot(bot.id, 'profile'))
 
 
-def my_bots_m(bots):
+def my_bots_markup(bots):
     keyboard = []
     iter_bots = iter(bots)
 
@@ -142,7 +142,7 @@ def confirm_deletion_markup(bot):
         [InlineKeyboardButton('Yes, delete the bot', callback_data=call_bot(bot.id, 'delete_confirm'))],
     ]
     random.shuffle(keyboard)
-    back_to_bot_btn = InlineKeyboardButton('« Back to bots list', callback_data=call_bot(bot.id, 'profile'))
+    back_to_bot_btn = back('bots list', call_bot(bot.id, 'profile'))
     keyboard.append([back_to_bot_btn])
 
     return InlineKeyboardMarkup(keyboard)
@@ -175,5 +175,12 @@ def faq_id_markup(faq, vote=None):
             InlineKeyboardButton(thumbs_down, callback_data='faq_rate_down__' + str(faq.id)),
         ],
         [back('FAQs list', 'faq')]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def bot_settings_markup(bot):
+    keyboard = [
+        [back('bot', call_bot(bot.id, 'profile'))],
     ]
     return InlineKeyboardMarkup(keyboard)

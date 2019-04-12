@@ -1,4 +1,5 @@
 from telegram.ext import CommandHandler, CallbackQueryHandler
+from telegram.ext.dispatcher import run_async
 
 from main import texts, keyboards
 from main.models import User
@@ -6,6 +7,7 @@ from main.utils import get_or_create_user, log_exception
 
 
 @log_exception
+@run_async
 def start_command(bot, update):
     ''' The start was called with /start '''
     message = update.message
