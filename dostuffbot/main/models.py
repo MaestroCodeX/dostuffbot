@@ -55,8 +55,6 @@ class Faq(CreatedUpdatedModel):
     )
     question = models.CharField(max_length=255)
     answer = models.TextField()
-    positive_count = models.IntegerField(default=0)
-    negative_count = models.IntegerField(default=0)
 
 
 class FaqRate(CreatedUpdatedModel):

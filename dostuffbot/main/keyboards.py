@@ -2,7 +2,6 @@ import random
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from main.models import Faq
 from main.utils import e, build_deeplink, call_bot
 
 
@@ -146,14 +145,13 @@ def confirm_deletion_markup(bot):
     return InlineKeyboardMarkup(keyboard)
 
 
-def faq_keyboard_markup():
-    issues_queryset = Faq.objects.all()
+def faq_keyboard_markup(queryset):
     issues_keyboard = [
         [InlineKeyboardButton(
             e(f':grey_question: {issue.question} :grey_question:'),
             callback_data='faq__' + str(issue.id)
         )]
-        for issue in issues_queryset
+        for issue in queryset
     ]
     keyboard = [
         *issues_keyboard,
@@ -164,11 +162,14 @@ def faq_keyboard_markup():
     return InlineKeyboardMarkup(keyboard)
 
 
-def faq_id_markup(faq):
+def faq_id_markup(faq, vote=None):
+    thumbs_up = e(':thumbsup:') + (' (voted)' if vote is True else '')
+    thumbs_down = e(':thumbsdown:') + (' (voted)' if vote is False else '')
+
     keyboard = [
         [
-            InlineKeyboardButton(e(':thumbsup:'), callback_data='faq_rate_up__' + str(faq.id)),
-            InlineKeyboardButton(e(':thumbsdown:'), callback_data='faq_rate_down__' + str(faq.id)),
+            InlineKeyboardButton(thumbs_up, callback_data='faq_rate_up__' + str(faq.id)),
+            InlineKeyboardButton(thumbs_down, callback_data='faq_rate_down__' + str(faq.id)),
         ],
         [back('FAQs list', 'faq')]
     ]

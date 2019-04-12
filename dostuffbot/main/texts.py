@@ -18,7 +18,8 @@ def bot_profile(username):
 
 
 def faq_id(faq):
-    return add_header(f'***{faq.question}***\n\n{faq.answer}\n\nWas it helpful?')
+    rates_count = faq.rates.filter(is_positive=True).count()
+    return add_header(e(f'***{faq.question}***\n\n{faq.answer}\n\n:thumbsup: ({rates_count})\nWas it helpful?'))
 
 
 HEADER = 'Dostuff bot 🤖\n\n'

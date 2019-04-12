@@ -32,6 +32,7 @@ def main():
     dp.add_handler(support.about_handler)
     dp.add_handler(support.faq_handler)
     dp.add_handler(support.faq_by_id_handler)
+    dp.add_handler(support.faq_rate_handler)
     dp.add_handler(support.donate_handler)
     dp.add_handler(support.donate_predefined_handler)
     dp.add_handler(support.donate_custom_handler)

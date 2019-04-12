@@ -12,7 +12,7 @@ def e(text):
     return emoji.emojize(text, use_aliases=True)
 
 
-def get_user_from_message(message: Message) -> User:
+def get_or_create_user(message: Message) -> User:
     from_user = message.from_user
     try:
         user = User.objects.get(id=from_user.id)

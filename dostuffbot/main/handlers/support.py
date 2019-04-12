@@ -3,7 +3,7 @@ from telegram.ext import CallbackQueryHandler
 
 import env
 from main import texts, keyboards
-from main.models import Faq
+from main.models import Faq, FaqRate, User
 
 
 def help(bot, update):
@@ -21,9 +21,10 @@ def about(bot, update):
 def faq(bot, update):
     ''' FAQs section handler method called with inline keyboard '''
     query = update.callback_query
+    queryset = Faq.objects.all()
     query.edit_message_text(
         text=texts.FAQ,
-        reply_markup=keyboards.faq_keyboard_markup(),
+        reply_markup=keyboards.faq_keyboard_markup(queryset),
         parse_mode='MARKDOWN',
     )
 
@@ -36,7 +37,37 @@ def faq_by_id(bot, update):
     query = update.callback_query
     faq_id = query.data.split('__')[1]
     faq = Faq.objects.get(id=faq_id)
-    query.edit_message_text(text=texts.faq_id(faq), reply_markup=keyboards.faq_id_markup(faq), parse_mode='MARKDOWN')
+
+    try:
+        rate = FaqRate.objects.get(user__id=query.from_user.id)
+        is_positive = rate.is_positive
+    except FaqRate.DoesNotExist:
+        is_positive = None
+    text = texts.faq_id(faq)
+    markup = keyboards.faq_id_markup(faq, vote=is_positive)
+    query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
+
+
+def faq_rate(bot, update):
+    '''
+    Handler selected faq with inline keyboard.
+    Send full question, answer and propose to rate the issue.
+    '''
+    query = update.callback_query
+    user = User.objects.get(id=query.from_user.id)
+    faq_id = query.data.split('__')[1]
+    faq = Faq.objects.get(id=faq_id)
+    is_positive = '_up_' in query.data
+    try:
+        rate = FaqRate.objects.get(user=user, faq=faq)
+        rate.is_positive = is_positive
+        rate.save()
+    except FaqRate.DoesNotExist:
+        FaqRate.objects.create(user=user, faq=faq, is_positive=is_positive)
+
+    text = texts.faq_id(faq)
+    markup = keyboards.faq_id_markup(faq, vote=is_positive)
+    query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
 
 
 def donate(bot, update):
@@ -107,6 +138,7 @@ help_handler = CallbackQueryHandler(help, pattern='help')
 about_handler = CallbackQueryHandler(about, pattern='about')
 faq_handler = CallbackQueryHandler(faq, pattern='^faq$')
 faq_by_id_handler = CallbackQueryHandler(faq_by_id, pattern=r'^faq__\d*$')
+faq_rate_handler = CallbackQueryHandler(faq_rate, pattern=r'^faq_rate_(up|down)__\d*$')
 donate_handler = CallbackQueryHandler(donate, pattern='^donate$')
 donate_custom_handler = CallbackQueryHandler(donate_custom, pattern='donate_custom')
 donate_add_handler = CallbackQueryHandler(donate_add, pattern=r'donate_add__\d?')
