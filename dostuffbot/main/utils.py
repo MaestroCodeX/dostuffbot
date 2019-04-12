@@ -28,15 +28,6 @@ def get_or_create_user(message: Message) -> User:
     return user
 
 
-def get_telegram_user(user: User) -> TelegramUser:
-    t_user = TelegramUser(
-        id=user.id,
-        is_bot=user.is_bot,
-        first_name=user.first_name,
-    )
-    return t_user
-
-
 def build_deeplink(bot_name: str, parametr: str = None) -> str:
     link = 'https://t.me/' + bot_name
     if parametr:

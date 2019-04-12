@@ -30,6 +30,7 @@ def main():
     dp.add_handler(management.delete_bot_confirm_handler)
     dp.add_handler(settings.settings_handler)
     dp.add_handler(settings.edit_lang_handler)
+    dp.add_handler(settings.lang_list_handler)
     dp.add_handler(support.help_handler)
     dp.add_handler(support.about_handler)
     dp.add_handler(support.faq_handler)

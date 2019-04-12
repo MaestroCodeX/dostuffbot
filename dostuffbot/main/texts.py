@@ -2,7 +2,7 @@ from main.utils import e
 
 
 def add_header(text):
-    return HEADER + text
+    return text  # HEADER + text
 
 
 def donate_custom(n):
@@ -24,6 +24,10 @@ def faq_id(faq):
 
 def bot_settings(bot):
     return 'Settings.'
+
+
+def settings(user):
+    return add_header(f'***Language***: {user.lang}')
 
 
 HEADER = 'Dostuffbot 🤖\n\n'
@@ -70,4 +74,4 @@ FAQ = add_header((
     'Here are the most common questions.\n\n'
     '***Not what you\'re looking for?*** Try asking the `Help Community`'
 ))
-EDIT_LANG = add_header('Choose a new language from the list below:')
+EDIT_LANG = add_header('Choose a language from the list below:')

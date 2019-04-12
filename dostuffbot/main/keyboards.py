@@ -28,7 +28,7 @@ CANCEL_START_KB = [[
     InlineKeyboardButton(e('Cancel :x:'), callback_data='start'),
 ]]
 SETTINGS_KB = [[
-    InlineKeyboardButton('Edit Language', callback_data='edit_lang'),
+    InlineKeyboardButton('Edit Language', callback_data='lang_list'),
     BACK_TO_MENU_BTN,
 ]]
 HELP_KB = [
@@ -85,7 +85,7 @@ FAQ_ID_KB = [
 ]
 EDIT_LANG_KB = [
     *[
-        [InlineKeyboardButton(str(lang[1]), callback_data='edit_lang_to__' + lang[0])]
+        [InlineKeyboardButton(str(lang[1]), callback_data='edit_lang__' + lang[0])]
         for lang in settings.LANGUAGES
     ],
     [back('settings')],
