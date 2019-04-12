@@ -70,3 +70,4 @@ FAQ = add_header((
     'Here are the most common questions.\n\n'
     '***Not what you\'re looking for?*** Try asking the `Help Community`'
 ))
+EDIT_LANG = add_header('Choose a new language from the list below:')

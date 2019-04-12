@@ -1,10 +1,10 @@
 from telegram.ext import CallbackQueryHandler
 
-from main import keyboards
+from main import keyboards, texts
 from main.models import User
 
 
-def settings(bot, update):
+def my_settings(bot, update):
     ''' Settings with inline keyboard '''
     query = update.callback_query
 
@@ -13,4 +13,12 @@ def settings(bot, update):
     query.edit_message_text(text=text, reply_markup=keyboards.SETTINGS_M, parse_mode='MARKDOWN')
 
 
-settings_handler = CallbackQueryHandler(settings, pattern='settings')
+def edit_lang(bot, update):
+    ''' Send available languages list to user to change language interface. '''
+    query = update.callback_query
+
+    query.edit_message_text(text=texts.EDIT_LANG, reply_markup=keyboards.EDIT_LANG_M, parse_mode='MARKDOWN')
+
+
+settings_handler = CallbackQueryHandler(my_settings, pattern='settings')
+edit_lang_handler = CallbackQueryHandler(edit_lang, pattern='edit_lang')

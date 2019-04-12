@@ -1,6 +1,7 @@
 import random
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from django.conf import settings
 
 from main.utils import e, build_deeplink, call_bot
 
@@ -82,6 +83,13 @@ FAQ_ID_KB = [
         InlineKeyboardButton('<', callback_data='donate_erase'),
     ]
 ]
+EDIT_LANG_KB = [
+    *[
+        [InlineKeyboardButton(str(lang[1]), callback_data='edit_lang_to__' + lang[0])]
+        for lang in settings.LANGUAGES
+    ],
+    [back('settings')],
+]
 
 START_M = InlineKeyboardMarkup(START_KB)
 CANCEL_START_M = InlineKeyboardMarkup(CANCEL_START_KB)
@@ -91,6 +99,7 @@ ABOUT_M = InlineKeyboardMarkup(ABOUT_KB)
 DONATE_M = InlineKeyboardMarkup(DONATE_KB)
 DONATE_CUSTOM_M = InlineKeyboardMarkup(DONATE_CUSTOM_KB)
 CONNECT_BOT_M = InlineKeyboardMarkup(CONNECT_BOT_KB)
+EDIT_LANG_M = InlineKeyboardMarkup(EDIT_LANG_KB)
 
 
 def bot_profile_markup(bot):
