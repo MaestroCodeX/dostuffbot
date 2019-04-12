@@ -20,7 +20,7 @@ START_KB = [
     [
         InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
         InlineKeyboardButton(e('Help :question:'), callback_data='help'),
-        InlineKeyboardButton(e('About me :pencil2:'), callback_data='about'),
+        InlineKeyboardButton(e('About :pencil2:'), callback_data='about'),
     ]
 ]
 CANCEL_START_KB = [[
@@ -30,10 +30,13 @@ SETTINGS_KB = [[
     InlineKeyboardButton('Edit Language', callback_data='edit_lang'),
     BACK_TO_MENU_BTN,
 ]]
-HELP_KB = [[
-    InlineKeyboardButton('FAQs', callback_data='faq'),
-    BACK_TO_MENU_BTN,
-]]
+HELP_KB = [
+    [CONTACT_ME_BTN],
+    [
+        InlineKeyboardButton('FAQs', callback_data='faq'),
+        BACK_TO_MENU_BTN,
+    ]
+]
 ABOUT_KB = [
     [
         InlineKeyboardButton('Donate', callback_data='donate'),
