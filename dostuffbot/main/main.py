@@ -3,6 +3,7 @@ import logging
 from telegram.ext import Updater
 
 import env
+from core import logger
 from main.handlers import (
     connection,
     maintance,
@@ -11,7 +12,6 @@ from main.handlers import (
     settings,
     support,
 )
-from config import logger
 
 
 def main():

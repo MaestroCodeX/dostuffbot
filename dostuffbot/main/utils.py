@@ -2,7 +2,7 @@ import re
 import emoji
 import logging
 
-from telegram import User as TelegramUser, Message
+from telegram import Message
 
 from main.constants import BOT_CALL_PREFIX, BOT_ID_REGEX
 from main.models import User, Bot

@@ -17,7 +17,7 @@ CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/dostuf
 
 START_KB = [
     [CONNECT_BOT_BTN],
-    [InlineKeyboardButton(e('My bots :closed_book:'), callback_data='my_bots')],
+    [InlineKeyboardButton('My bots', callback_data='my_bots')],
     [
         InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
         InlineKeyboardButton(e('Help :question:'), callback_data='help'),

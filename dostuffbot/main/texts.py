@@ -1,3 +1,4 @@
+from django.conf import settings as django_settings
 from main.utils import e
 
 
@@ -27,7 +28,8 @@ def bot_settings(bot):
 
 
 def settings(user):
-    return add_header(f'***Language***: {user.lang}')
+    lang = dict(django_settings.LANGUAGES).get(user.lang, 'English')
+    return add_header(f'***Language***: {lang}')
 
 
 HEADER = 'Dostuffbot 🤖\n\n'

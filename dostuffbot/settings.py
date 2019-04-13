@@ -14,8 +14,8 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'config',
     'main',
+    'member',
 )
 
 LANGUAGES = (
