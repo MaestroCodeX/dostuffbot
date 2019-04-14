@@ -5,7 +5,8 @@ import logging
 from telegram import Message
 
 from main.constants import BOT_CALL_PREFIX, BOT_ID_REGEX
-from main.models import User, Bot
+from main.models import User
+from member.models import Bot
 
 
 def e(text):

@@ -1,14 +1,7 @@
 from django.db import models
 from telegram.error import BadRequest
-from django.utils import timezone
 
-
-class CreatedUpdatedModel(models.Model):
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+from core.models import CreatedUpdatedModel
 
 
 class User(CreatedUpdatedModel):
@@ -29,21 +22,6 @@ class User(CreatedUpdatedModel):
 
         self.dialog_id = new_dialog_id
         self.save()
-
-
-class Bot(CreatedUpdatedModel):
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='bot_set',
-    )
-    name = models.CharField(max_length=128)
-    username = models.CharField(max_length=128)
-    token = models.CharField(max_length=100)
-
-    @property
-    def full_username(self):
-        return '@' + self.username
 
 
 class Faq(CreatedUpdatedModel):

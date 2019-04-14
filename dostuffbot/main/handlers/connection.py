@@ -2,7 +2,8 @@ import telegram
 from telegram.ext import Filters, CallbackQueryHandler, MessageHandler, ConversationHandler
 
 from main import texts, keyboards
-from main.models import User, Bot
+from main.models import User
+from member.models import Bot
 
 
 def connect_bot(bot, update):
