@@ -46,6 +46,7 @@ def token(bot, update):
             connected_bot.save()
         else:
             connected_bot = Bot.objects.create(
+                id=bot_user.id,
                 owner=user,
                 token=token,
                 name=bot_user.name,

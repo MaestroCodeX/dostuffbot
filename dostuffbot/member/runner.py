@@ -3,6 +3,7 @@ import logging
 from telegram.ext import Updater
 
 from core import logger
+from member import constants
 from member.handlers import start
 
 
@@ -15,6 +16,7 @@ def run_bot_with_handlers(instance):
     # Configure bot
     updater = Updater(instance.token)
     dp = updater.dispatcher
+    constants.BOT_ID = instance.id
 
     # Add handlers
     for handler in DEFAULT_HANDLERS:

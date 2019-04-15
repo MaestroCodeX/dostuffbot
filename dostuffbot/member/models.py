@@ -2,6 +2,13 @@ from django.db import models
 
 from core.models import CreatedUpdatedModel
 from main.models import User
+from member import constants
+
+
+class BotAccessManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(bot__id=constants.BOT_ID)
 
 
 class Bot(CreatedUpdatedModel):
@@ -17,3 +24,19 @@ class Bot(CreatedUpdatedModel):
     @property
     def full_username(self):
         return '@' + self.username
+
+
+class BotAdmin(CreatedUpdatedModel):
+    objects = BotAccessManager()
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bot_admins',
+    )
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE,
+        related_name='admins',
+    )
+    is_owner = models.BooleanField(default=False)
