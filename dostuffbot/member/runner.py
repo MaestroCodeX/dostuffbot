@@ -4,11 +4,12 @@ from telegram.ext import Updater
 
 from core import logger
 from member import constants
-from member.handlers import start
+from member.handlers import start, commands
 
 
 DEFAULT_HANDLERS = [
     start.start_handler,
+    commands.commands_handler,
 ]
 
 

@@ -40,3 +40,15 @@ class BotAdmin(CreatedUpdatedModel):
         related_name='admins',
     )
     is_owner = models.BooleanField(default=False)
+
+
+class Command(CreatedUpdatedModel):
+    objects = BotAccessManager()
+
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE,
+        related_name='commands',
+    )
+    text = models.CharField(max_length=40)
+    content = models.CharField(max_length=400)

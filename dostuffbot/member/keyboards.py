@@ -1,6 +1,16 @@
 from telegram import KeyboardButton, ReplyKeyboardMarkup
 
 
+def commands_keyboard(commands):
+    keyboard = [
+        [KeyboardButton(c.text)]
+        for c in commands
+    ]
+    keyboard.append([KeyboardButton('Menu')])
+    keyboard.append([KeyboardButton('Add command')])
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+
 START_KB = [[
     KeyboardButton('Commands'),
     KeyboardButton('Send notification'),
