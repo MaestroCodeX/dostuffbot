@@ -1,12 +1,19 @@
-from telegram.ext import CommandHandler
+from telegram.ext import Filters, CommandHandler, MessageHandler
 
 from member import texts, keyboards
+from member.handlers import commands
 from member.utils import admin_only
 
 
 @admin_only
 def start(bot, update):
-    ''' The start was called with /start '''
+    args = update.message.text.split()
+    if args[0] == '/start' and len(args) > 1:
+        argument = args[0]
+        if argument == 'commands':
+            commands.commands(bot, update)
+            return
+
     update.message.reply_text(
         texts.START,
         reply_markup=keyboards.START_M,
@@ -15,3 +22,4 @@ def start(bot, update):
 
 
 start_handler = CommandHandler('start', start)
+menu_handler = MessageHandler(Filters.regex('Menu'), start)

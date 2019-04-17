@@ -1,16 +1,31 @@
 import logging
 
-from telegram.ext import Updater
+from telegram.ext import Updater, Filters, MessageHandler
 
 from core import logger
 from member import constants
 from member.handlers import start, commands
 
-
-DEFAULT_HANDLERS = [
+ADMIN_GROUP = 1
+ADMIN_HANDLERS = [
     start.start_handler,
+    start.menu_handler,
     commands.commands_handler,
 ]
+
+
+def get_handler(command):
+    def handler(bot, update):
+        update.message.reply_text(
+            command.content,
+            parse_mode='MARKDOWN',
+        )
+
+    return handler
+
+
+def command_handler(command):
+    return MessageHandler(Filters.regex(command.text), get_handler(command))
 
 
 def run_bot_with_handlers(instance):
@@ -20,7 +35,12 @@ def run_bot_with_handlers(instance):
     constants.BOT_ID = instance.id
 
     # Add handlers
-    for handler in DEFAULT_HANDLERS:
+    for handler in ADMIN_HANDLERS:
+        dp.add_handler(handler, group=ADMIN_GROUP)
+
+    commands = instance.commands.all()
+    for command in commands:
+        handler = command_handler(command)
         dp.add_handler(handler)
 
     # Log all errors
@@ -30,4 +50,3 @@ def run_bot_with_handlers(instance):
     # Start bot
     updater.start_polling()
     logging.info('Bot is running.')
-    updater.idle()
