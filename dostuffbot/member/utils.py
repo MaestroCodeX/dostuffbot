@@ -1,5 +1,4 @@
-
-from member.models import BotAdmin
+from member.models import BotAdmin, Bot
 
 
 def admin_only(func):
@@ -11,3 +10,8 @@ def admin_only(func):
         return func(bot, update)
 
     return func_wrapper
+
+
+def get_me_from_db(bot):
+    my_bot = bot.get_me()
+    return Bot.objects.get(id=my_bot.id)
