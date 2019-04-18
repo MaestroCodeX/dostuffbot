@@ -4,13 +4,14 @@ from telegram.ext import Updater, Filters, MessageHandler
 
 from core import logger
 from member import constants
-from member.handlers import start, commands
+from member.handlers import start, commands, notifications
 
 ADMIN_GROUP = 1
 ADMIN_HANDLERS = [
     start.start_handler,
     start.menu_handler,
     commands.commands_handler,
+    notifications.notify_handler,
 ]
 
 

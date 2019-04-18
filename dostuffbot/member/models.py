@@ -52,3 +52,13 @@ class Command(CreatedUpdatedModel):
     )
     text = models.CharField(max_length=40)
     content = models.CharField(max_length=400)
+
+
+class Subscriber(CreatedUpdatedModel):
+    objects = BotAccessManager()
+
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+    )
