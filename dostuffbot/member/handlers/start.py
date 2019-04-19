@@ -1,19 +1,19 @@
 from telegram.ext import Filters, CommandHandler, MessageHandler
 
 from member import texts, keyboards
-from member.constants import BOT_ID
 from member.handlers import commands, notifications
 from member.models import Subscriber
-from member.utils import admin_only, get_me_from_db
+from member.utils import admin_only, get_me_from_db, middleware
 
 
 @admin_only
+@middleware
 def start(bot, update):
     my_bot = get_me_from_db(bot)
     Subscriber.objects.get_or_create(id=update.effective_user.id, bot=my_bot)
     args = update.message.text.split()
     if args[0] == '/start' and len(args) > 1:
-        argument = args[0]
+        argument = args[1]
         if argument == 'commands':
             commands.commands(bot, update)
             return

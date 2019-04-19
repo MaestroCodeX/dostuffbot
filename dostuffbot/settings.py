@@ -21,6 +21,11 @@ INSTALLED_APPS = (
 LANGUAGES = (
     ('en', _('English')),
     ('fr', _('French')),
+    ('ru', _('Russian')),
+)
+LANGUAGE_CODE = 'en'
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
 )
 
 SECRET_KEY = env.SECRET_KEY
