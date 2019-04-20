@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-19 15:36-0500\n"
+"POT-Creation-Date: 2019-04-20 17:20-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,18 +20,37 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: member/handlers/notifications.py:10
+#: dostuffbot/member/handlers/commands.py:14
+msgid "page_commands"
+msgstr "Это список Ваших команд. Выберите команду, чтобы увидеть подробности:"
+
+#: dostuffbot/member/handlers/notifications.py:10
 msgid "send_message_to_notify"
-msgstr "Отправте сообщение, которым Вы хотите поделиться с Вашими подписчиками."
+msgstr ""
+"Отправте сообщение, которым Вы хотите поделиться с Вашими подписчиками."
 
-#: settings.py:22
+#: dostuffbot/member/handlers/start.py:27
+msgid "page_start"
+msgstr "Выберите опцию из списка ниже:"
+
+#: dostuffbot/member/texts.py:5
+#, fuzzy
+#| msgid "page_commands"
+msgid "command"
+msgstr "Команда"
+
+#: dostuffbot/member/texts.py:6
+msgid "answer"
+msgstr "Ответ"
+
+#: dostuffbot/settings.py:22
 msgid "English"
-msgstr ""
+msgstr "Английский"
 
-#: settings.py:23
+#: dostuffbot/settings.py:23
 msgid "French"
-msgstr ""
+msgstr "Французкий"
 
-#: settings.py:24
+#: dostuffbot/settings.py:24
 msgid "Russian"
-msgstr ""
+msgstr "Русский"

@@ -1,9 +1,9 @@
 from telegram import KeyboardButton, ReplyKeyboardMarkup
 
 
-def commands_keyboard(commands):
+def commands_markup(commands):
     keyboard = [
-        [KeyboardButton(c.text)]
+        [KeyboardButton(c.command)]
         for c in commands
     ]
     keyboard.append([KeyboardButton('Menu')])
@@ -11,7 +11,7 @@ def commands_keyboard(commands):
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 
-def command_menu_keyboard(command):
+def command_menu_markup(command):
     keyboard = [
         [KeyboardButton('Edit command')],
         [KeyboardButton('See response')],

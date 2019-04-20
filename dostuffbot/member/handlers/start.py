@@ -1,6 +1,7 @@
+from django.utils.translation import ugettext as _
 from telegram.ext import Filters, CommandHandler, MessageHandler
 
-from member import texts, keyboards
+from member import keyboards
 from member.handlers import commands, notifications
 from member.models import Subscriber
 from member.utils import admin_only, get_me_from_db, middleware
@@ -23,7 +24,7 @@ def start(bot, update):
             return
 
     update.message.reply_text(
-        texts.START,
+        _('page_start'),
         reply_markup=keyboards.START_M,
         parse_mode='MARKDOWN',
     )

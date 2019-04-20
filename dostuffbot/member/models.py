@@ -53,6 +53,10 @@ class Command(CreatedUpdatedModel):
     text = models.CharField(max_length=40)
     content = models.CharField(max_length=400)
 
+    @property
+    def command(self):
+        return '/' + self.text
+
 
 class Subscriber(CreatedUpdatedModel):
     objects = BotAccessManager()

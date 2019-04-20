@@ -5,6 +5,7 @@ from telegram.ext import Updater, Filters, MessageHandler
 from core import logger
 from member import constants
 from member.handlers import start, commands, notifications
+from member.models import Subscriber, Bot
 
 ADMIN_GROUP = 1
 ADMIN_HANDLERS = [
@@ -17,6 +18,9 @@ ADMIN_HANDLERS = [
 
 def get_handler(command):
     def handler(bot, update):
+        user_bot = bot.get_me()
+        my_bot = Bot.objects.get(id=user_bot.id)
+        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=my_bot)
         update.message.reply_text(
             command.content,
             parse_mode='MARKDOWN',
