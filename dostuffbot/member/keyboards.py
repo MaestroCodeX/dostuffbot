@@ -11,6 +11,16 @@ def commands_keyboard(commands):
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 
+def command_menu_keyboard(command):
+    keyboard = [
+        [KeyboardButton('Edit command')],
+        [KeyboardButton('See response')],
+        [KeyboardButton('Delete command')],
+        [KeyboardButton('Back to commands list')],
+    ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+
 START_KB = [[
     KeyboardButton('Commands'),
     KeyboardButton('Send notification'),
