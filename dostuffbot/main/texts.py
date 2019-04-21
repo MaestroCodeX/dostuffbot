@@ -1,9 +1,10 @@
 from django.conf import settings as django_settings
+from django.utils.translation import gettext as _
 from main.utils import e
 
 
 def add_header(text):
-    return text  # HEADER + text
+    return text
 
 
 def donate_custom(n):
@@ -11,25 +12,29 @@ def donate_custom(n):
 
 
 def delete_bot(bot):
-    return f'You are about to delete your bot ***I{bot.name}*** {bot.full_username}. Is that correct?'
+    text = _('You are about to delete your bot ***{name}*** {username}. Is that correct?')
+    return text.format(name=bot.name, username=bot.full_username)
 
 
 def bot_profile(username):
-    return f'***Bot Name***: {username}\n\nSelect what you want to do:'
+    text = _('***Bot Name***: {}\n\nSelect what you want to do:')
+    return text.format(username)
 
 
 def faq_id(faq):
     rates_count = faq.rates.filter(is_positive=True).count()
-    return add_header(e(f'***{faq.question}***\n\n{faq.answer}\n\n:thumbsup: ({rates_count})\nWas it helpful?'))
+    text = add_header(e(_('***{q}***\n\n{a}\n\n:thumbsup: ({rates_count})\nWas it helpful?')))
+    return text.format(q=faq.question, a=faq.answer, rates_count=rates_count)
 
 
 def bot_settings(bot):
-    return 'Settings.'
+    return _('Settings.')
 
 
 def settings(user):
     lang = dict(django_settings.LANGUAGES).get(user.lang, 'English')
-    return add_header(f'***Language***: {lang}')
+    text = add_header(_('***Language***: {}'))
+    return text.format(lang)
 
 
 HEADER = 'Dostuffbot 🤖\n\n'
@@ -37,17 +42,8 @@ START = add_header((
     '***Dostuffbot*** is created to help you build your own bots without any coding. '
     'It\'s simple and absolutely free for use.'
 ))
-BOT_CONNECT = e(add_header((
-    'To connect your bot:\n\n'
-    ':small_blue_diamond: Go to @BotFather.\n'
-    ':small_blue_diamond: Send /addbot and set a name for it.\n'
-    ':small_blue_diamond: Copy a token you get if bot is created.\n'
-    ':small_blue_diamond: Return to me and send it.\n\n'
-    'Example of the token: `987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM`'
-)))
-TOKEN_INVALID = BOT_CONNECT + e(
-    '\n\nThe token is invalid :heavy_exclamation_mark:'
-)
+BOT_CONNECT = add_header(e(_('main_bot_connect')))
+TOKEN_INVALID = BOT_CONNECT + '\n\n' + e(_('main_token_invalid'))
 BOT_CONNECTED = e(
     'Your bot was succesfully added to the system :bear:\n\n'
 )

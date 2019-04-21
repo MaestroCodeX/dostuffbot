@@ -26,7 +26,7 @@ def start(bot, update):
     so that chat with the bot gets to the top of all chats list.
     '''
     query = update.callback_query
-
+    print(texts.START)
     sent_message = query.message.reply_text(texts.START, reply_markup=keyboards.START_M, parse_mode='MARKDOWN')
     user = User.objects.get(id=update.effective_user.id)
     user.update_dialog(bot, sent_message.message_id)

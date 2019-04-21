@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-20 17:20-0500\n"
+"POT-Creation-Date: 2019-04-21 15:49-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,52 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: dostuffbot/main/texts.py:15
+#, python-brace-format
+msgid ""
+"You are about to delete your bot ***{name}*** {username}. Is that correct?"
+msgstr ""
+"You are about to delete your bot ***{name}*** {username}. Is that correct?"
+
+#: dostuffbot/main/texts.py:20
+msgid ""
+"***Bot Name***: {}\n"
+"\n"
+"Select what you want to do:"
+msgstr ""
+
+#: dostuffbot/main/texts.py:31
+msgid "Settings."
+msgstr "Settings."
+
+#: dostuffbot/main/texts.py:36
+msgid "***Language***: {}"
+msgstr "***Language***: {}"
+
+#: dostuffbot/main/texts.py:41
+#, fuzzy
+#| msgid "page_start"
+msgid "main_start"
+msgstr ""
+"***Dostuffbot*** is created to help you build your own bots without any "
+"coding. It's simple and absolutely free for use."
+
+#: dostuffbot/main/texts.py:42
+msgid "main_bot_connect"
+msgstr ""
+"To connect your bot:\n"
+"\n"
+":small_blue_diamond: Go to @BotFather.\n"
+":small_blue_diamond: Send /addbot and set a name for it.\n"
+":small_blue_diamond: Copy a token you get if bot is created.\n"
+":small_blue_diamond: Return to me and send it.\n"
+"\n"
+"Example of the token: `987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM`"
+
+#: dostuffbot/main/texts.py:43
+msgid "main_token_invalid"
+msgstr "The token is invalid :heavy_exclamation_mark:"
 
 #: dostuffbot/member/handlers/commands.py:14
 msgid "page_commands"
