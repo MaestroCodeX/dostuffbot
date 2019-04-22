@@ -3,7 +3,7 @@ import random
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 
-from main.utils import e, build_deeplink, call_bot
+from main.utils import emojize, build_deeplink, call_bot
 
 
 def back(section, callback_data=None):
@@ -11,7 +11,7 @@ def back(section, callback_data=None):
 
 
 BACK_TO_MENU_BTN = back('menu', 'start')
-CONNECT_BOT_BTN = InlineKeyboardButton(e('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
+CONNECT_BOT_BTN = InlineKeyboardButton(emojize('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
 CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/dostuffsupportbot')
 
 
@@ -20,12 +20,12 @@ START_KB = [
     [InlineKeyboardButton('My bots', callback_data='my_bots')],
     [
         InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
-        InlineKeyboardButton(e('Help :question:'), callback_data='help'),
-        InlineKeyboardButton(e('About :pencil2:'), callback_data='about'),
+        InlineKeyboardButton(emojize('Help :question:'), callback_data='help'),
+        InlineKeyboardButton(emojize('About :pencil2:'), callback_data='about'),
     ]
 ]
 CANCEL_START_KB = [[
-    InlineKeyboardButton(e('Cancel :x:'), callback_data='start'),
+    InlineKeyboardButton(emojize('Cancel :x:'), callback_data='start'),
 ]]
 SETTINGS_KB = [[
     InlineKeyboardButton('Edit Language', callback_data='lang_list'),
@@ -160,7 +160,7 @@ def confirm_deletion_markup(bot):
 def faq_keyboard_markup(queryset):
     issues_keyboard = [
         [InlineKeyboardButton(
-            e(f':grey_question: {issue.question} :grey_question:'),
+            emojize(f':grey_question: {issue.question} :grey_question:'),
             callback_data='faq__' + str(issue.id)
         )]
         for issue in queryset
@@ -175,8 +175,8 @@ def faq_keyboard_markup(queryset):
 
 
 def faq_id_markup(faq, vote=None):
-    thumbs_up = e(':thumbsup:') + (' (voted)' if vote is True else '')
-    thumbs_down = e(':thumbsdown:') + (' (voted)' if vote is False else '')
+    thumbs_up = emojize(':thumbsup:') + (' (voted)' if vote is True else '')
+    thumbs_down = emojize(':thumbsdown:') + (' (voted)' if vote is False else '')
 
     keyboard = [
         [

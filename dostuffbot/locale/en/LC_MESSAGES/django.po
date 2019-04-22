@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-21 15:49-0500\n"
+"POT-Creation-Date: 2019-04-22 15:56-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,39 +18,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: dostuffbot/main/texts.py:15
+#: dostuffbot/main/texts.py:11
 #, python-brace-format
 msgid ""
 "You are about to delete your bot ***{name}*** {username}. Is that correct?"
 msgstr ""
 "You are about to delete your bot ***{name}*** {username}. Is that correct?"
 
-#: dostuffbot/main/texts.py:20
+#: dostuffbot/main/texts.py:16
+#, python-brace-format
 msgid ""
-"***Bot Name***: {}\n"
+"***Bot Name***: {username}\n"
 "\n"
 "Select what you want to do:"
 msgstr ""
 
-#: dostuffbot/main/texts.py:31
+#: dostuffbot/main/texts.py:22
+#, python-brace-format
+msgid ""
+"***{q}***\n"
+"\n"
+"{a}\n"
+"\n"
+":thumbsup: ({rates_count})\n"
+"Was it helpful?"
+msgstr ""
+
+#: dostuffbot/main/texts.py:27
 msgid "Settings."
 msgstr "Settings."
 
-#: dostuffbot/main/texts.py:36
-msgid "***Language***: {}"
+#: dostuffbot/main/texts.py:32
+#, fuzzy, python-brace-format
+#| msgid "***Language***: {}"
+msgid "***Language***: {lang}"
 msgstr "***Language***: {}"
 
-#: dostuffbot/main/texts.py:41
-#, fuzzy
-#| msgid "page_start"
-msgid "main_start"
-msgstr ""
+#: dostuffbot/main/texts.py:37
+msgid ""
 "***Dostuffbot*** is created to help you build your own bots without any "
 "coding. It's simple and absolutely free for use."
-
-#: dostuffbot/main/texts.py:42
-msgid "main_bot_connect"
 msgstr ""
+
+#: dostuffbot/main/texts.py:41
+msgid ""
 "To connect your bot:\n"
 "\n"
 ":small_blue_diamond: Go to @BotFather.\n"
@@ -59,10 +70,74 @@ msgstr ""
 ":small_blue_diamond: Return to me and send it.\n"
 "\n"
 "Example of the token: `987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM`"
+msgstr ""
 
-#: dostuffbot/main/texts.py:43
-msgid "main_token_invalid"
-msgstr "The token is invalid :heavy_exclamation_mark:"
+#: dostuffbot/main/texts.py:48
+msgid "The token is invalid :heavy_exclamation_mark:"
+msgstr ""
+
+#: dostuffbot/main/texts.py:49
+msgid ""
+"Your bot was succesfully added to the system :bear:\n"
+"\n"
+msgstr ""
+
+#: dostuffbot/main/texts.py:51
+msgid ""
+"I am a bot builder that can help you create your bots without any boring "
+"coding.\n"
+"I try to customize every bot for their needs as much as possible.\n"
+"\n"
+"***To start*** go to menu and add your first bot. Then follow the "
+"inctructions to manage it.\n"
+"\n"
+"If you still have any question feel free to check out FAQs or contact us at "
+"@dostuffsupportbot."
+msgstr ""
+
+#: dostuffbot/main/texts.py:58
+msgid ""
+"I am bot who lives together with my creator @serhii_beznisko. My creator is "
+"a typical student who likes to code and drink enormous cups of tea.\n"
+"\n"
+"If you like me you can support my creator by donating a small amout of "
+"money. He will pay servers and buy better computers so I can work even "
+"faster!\n"
+"\n"
+"Feel free to contact us at @dostuffsupportbot."
+msgstr ""
+
+#: dostuffbot/main/texts.py:65
+msgid ""
+"Your help is significant. Select an amount you want to donate or hit custom."
+msgstr ""
+
+#: dostuffbot/main/texts.py:67
+msgid "Choose a bot from the list below:"
+msgstr ""
+
+#: dostuffbot/main/texts.py:68
+msgid "You haven't connected any bots yet."
+msgstr ""
+
+#: dostuffbot/main/texts.py:69
+msgid "Bot got forgotten forever."
+msgstr ""
+
+#: dostuffbot/main/texts.py:70
+msgid "Searching your bot..."
+msgstr ""
+
+#: dostuffbot/main/texts.py:72
+msgid ""
+"Here are the most common questions.\n"
+"\n"
+"***Not what you're looking for?*** Try asking the `Help Community`"
+msgstr ""
+
+#: dostuffbot/main/texts.py:75
+msgid "Choose a language from the list below:"
+msgstr ""
 
 #: dostuffbot/member/handlers/commands.py:14
 msgid "page_commands"
@@ -97,3 +172,24 @@ msgstr "French"
 #: dostuffbot/settings.py:24
 msgid "Russian"
 msgstr "Russian"
+
+#, fuzzy
+#~| msgid "page_start"
+#~ msgid "main_start"
+#~ msgstr ""
+#~ "***Dostuffbot*** is created to help you build your own bots without any "
+#~ "coding. It's simple and absolutely free for use."
+
+#~ msgid "main_bot_connect"
+#~ msgstr ""
+#~ "To connect your bot:\n"
+#~ "\n"
+#~ ":small_blue_diamond: Go to @BotFather.\n"
+#~ ":small_blue_diamond: Send /addbot and set a name for it.\n"
+#~ ":small_blue_diamond: Copy a token you get if bot is created.\n"
+#~ ":small_blue_diamond: Return to me and send it.\n"
+#~ "\n"
+#~ "Example of the token: `987865432:AAA-50DXLLPYEl1TDbnPYElDimH9CouAhfXLLM`"
+
+#~ msgid "main_token_invalid"
+#~ msgstr "The token is invalid :heavy_exclamation_mark:"

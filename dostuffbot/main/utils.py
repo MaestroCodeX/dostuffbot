@@ -9,7 +9,7 @@ from main.models import User
 from member.models import Bot
 
 
-def e(text):
+def emojize(text):
     return emoji.emojize(text, use_aliases=True)
 
 
