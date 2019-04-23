@@ -13,13 +13,21 @@ def notify_claim(bot, update):
     return 1
 
 
+def _notify_subscribers(bot, subs, message):
+    text_status = texts.message_mailing_status(0, subs.count())
+    status_message = bot.send_message(text_status)
+    for i, sub in enumerate(subs):
+        bot.send_message(chat_id=sub.id, text=message)
+        text_status = texts.message_mailing_status(i, subs.count())
+        status_message.edit_text(text_status)
+
+
 @admin_only
 @middleware
 def notify_subcribers(bot, update):
     subs = Subscriber.objects.all()
     message = update.message.text
-    for sub in subs:
-        bot.send_message(chat_id=sub.id, text=message)
+    _notify_subscribers(bot, subs, message)
 
     update.message.reply_text(texts.notification_sent(subs))
 

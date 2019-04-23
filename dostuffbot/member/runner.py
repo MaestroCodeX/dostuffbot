@@ -3,7 +3,6 @@ import logging
 from telegram.ext import Updater, Filters, MessageHandler
 
 from core import logger
-from member import constants
 from member.handlers import start, commands, notifications
 from member.models import Subscriber, Bot
 
@@ -37,7 +36,7 @@ def run_bot_with_handlers(instance):
     # Configure bot
     updater = Updater(instance.token)
     dp = updater.dispatcher
-    constants.BOT_ID = instance.id
+    dp.db_bot = instance
 
     # Add handlers
     for handler in ADMIN_HANDLERS:

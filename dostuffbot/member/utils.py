@@ -1,11 +1,6 @@
 from member.models import BotAdmin, Bot
 
 
-def get_me_from_db(bot):
-    my_bot = bot.get_me()
-    return Bot.objects.get(id=my_bot.id)
-
-
 def admin_only(func):
     def func_wrapper(bot, update):
         user_id = update.effective_user.id

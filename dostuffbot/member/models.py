@@ -1,14 +1,15 @@
+from telegram.ext import Dispatcher
 from django.db import models
 
 from core.models import CreatedUpdatedModel
 from main.models import User
-from member import constants
 
 
 class BotAccessManager(models.Manager):
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(bot__id=constants.BOT_ID)
+        bot = Dispatcher.get_instance().db_bot
+        return queryset.filter(bot=bot)
 
 
 class Bot(CreatedUpdatedModel):
