@@ -1,5 +1,3 @@
-from django.utils import translation
-
 from member.models import BotAdmin, Bot
 
 
@@ -19,13 +17,7 @@ def admin_only(func):
     return func_wrapper
 
 
-def activate_language(bot, update):
-    lang = update.effective_user.language_code
-    translation.activate(lang)
-
-
 MIDDLEWARES = [
-    activate_language,
 ]
 
 

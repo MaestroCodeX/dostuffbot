@@ -1,10 +1,14 @@
-from django.utils.translation import gettext as _
-
-
 def command_menu(command):
-    command_text = _('command')
-    answer_text = _('answer')
     return (
-        f"***{command_text}***: {command.command}\n"
-        f"***{answer_text}***: {command.content}"
+        f'***Command***: {command.command}\n'
+        f'***Answer***: {command.content}'
     )
+
+
+def notification_sent(subs):
+    return f'Notification was sent to all {subs.count()} active subscribers.'
+
+
+COMMANDS = 'This is a list of your commands. Select command to see the details:'
+NOTIFY_MESSAGE = 'Send a message that you want to share with your subscribers.'
+START = 'Choose an option from the list below:'

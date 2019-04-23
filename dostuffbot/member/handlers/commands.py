@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext as _
 from telegram.ext import Filters, MessageHandler, ConversationHandler
 
 from member import texts, keyboards
@@ -11,7 +10,7 @@ from member.utils import admin_only, middleware
 def commands(bot, update):
     commands = Command.objects.all()
     update.message.reply_text(
-        _('page_commands'),
+        texts.COMMANDS,
         reply_markup=keyboards.commands_markup(commands),
         parse_mode='MARKDOWN',
     )
