@@ -24,8 +24,12 @@ def command_menu_markup(command):
 START_KB = [[
     KeyboardButton('Commands'),
     KeyboardButton('Send notification'),
-    KeyboardButton('Scheduled notification'),
+    # KeyboardButton('Scheduled notification'),
+]]
+CANCEL_KB = [[
+    KeyboardButton('Cancel'),
 ]]
 
 
 START_M = ReplyKeyboardMarkup(START_KB, resize_keyboard=True)
+CANCEL_M = ReplyKeyboardMarkup(CANCEL_KB, resize_keyboard=True)

@@ -29,7 +29,7 @@ def get_handler(command):
 
 
 def command_handler(command):
-    return MessageHandler(Filters.regex(command.text), get_handler(command))
+    return MessageHandler(Filters.regex(f'^{command.text}$'), get_handler(command))
 
 
 def run_bot_with_handlers(instance):

@@ -3,6 +3,7 @@ import random
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 
+from core.enums import DeepCommand
 from main.utils import emojize, build_deeplink, call_bot
 
 
@@ -105,8 +106,8 @@ EDIT_LANG_M = InlineKeyboardMarkup(EDIT_LANG_KB)
 def bot_profile_markup(bot):
     keyboard = [
         [
-            InlineKeyboardButton('Manage commands', url=build_deeplink(bot.username, 'commands')),
-            InlineKeyboardButton('Notify bot users', url=build_deeplink(bot.username, 'notify')),
+            InlineKeyboardButton('Manage commands', url=build_deeplink(bot.username, DeepCommand.COMMANDS)),
+            InlineKeyboardButton('Notify bot users', url=build_deeplink(bot.username, DeepCommand.NOTIFY)),
         ],
         [
             InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),
