@@ -1,4 +1,4 @@
-from member.models import BotAdmin, Bot
+from member.models import BotAdmin
 
 
 def admin_only(func):
