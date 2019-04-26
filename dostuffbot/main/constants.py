@@ -1,2 +1,0 @@
-BOT_CALL_PREFIX = 'bot_'
-BOT_ID_REGEX = BOT_CALL_PREFIX + r'(\d*)__.*'

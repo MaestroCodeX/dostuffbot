@@ -1,35 +1,43 @@
-from telegram import KeyboardButton, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+import env
+from core.utils import back_button, build_deeplink
+from main.utils import call_bot
+from member.utils import call_command
 
 
 def commands_markup(commands):
     keyboard = [
-        [KeyboardButton(c.command)]
+        [InlineKeyboardButton(c.command, callback_data=call_command(c.id, 'menu'))]
         for c in commands
     ]
-    keyboard.append([KeyboardButton('Menu')])
-    keyboard.append([KeyboardButton('Add command')])
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    keyboard.append([InlineKeyboardButton('Menu', callback_data='start')])
+    keyboard.append([InlineKeyboardButton('Add command', callback_data='command_add')])
+    return InlineKeyboardMarkup(keyboard)
 
 
 def command_menu_markup(command):
     keyboard = [
-        [KeyboardButton('Edit command')],
-        [KeyboardButton('See response')],
-        [KeyboardButton('Delete command')],
-        [KeyboardButton('Back to commands list')],
+        [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit'))],
+        [InlineKeyboardButton('See answer', callback_data=call_command(command.id, 'full_answer'))],
+        [InlineKeyboardButton('Delete command', callback_data=call_command(command.id, 'delete'))],
+        [back_button('commands list')],
     ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    return InlineKeyboardMarkup(keyboard)
 
 
-START_KB = [[
-    KeyboardButton('Commands'),
-    KeyboardButton('Send notification'),
-    # KeyboardButton('Scheduled notification'),
-]]
+def start_markup(bot):
+    keyboard = [
+        [InlineKeyboardButton('Commands', callback_data='commands_list')],
+        [InlineKeyboardButton('Send notification', callback_data='notify')],
+        [InlineKeyboardButton('Settings', url=build_deeplink(env.BOT_USERNAME, call_bot(bot.id, 'settings')))],
+    ]
+
+    return InlineKeyboardMarkup(keyboard)
+
+
 CANCEL_KB = [[
-    KeyboardButton('Cancel'),
+    InlineKeyboardButton('Cancel'),
 ]]
 
-
-START_M = ReplyKeyboardMarkup(START_KB, resize_keyboard=True)
-CANCEL_M = ReplyKeyboardMarkup(CANCEL_KB, resize_keyboard=True)
+CANCEL_M = InlineKeyboardMarkup(CANCEL_KB)

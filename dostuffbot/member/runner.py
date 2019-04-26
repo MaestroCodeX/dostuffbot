@@ -9,9 +9,10 @@ from member.models import Subscriber, Bot
 ADMIN_GROUP = 1
 ADMIN_HANDLERS = [
     start.start_handler,
-    start.menu_handler,
-    commands.commands_handler,
-    notifications.notify_handler,
+    start.start_command_handler,
+    commands.commands_list_handler,
+    commands.command_menu_handler,
+    # notifications.notify_handler,
 ]
 
 

@@ -3,8 +3,9 @@ import emoji
 import logging
 
 from telegram import Message
+from django.conf import settings
 
-from main.constants import BOT_CALL_PREFIX, BOT_ID_REGEX
+# from main.constants import BOT_CALL_PREFIX, BOT_ID_REGEX
 from main.models import User
 from member.models import Bot
 
@@ -37,15 +38,15 @@ def build_deeplink(bot_name: str, parametr: str = None) -> str:
 
 
 def call_bot(bot_id: int, command: str) -> str:
-    return BOT_CALL_PREFIX + str(bot_id) + '__' + command
+    return settings.BOT_CALL_PREFIX + str(bot_id) + '__' + command
 
 
 def call_bot_regex(command) -> str:
-    return '^' + BOT_CALL_PREFIX + r'\d*__' + command + '$'
+    return '^' + settings.BOT_CALL_PREFIX + r'\d*__' + command + '$'
 
 
 def get_bot_from_call(call: str) -> Bot:
-    r = re.search(BOT_ID_REGEX, call)
+    r = re.search(settings.BOT_ID_REGEX, call)
     if not r:
         raise ValueError('Could not parse bot ID from call.')
 
@@ -53,7 +54,7 @@ def get_bot_from_call(call: str) -> Bot:
     try:
         bot = Bot.objects.get(id=bot_id)
     except Bot.DoesNotExist:
-        raise ValueError('Could not found bot with given ID from call.')
+        raise ValueError('Could not find a bot with given ID from call.')
 
     return bot
 

@@ -4,14 +4,11 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 
 from core.enums import DeepCommand
+from core.utils import back_button
 from main.utils import emojize, build_deeplink, call_bot
 
 
-def back(section, callback_data=None):
-    return InlineKeyboardButton(f'« Back to {section}', callback_data=callback_data or section)
-
-
-BACK_TO_MENU_BTN = back('menu', 'start')
+BACK_TO_MENU_BTN = back_button('menu', 'start')
 CONNECT_BOT_BTN = InlineKeyboardButton(emojize('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
 CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/dostuffsupportbot')
 
@@ -53,7 +50,7 @@ DONATE_KB = [
     ],
     [
         InlineKeyboardButton('Custom', callback_data='donate_custom'),
-        back('about'),
+        back_button('about'),
     ],
 ]
 DONATE_CUSTOM_KB = [
@@ -71,7 +68,7 @@ DONATE_CUSTOM_KB = [
     ],
     [
         InlineKeyboardButton('Submit', callback_data='donate_submit'),
-        back('donate'),
+        back_button('donate'),
     ],
 ]
 CONNECT_BOT_KB = [[
@@ -89,7 +86,7 @@ EDIT_LANG_KB = [
         [InlineKeyboardButton(str(lang[1]), callback_data='edit_lang__' + lang[0])]
         for lang in settings.LANGUAGES
     ],
-    [back('settings')],
+    [back_button('settings')],
 ]
 
 START_M = InlineKeyboardMarkup(START_KB)
@@ -113,7 +110,7 @@ def bot_profile_markup(bot):
             InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),
             InlineKeyboardButton('Delete bot', callback_data=call_bot(bot.id, 'delete')),
         ],
-        [back('bots list', 'my_bots')],
+        [back_button('bots list', 'my_bots')],
     ]
 
     return InlineKeyboardMarkup(keyboard)
@@ -152,7 +149,7 @@ def confirm_deletion_markup(bot):
         [InlineKeyboardButton('Yes, delete the bot', callback_data=call_bot(bot.id, 'delete_confirm'))],
     ]
     random.shuffle(keyboard)
-    back_to_bot_btn = back('bots list', call_bot(bot.id, 'profile'))
+    back_to_bot_btn = back_button('bots list', call_bot(bot.id, 'profile'))
     keyboard.append([back_to_bot_btn])
 
     return InlineKeyboardMarkup(keyboard)
@@ -169,7 +166,7 @@ def faq_keyboard_markup(queryset):
     keyboard = [
         *issues_keyboard,
         [CONTACT_ME_BTN],
-        [back('help')],
+        [back_button('help')],
     ]
 
     return InlineKeyboardMarkup(keyboard)
@@ -184,13 +181,13 @@ def faq_id_markup(faq, vote=None):
             InlineKeyboardButton(thumbs_up, callback_data='faq_rate_up__' + str(faq.id)),
             InlineKeyboardButton(thumbs_down, callback_data='faq_rate_down__' + str(faq.id)),
         ],
-        [back('FAQs list', 'faq')]
+        [back_button('FAQs list', 'faq')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
 def bot_settings_markup(bot):
     keyboard = [
-        [back('bot', call_bot(bot.id, 'profile'))],
+        [back_button('bot', call_bot(bot.id, 'profile'))],
     ]
     return InlineKeyboardMarkup(keyboard)
