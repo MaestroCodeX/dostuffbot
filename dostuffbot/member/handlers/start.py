@@ -12,11 +12,11 @@ def start_command(bot, update):
     dispatcher = Dispatcher.get_instance()
     db_bot = dispatcher.db_bot
 
-    # args = update.message.text.split()
-    # if len(args) > 1:
-    #     handle_start_command(bot, update, args[1])
-    #     # break further execution as soon as user did't want to send start command
-    #     return
+    args = update.message.text.split()
+    if len(args) > 1:
+        handle_start_command(bot, update, args[1])
+        # break further execution as soon as user did't want to send start command
+        return
 
     update.message.reply_text(
         texts.START,
