@@ -1,16 +1,16 @@
-from telegram.ext import Filters, MessageHandler, ConversationHandler
+from telegram.ext import Filters, MessageHandler, ConversationHandler, CallbackQueryHandler
 
 from member import texts, keyboards
 from member.handlers import start
+from member.middleware import middleware
 from member.models import Subscriber
-from member.utils import admin_only, middleware
 
 
-@admin_only
 @middleware
 def notify_claim(bot, update):
-    update.message.reply_text(
-        texts.NOTIFY_MESSAGE,
+    query = update.callback_query
+    query.edit_message_text(
+        'Send a me message that you want to share with your subscribers.',
         reply_markup=keyboards.CANCEL_M,
     )
 
@@ -26,7 +26,6 @@ def _notify_subscribers(bot, subs, message):
         status_message.edit_text(text_status)
 
 
-@admin_only
 @middleware
 def notify_subcribers(bot, update):
     subs = Subscriber.objects.all()
@@ -38,21 +37,18 @@ def notify_subcribers(bot, update):
     return ConversationHandler.END
 
 
-@admin_only
 @middleware
 def cancel_notification(bot, update):
-    update.message.reply_text(texts.NOTIFICATION_CANCELLED)
     start.start(bot, update)
     return ConversationHandler.END
 
 
 notify_handler = ConversationHandler(
-    entry_points=[MessageHandler(Filters.regex('Send notification'), notify_claim)],
+    entry_points=[CallbackQueryHandler(notify_claim, pattern='^notify$')],
     states={
         1: [
-            MessageHandler(Filters.regex('Cancel'), cancel_notification),
             MessageHandler(Filters.text, notify_subcribers),
         ],
     },
-    fallbacks=[],
+    fallbacks=[CallbackQueryHandler(cancel_notification, pattern='^start$')],
 )

@@ -12,7 +12,9 @@ ADMIN_HANDLERS = [
     start.start_command_handler,
     commands.commands_list_handler,
     commands.command_menu_handler,
-    # notifications.notify_handler,
+    commands.command_delete_handler,
+    commands.command_delete_confirm_handler,
+    notifications.notify_handler,
 ]
 
 

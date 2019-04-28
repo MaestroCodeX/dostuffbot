@@ -1,9 +1,10 @@
 from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher
 
 from core.enums import DeepCommand
-from member import texts, keyboards
+from member import keyboards
 from member.handlers import commands
-from member.utils import admin_only, middleware
+from member.middleware import middleware
+from member.utils import admin_only
 
 
 @admin_only
@@ -14,30 +15,31 @@ def start_command(bot, update):
 
     args = update.message.text.split()
     if len(args) > 1:
-        handle_start_command(bot, update, args[1])
+        handle_deeplink(bot, update, args[1])
         # break further execution as soon as user did't want to send start command
         return
 
     update.message.reply_text(
-        texts.START,
+        'Choose an option from the list below:',
         reply_markup=keyboards.start_markup(db_bot),
         parse_mode='MARKDOWN',
     )
 
 
+@middleware
 def start(bot, update):
     query = update.callback_query
     dispatcher = Dispatcher.get_instance()
     db_bot = dispatcher.db_bot
 
     query.edit_message_text(
-        texts.START,
+        'Choose an option from the list below:',
         reply_markup=keyboards.start_markup(db_bot),
         parse_mode='MARKDOWN',
     )
 
 
-def handle_start_command(bot, update, command):
+def handle_deeplink(bot, update, command):
     if command == DeepCommand.COMMANDS:
         commands.commands(bot, update)
     elif command == DeepCommand.NOTIFY:
