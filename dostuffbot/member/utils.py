@@ -16,19 +16,6 @@ def admin_only(func):
     return func_wrapper
 
 
-MIDDLEWARES = [
-]
-
-
-def middleware(func):
-    def func_wrapper(bot, update):
-        for middleware in MIDDLEWARES:
-            middleware(bot, update)
-        return func(bot, update)
-
-    return func_wrapper
-
-
 def call_command(bot_id: int, command: str) -> str:
     return settings.COMMAND_CALL_PREFIX + str(bot_id) + '__' + command
 
@@ -38,7 +25,6 @@ def call_command_regex(command) -> str:
 
 
 def get_command_from_call(call):
-    print(call)
     r = re.search(settings.COMMAND_ID_REGEX, call)
     if not r:
         raise ValueError('Could not parse command ID from call.')

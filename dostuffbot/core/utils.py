@@ -13,3 +13,12 @@ def build_deeplink(bot_name: str, parametr: str = None) -> str:
     if parametr:
         link += '?start=' + parametr
     return link
+
+
+def get_fullname(user):
+    if user.username:
+        return '@' + user.username
+    fullname = user.first_name
+    if user.last_name:
+        fullname += ' ' + user.last_name
+    return fullname

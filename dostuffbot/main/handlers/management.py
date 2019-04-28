@@ -26,7 +26,7 @@ def bot_profile(bot, update):
     ''' Show bot profile '''
     query = update.callback_query
 
-    bot = get_bot_from_call(query.data)
+    bot = get_bot_from_call(query.data, query.from_user.id)
 
     query.edit_message_text(
         text=texts.bot_profile(bot.name),
@@ -39,7 +39,7 @@ def bot_settings(bot, update):
     ''' Show bot settings '''
     query = update.callback_query
 
-    bot = get_bot_from_call(query.data)
+    bot = get_bot_from_call(query.data, query.from_user.id)
 
     query.edit_message_text(
         text=texts.bot_settings(bot.name),
@@ -55,7 +55,7 @@ def delete_bot(bot, update):
     '''
     query = update.callback_query
 
-    bot = get_bot_from_call(query.data)
+    bot = get_bot_from_call(query.data, query.from_user.id)
     text = texts.delete_bot(bot)
     markup = keyboards.confirm_deletion_markup(bot)
 
@@ -69,7 +69,7 @@ def delete_bot_confirm(bot, update):
     '''
     query = update.callback_query
 
-    bot = get_bot_from_call(query.data)
+    bot = get_bot_from_call(query.data, query.from_user.id)
     bot.delete()
 
     query.answer(texts.BOT_DELETED)

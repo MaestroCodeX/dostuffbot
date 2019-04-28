@@ -45,14 +45,14 @@ def call_bot_regex(command) -> str:
     return '^' + settings.BOT_CALL_PREFIX + r'\d*__' + command + '$'
 
 
-def get_bot_from_call(call: str) -> Bot:
+def get_bot_from_call(call: str, caller: int) -> Bot:
     r = re.search(settings.BOT_ID_REGEX, call)
     if not r:
         raise ValueError('Could not parse bot ID from call.')
 
     bot_id = r.groups()[0]
     try:
-        bot = Bot.objects.get(id=bot_id)
+        bot = Bot.objects.get(id=bot_id, owner__id=caller)
     except Bot.DoesNotExist:
         raise ValueError('Could not find a bot with given ID from call.')
 
