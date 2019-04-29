@@ -14,6 +14,7 @@ ADMIN_HANDLERS = [
     commands.command_menu_handler,
     commands.command_delete_handler,
     commands.command_delete_confirm_handler,
+    commands.command_edit_handlers,
     notifications.notify_handler,
 ]
 
@@ -32,7 +33,7 @@ def get_handler(command):
 
 
 def command_handler(command):
-    return MessageHandler(Filters.regex(f'^{command.text}$'), get_handler(command))
+    return MessageHandler(Filters.regex(f'^{command.caller}$'), get_handler(command))
 
 
 def run_bot_with_handlers(instance):

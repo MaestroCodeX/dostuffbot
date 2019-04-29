@@ -1,7 +1,7 @@
 def command_menu(command):
     return (
         f'***Command***: {command.command}\n'
-        f'***Answer***: {command.content}'
+        f'***Answer***: {command.get_answer_preview()}'
     )
 
 
@@ -17,4 +17,4 @@ def message_mailing_status(done_count, all_count):
 
 
 def delete_command(command):
-    return f'You are about to delete your command ***{command.text}***. Is that correct?'
+    return f'You are about to delete your command ***{command.caller}***. Is that correct?'

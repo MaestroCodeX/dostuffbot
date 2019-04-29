@@ -3,7 +3,11 @@ from telegram.ext import CallbackQueryHandler
 from member import texts, keyboards
 from member.middleware import middleware
 from member.models import Command
-from member.utils import call_command_regex, get_command_from_call
+from member.utils import (
+    call_command_regex,
+    get_command_from_call,
+    get_command_id_from_call,
+)
 
 
 @middleware
@@ -44,6 +48,18 @@ def command_delete(bot, update):
 
 
 @middleware
+def command_edit(bot, update):
+    query = update.callback_query
+
+    command_id = get_command_id_from_call(query.data)
+    query.edit_message_text(
+        text='What do you want to edit?',
+        reply_markup=keyboards.command_edit_markup(command_id),
+        parse_mode='MARKDOWN',
+    )
+
+
+@middleware
 def command_delete_confirm(bot, update):
     '''
     Handle delete confirmation button.
@@ -65,3 +81,4 @@ command_delete_confirm_handler = CallbackQueryHandler(
     command_delete_confirm,
     pattern=call_command_regex('delete_confirm'),
 )
+command_edit_handlers = CallbackQueryHandler(command_edit, pattern=call_command_regex('edit'))

@@ -1,6 +1,7 @@
 from telegram.ext import Dispatcher
 from django.db import models
 
+from core.enums import CommandMessageType
 from core.models import CreatedUpdatedModel
 from main.models import User
 
@@ -51,12 +52,50 @@ class Command(CreatedUpdatedModel):
         on_delete=models.CASCADE,
         related_name='commands',
     )
-    text = models.CharField(max_length=40)
-    content = models.CharField(max_length=400)
+    caller = models.CharField(max_length=40)
 
     @property
     def command(self):
-        return '/' + self.text
+        return '/' + self.caller
+
+    def get_answer_preview(self):
+        messages = self.command_messages.all()
+        answer = ''
+        if messages.exclude(type=CommandMessageType.TEXT).exists():
+            for key, value in CommandMessageType:
+                msgs_count = messages.filter(type=value).count()
+                if msgs_count:
+                    answer += f'[{msgs_count} {key.lower()} message{"s" if msgs_count > 1 else ""}]\n'
+        else:
+            text_message = messages.first()
+            if not text_message:
+                return r'\[No content]'
+            else:
+                answer += text_message.text[:50]
+                if text_message.text_length > 50:
+                    answer += '...'
+                msgs_count = messages.count()
+                if msgs_count > 1:
+                    answer += f'\n[and {msgs_count} text message{"s" if msgs_count > 2 else ""} more...]'
+        return answer
+
+
+class CommandMessage(CreatedUpdatedModel):
+    command = models.ForeignKey(
+        Command,
+        on_delete=models.CASCADE,
+        related_name='command_messages',
+    )
+    type = models.CharField(max_length=20, choices=CommandMessageType)
+    text = models.TextField(blank=True, null=True)
+    text_length = models.IntegerField(default=0)
+    files = models.CharField(max_length=40, blank=True, null=True)
+    images = models.CharField(max_length=40, blank=True, null=True)
+    videos = models.CharField(max_length=40, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.text_length = len(self.text)
+        super().save(*args, **kwargs)
 
 
 class Subscriber(CreatedUpdatedModel):

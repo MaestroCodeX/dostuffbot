@@ -11,7 +11,7 @@ def notify_claim(bot, update):
     query = update.callback_query
     query.edit_message_text(
         'Send a me message that you want to share with your subscribers.',
-        reply_markup=keyboards.CANCEL_M,
+        reply_markup=keyboards.back_start(),
     )
 
     return 1

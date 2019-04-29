@@ -3,6 +3,7 @@ import random
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import env
+from core.enums import CommandMessageType
 from core.utils import back_button, build_deeplink
 from main.utils import call_bot
 from member.utils import call_command
@@ -33,10 +34,18 @@ def commands_markup(commands):
 def command_menu_markup(command):
     keyboard = [
         [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit'))],
-        [InlineKeyboardButton('See answer', callback_data=call_command(command.id, 'full_answer'))],
-        [InlineKeyboardButton('Delete command', callback_data=call_command(command.id, 'delete'))],
-        [back_button('commands list')],
     ]
+    if command.command_messages.exclude(type=CommandMessageType.TEXT).exists():
+        keyboard.append(
+            [InlineKeyboardButton('See full answer', callback_data=call_command(command.id, 'full_answer'))]
+        )
+
+    keyboard.append(
+        [
+            InlineKeyboardButton('Delete command', callback_data=call_command(command.id, 'delete')),
+            back_button('commands list')
+        ]
+    )
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -53,8 +62,17 @@ def confirm_deletion_markup(command):
     return InlineKeyboardMarkup(keyboard)
 
 
-CANCEL_KB = [[
-    InlineKeyboardButton('Cancel', callback_data='start'),
-]]
+def command_edit_markup(command_id):
+    keyboard = [
+        [
+            InlineKeyboardButton('Edit command', callback_data=call_command(command_id, 'edit_text')),
+            InlineKeyboardButton('Edit answer', callback_data=call_command(command_id, 'edit_answer'))
+        ],
+        [back_button('command menu', call_command(command_id, 'menu'))],
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
-CANCEL_M = InlineKeyboardMarkup(CANCEL_KB)
+
+def back_start():
+    keyboard = [[back_button('menu', 'start')]]
+    return InlineKeyboardMarkup(keyboard)

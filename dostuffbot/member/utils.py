@@ -24,12 +24,15 @@ def call_command_regex(command) -> str:
     return '^' + settings.COMMAND_CALL_PREFIX + r'\d*__' + command + '$'
 
 
-def get_command_from_call(call):
+def get_command_id_from_call(call):
     r = re.search(settings.COMMAND_ID_REGEX, call)
     if not r:
         raise ValueError('Could not parse command ID from call.')
+    return r.groups()[0]
 
-    command_id = r.groups()[0]
+
+def get_command_from_call(call):
+    command_id = get_command_id_from_call(call)
     try:
         command = Command.objects.get(id=command_id)
     except Command.DoesNotExist:
