@@ -66,7 +66,7 @@ def command_edit_markup(command_id):
     keyboard = [
         [
             InlineKeyboardButton('Edit command', callback_data=call_command(command_id, 'edit_text')),
-            InlineKeyboardButton('Edit answer', callback_data=call_command(command_id, 'edit_answer'))
+            InlineKeyboardButton('Edit response', callback_data=call_command(command_id, 'edit_answer'))
         ],
         [back_button('command menu', call_command(command_id, 'menu'))],
     ]
