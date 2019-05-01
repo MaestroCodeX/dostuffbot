@@ -1,6 +1,6 @@
 def command_menu(command):
     return (
-        f'***Command***: {command.command}\n'
+        f'***Command***: {command.caller}\n'
         f'***Answer***: {command.get_answer_preview()}'
     )
 

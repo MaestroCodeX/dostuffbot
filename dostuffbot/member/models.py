@@ -54,9 +54,12 @@ class Command(CreatedUpdatedModel):
     )
     caller = models.CharField(max_length=40)
 
-    @property
-    def command(self):
-        return '/' + self.caller
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            db_bot = Dispatcher.get_instance().db_bot
+            self.bot = db_bot
+
+        super().save(*args, **kwargs)
 
     def get_answer_preview(self):
         messages = self.command_messages.all()
@@ -76,7 +79,7 @@ class Command(CreatedUpdatedModel):
                     answer += '...'
                 msgs_count = messages.count()
                 if msgs_count > 1:
-                    answer += f'\n[and {msgs_count} text message{"s" if msgs_count > 2 else ""} more...]'
+                    answer += f'\n[and {msgs_count - 1} text message{"s" if msgs_count > 2 else ""} more...]'
         return answer
 
 

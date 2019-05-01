@@ -21,7 +21,7 @@ def start_markup(bot):
 
 def commands_markup(commands):
     keyboard = [
-        [InlineKeyboardButton(c.command, callback_data=call_command(c.id, 'menu'))]
+        [InlineKeyboardButton(c.caller, callback_data=call_command(c.id, 'menu'))]
         for c in commands
     ]
     keyboard.append([

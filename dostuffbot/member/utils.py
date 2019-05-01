@@ -1,8 +1,9 @@
 import re
 
+from telegram.ext import MessageHandler, Filters
 from django.conf import settings
 
-from member.models import BotAdmin, Command
+from member.models import BotAdmin, Command, Subscriber, Bot
 
 
 def admin_only(func):
@@ -39,3 +40,22 @@ def get_command_from_call(call):
         raise ValueError('Could not find a command with given ID from call.')
 
     return command
+
+
+def get_handler(command):
+    def handler(bot, update):
+        user_bot = bot.get_me()
+        my_bot = Bot.objects.get(id=user_bot.id)
+        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=my_bot)
+        messages = command.command_messages.all()
+        for message in messages:
+            update.message.reply_text(
+                message.text,
+                parse_mode='MARKDOWN',
+            )
+
+    return handler
+
+
+def command_handler(command):
+    return MessageHandler(Filters.regex(f'^{command.caller}$'), get_handler(command))

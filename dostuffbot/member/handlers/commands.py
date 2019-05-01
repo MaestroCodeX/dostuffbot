@@ -1,12 +1,12 @@
-import re
+from telegram.ext import CallbackQueryHandler, Dispatcher, ConversationHandler, MessageHandler, Filters, CommandHandler
 
-from telegram.ext import CallbackQueryHandler
-
+from core.enums import CommandMessageType
 from member import texts, keyboards
 from member.middleware import middleware
-from member.models import Command
+from member.models import Command, CommandMessage
 from member.utils import (
     call_command_regex,
+    command_handler,
     get_command_from_call,
     get_command_id_from_call,
 )
@@ -38,13 +38,62 @@ def command_add(bot, update):
         parse_mode='MARKDOWN',
     )
 
+    return 1
 
+
+@middleware
 def command_add_caller(bot, update):
     caller = update.message.text
-    if not re.match(r'^\/\w+$', caller):
-        update.message.reply_text(
-            'The command should start with / and can only contain [a-Z] letters, [0-9] numbers and "\\_"',
-        )
+
+    if Command.objects.filter(caller=caller).exists():
+        update.message.reply_text(f'The command {caller} already exists.')
+        return 1
+
+    Command.objects.create(caller=caller)
+
+    update.message.reply_text(
+        f'Now send me everything that bot will answer when user types {caller}',
+    )
+
+    return 2
+
+
+@middleware
+def command_add_caller_invalid(bot, update):
+    update.message.reply_text(
+        'The command should start with / and can only contain [a-Z] letters, [0-9] numbers and [_] underscores',
+    )
+    return 1
+
+
+@middleware
+def command_add_message(bot, update):
+    text = update.message.text
+    command = Command.objects.latest('id')
+    CommandMessage.objects.create(command=command, type=CommandMessageType.TEXT, text=text)
+    update.message.reply_text(
+        'Message saved. Continue sending messsages or /complete to save the command.',
+    )
+
+    return 2
+
+
+@middleware
+def command_add_complete(bot, update):
+    update.message.reply_text(
+        'Congratulations! The command was added to your bot.',
+    )
+    command = Command.objects.latest('id')
+    handler = command_handler(command)
+    dp = Dispatcher.get_instance()
+    dp.add_handler(handler)
+    commands = Command.objects.all()
+    update.message.reply_text(
+        'This is a list of your commands. Select command to see the details:',
+        reply_markup=keyboards.commands_markup(commands),
+        parse_mode='MARKDOWN',
+    )
+    return ConversationHandler.END
 
 
 @middleware
@@ -112,8 +161,11 @@ def command_delete_confirm(bot, update):
     commands_list(bot, update)
 
 
+def idle(bot, update):
+    pass
+
+
 commands_list_handler = CallbackQueryHandler(commands_list, pattern='commands_list')
-command_add_handler = CallbackQueryHandler(command_add, pattern='command_add')
 command_menu_handler = CallbackQueryHandler(command_menu, pattern=call_command_regex('menu'))
 command_delete_handler = CallbackQueryHandler(command_delete, pattern=call_command_regex('delete'))
 command_delete_confirm_handler = CallbackQueryHandler(
@@ -121,3 +173,17 @@ command_delete_confirm_handler = CallbackQueryHandler(
     pattern=call_command_regex('delete_confirm'),
 )
 command_edit_handlers = CallbackQueryHandler(command_edit, pattern=call_command_regex('edit'))
+command_add_handler = ConversationHandler(
+    entry_points=[CallbackQueryHandler(command_add, pattern='command_add')],
+    states={
+        1: [
+            MessageHandler(Filters.command, command_add_caller),
+            MessageHandler(Filters.text, command_add_caller_invalid),
+        ],
+        2: [
+            MessageHandler(Filters.text, command_add_message),
+            CommandHandler('complete', command_add_complete),
+        ],
+    },
+    fallbacks=[MessageHandler(Filters.all, idle)]
+)
