@@ -10,9 +10,6 @@ from member.utils import admin_only
 @admin_only
 @middleware
 def start_command(bot, update):
-    dispatcher = Dispatcher.get_instance()
-    db_bot = dispatcher.db_bot
-
     args = update.message.text.split()
     if len(args) > 1:
         handle_deeplink(bot, update, args[1])
@@ -21,7 +18,7 @@ def start_command(bot, update):
 
     update.message.reply_text(
         'Choose an option from the list below:',
-        reply_markup=keyboards.start_markup(db_bot),
+        reply_markup=keyboards.start_markup(bot.db_bot),
         parse_mode='MARKDOWN',
     )
 
@@ -29,12 +26,10 @@ def start_command(bot, update):
 @middleware
 def start(bot, update):
     query = update.callback_query
-    dispatcher = Dispatcher.get_instance()
-    db_bot = dispatcher.db_bot
 
     query.edit_message_text(
         'Choose an option from the list below:',
-        reply_markup=keyboards.start_markup(db_bot),
+        reply_markup=keyboards.start_markup(bot.db_bot),
         parse_mode='MARKDOWN',
     )
 

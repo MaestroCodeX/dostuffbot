@@ -25,6 +25,7 @@ def run_bot_with_handlers(instance):
     updater = Updater(instance.token)
     dp = updater.dispatcher
     dp.db_bot = instance
+    dp.bot.db_bot = instance
 
     # Add handlers
     for handler in ADMIN_HANDLERS:

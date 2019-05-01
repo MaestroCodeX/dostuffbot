@@ -49,7 +49,7 @@ def command_add_caller(bot, update):
         update.message.reply_text(f'The command {caller} already exists.')
         return 1
 
-    Command.objects.create(caller=caller)
+    Command.objects.create(bot=bot.db_bot, caller=caller)
 
     update.message.reply_text(
         f'Now send me everything that bot will answer when user types {caller}',
@@ -70,7 +70,11 @@ def command_add_caller_invalid(bot, update):
 def command_add_message(bot, update):
     text = update.message.text
     command = Command.objects.latest('id')
-    CommandMessage.objects.create(command=command, type=CommandMessageType.TEXT, text=text)
+    CommandMessage.objects.create(
+        command=command,
+        type=CommandMessageType.TEXT,
+        text=text,
+    )
     update.message.reply_text(
         'Message saved. Continue sending messsages or /complete to save the command.',
     )

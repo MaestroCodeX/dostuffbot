@@ -55,10 +55,6 @@ class Command(CreatedUpdatedModel):
     caller = models.CharField(max_length=40)
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            db_bot = Dispatcher.get_instance().db_bot
-            self.bot = db_bot
-
         super().save(*args, **kwargs)
 
     def get_answer_preview(self):
