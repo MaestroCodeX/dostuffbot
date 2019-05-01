@@ -1,3 +1,5 @@
+import re
+
 from telegram.ext import CallbackQueryHandler
 
 from member import texts, keyboards
@@ -19,6 +21,30 @@ def commands_list(bot, update):
         reply_markup=keyboards.commands_markup(commands),
         parse_mode='MARKDOWN',
     )
+
+
+@middleware
+def command_add(bot, update):
+    query = update.callback_query
+
+    text = (
+        'Now send a command that you want to add.\n\n'
+        'Here are some examples:\n'
+        '/start\n/help\n/about\\_project\n/chapter\\_3'
+    )
+    query.edit_message_text(
+        text,
+        reply_markup=keyboards.back_markup('commands list'),
+        parse_mode='MARKDOWN',
+    )
+
+
+def command_add_caller(bot, update):
+    caller = update.message.text
+    if not re.match(r'^\/\w+$', caller):
+        update.message.reply_text(
+            'The command should start with / and can only contain [a-Z] letters, [0-9] numbers and "\\_"',
+        )
 
 
 @middleware
@@ -60,6 +86,18 @@ def command_edit(bot, update):
 
 
 @middleware
+def command_edit_command(bot, update):
+    query = update.callback_query
+
+    command_id = get_command_id_from_call(query.data)
+    query.edit_message_text(
+        text='What do you want to edit?',
+        reply_markup=keyboards.command_edit_markup(command_id),
+        parse_mode='MARKDOWN',
+    )
+
+
+@middleware
 def command_delete_confirm(bot, update):
     '''
     Handle delete confirmation button.
@@ -75,6 +113,7 @@ def command_delete_confirm(bot, update):
 
 
 commands_list_handler = CallbackQueryHandler(commands_list, pattern='commands_list')
+command_add_handler = CallbackQueryHandler(command_add, pattern='command_add')
 command_menu_handler = CallbackQueryHandler(command_menu, pattern=call_command_regex('menu'))
 command_delete_handler = CallbackQueryHandler(command_delete, pattern=call_command_regex('delete'))
 command_delete_confirm_handler = CallbackQueryHandler(

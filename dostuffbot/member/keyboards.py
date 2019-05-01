@@ -73,6 +73,11 @@ def command_edit_markup(command_id):
     return InlineKeyboardMarkup(keyboard)
 
 
+def back_markup(caption, data=None):
+    keyboard = [[back_button(caption, data or caption)]]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def back_start():
     keyboard = [[back_button('menu', 'start')]]
     return InlineKeyboardMarkup(keyboard)

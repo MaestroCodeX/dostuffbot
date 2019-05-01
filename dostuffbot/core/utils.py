@@ -2,9 +2,10 @@ from telegram import InlineKeyboardButton
 
 
 def back_button(section, callback_data=None):
+    callback_data = callback_data or section
     return InlineKeyboardButton(
         f'« Back to {section}',
-        callback_data=callback_data or section.replace(' ', '_'),
+        callback_data=callback_data.replace(' ', '_'),
     )
 
 
