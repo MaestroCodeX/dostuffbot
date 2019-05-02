@@ -1,6 +1,6 @@
 from telegram.ext import CallbackQueryHandler, Dispatcher, ConversationHandler, MessageHandler, Filters, CommandHandler
 
-from core.enums import CommandMessageType
+from core.enums import CommandMessageType, CommandStatus
 from member import texts, keyboards
 from member.middleware import middleware
 from member.models import Command, CommandMessage
@@ -15,10 +15,21 @@ from member.utils import (
 @middleware
 def commands_list(bot, update):
     query = update.callback_query
-    commands = Command.objects.all()
+    commands = Command.objects.filter(bot=bot.db_bot)
     query.edit_message_text(
         'This is a list of your commands. Select command to see the details:',
         reply_markup=keyboards.commands_markup(commands),
+        parse_mode='MARKDOWN',
+    )
+
+
+@middleware
+def command_menu(bot, update):
+    query = update.callback_query
+    command = get_command_from_call(bot, query.data)
+    query.edit_message_text(
+        texts.command_menu(command),
+        reply_markup=keyboards.command_menu_markup(command),
         parse_mode='MARKDOWN',
     )
 
@@ -45,7 +56,7 @@ def command_add(bot, update):
 def command_add_caller(bot, update):
     caller = update.message.text
 
-    if Command.objects.filter(caller=caller).exists():
+    if Command.objects.filter(bot=bot.db_bot, caller=caller).exists():
         update.message.reply_text(f'The command {caller} already exists.')
         return 1
 
@@ -101,17 +112,6 @@ def command_add_complete(bot, update):
 
 
 @middleware
-def command_menu(bot, update):
-    query = update.callback_query
-    command = get_command_from_call(query.data)
-    query.edit_message_text(
-        texts.command_menu(command),
-        reply_markup=keyboards.command_menu_markup(command),
-        parse_mode='MARKDOWN',
-    )
-
-
-@middleware
 def command_delete(bot, update):
     '''
     Handle delete button in command menu.
@@ -119,7 +119,7 @@ def command_delete(bot, update):
     '''
     query = update.callback_query
 
-    command = get_command_from_call(query.data)
+    command = get_command_from_call(bot, query.data)
     text = texts.delete_command(command)
     markup = keyboards.confirm_deletion_markup(command)
 
@@ -127,25 +127,30 @@ def command_delete(bot, update):
 
 
 @middleware
-def command_edit(bot, update):
+def command_edit_caller(bot, update):
     query = update.callback_query
 
     command_id = get_command_id_from_call(query.data)
     query.edit_message_text(
-        text='What do you want to edit?',
-        reply_markup=keyboards.command_edit_markup(command_id),
+        text='Send me a new command.',
+        reply_markup=keyboards.back_command_menu_markup(command_id),
         parse_mode='MARKDOWN',
     )
 
 
 @middleware
-def command_edit_command(bot, update):
-    query = update.callback_query
+def command_edit_caller_sent(bot, update):
+    caller = update.message.text
 
-    command_id = get_command_id_from_call(query.data)
-    query.edit_message_text(
-        text='What do you want to edit?',
-        reply_markup=keyboards.command_edit_markup(command_id),
+    if Command.objects.filter(bot=bot.db_bot, caller=caller).exists():
+        update.message.reply_text(f'The command {caller} already exists.')
+
+    command = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.EDIT_CALLER).first()
+    command.caller = caller
+    command.save()
+    update.message.reply_text(
+        texts.command_menu(command),
+        reply_markup=keyboards.command_menu_markup(command),
         parse_mode='MARKDOWN',
     )
 
@@ -158,7 +163,7 @@ def command_delete_confirm(bot, update):
     '''
     query = update.callback_query
 
-    command = get_command_from_call(query.data)
+    command = get_command_from_call(bot, query.data)
     command.delete()
 
     query.answer('The command has disappeared...')
@@ -176,7 +181,7 @@ command_delete_confirm_handler = CallbackQueryHandler(
     command_delete_confirm,
     pattern=call_command_regex('delete_confirm'),
 )
-command_edit_handlers = CallbackQueryHandler(command_edit, pattern=call_command_regex('edit'))
+command_edit_caller_handler = CallbackQueryHandler(command_edit_caller, pattern=call_command_regex('edit_caller'))
 command_add_handler = ConversationHandler(
     entry_points=[CallbackQueryHandler(command_add, pattern='command_add')],
     states={

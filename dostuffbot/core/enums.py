@@ -32,3 +32,9 @@ class CommandMessageType(ChoicesEnum):
     FILES = 'FILES'
     IMAGES = 'IMAGES'
     VIDEOS = 'VIDEOS'
+
+
+class CommandStatus(ChoicesEnum):
+    DONE = 'DONE'
+    EDIT_CALLER = 'EDIT_CALLER'
+    EDIT_ANSWER = 'EDIT_ANSWER'

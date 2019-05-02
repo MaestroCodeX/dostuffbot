@@ -33,7 +33,8 @@ def commands_markup(commands):
 
 def command_menu_markup(command):
     keyboard = [
-        [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit'))],
+        [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit_caller'))],
+        [InlineKeyboardButton('Edit answer', callback_data=call_command(command.id, 'edit_answer'))],
     ]
     if command.command_messages.exclude(type=CommandMessageType.TEXT).exists():
         keyboard.append(
@@ -62,22 +63,10 @@ def confirm_deletion_markup(command):
     return InlineKeyboardMarkup(keyboard)
 
 
-def command_edit_markup(command_id):
-    keyboard = [
-        [
-            InlineKeyboardButton('Edit command', callback_data=call_command(command_id, 'edit_text')),
-            InlineKeyboardButton('Edit response', callback_data=call_command(command_id, 'edit_answer'))
-        ],
-        [back_button('command menu', call_command(command_id, 'menu'))],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
 def back_markup(caption, data=None):
     keyboard = [[back_button(caption, data or caption)]]
     return InlineKeyboardMarkup(keyboard)
 
 
-def back_start():
-    keyboard = [[back_button('menu', 'start')]]
-    return InlineKeyboardMarkup(keyboard)
+def back_command_menu_markup(command_id):
+    return back_markup('command menu', call_command(command_id, 'menu'))

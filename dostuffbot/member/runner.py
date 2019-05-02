@@ -15,7 +15,7 @@ ADMIN_HANDLERS = [
     commands.command_menu_handler,
     commands.command_delete_handler,
     commands.command_delete_confirm_handler,
-    commands.command_edit_handlers,
+    commands.command_edit_caller_handler,
     notifications.notify_handler,
 ]
 

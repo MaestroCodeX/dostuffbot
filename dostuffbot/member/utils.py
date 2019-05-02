@@ -9,7 +9,7 @@ from member.models import BotAdmin, Command, Subscriber, Bot
 def admin_only(func):
     def func_wrapper(bot, update):
         user_id = update.effective_user.id
-        if not BotAdmin.objects.filter(user__id=user_id).exists():
+        if not BotAdmin.objects.filter(bot=bot.db_bot, user__id=user_id).exists():
             return
 
         return func(bot, update)
@@ -32,10 +32,10 @@ def get_command_id_from_call(call):
     return r.groups()[0]
 
 
-def get_command_from_call(call):
+def get_command_from_call(bot, call):
     command_id = get_command_id_from_call(call)
     try:
-        command = Command.objects.get(id=command_id)
+        command = Command.objects.get(id=command_id, bot=bot.db_bot)
     except Command.DoesNotExist:
         raise ValueError('Could not find a command with given ID from call.')
 
@@ -44,9 +44,7 @@ def get_command_from_call(call):
 
 def get_handler(command):
     def handler(bot, update):
-        user_bot = bot.get_me()
-        my_bot = Bot.objects.get(id=user_bot.id)
-        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=my_bot)
+        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=bot.db_bot)
         messages = command.command_messages.all()
         for message in messages:
             update.message.reply_text(

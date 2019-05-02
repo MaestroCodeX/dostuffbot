@@ -10,8 +10,8 @@ from member.models import Subscriber
 def notify_claim(bot, update):
     query = update.callback_query
     query.edit_message_text(
-        'Send a me message that you want to share with your subscribers.',
-        reply_markup=keyboards.back_start(),
+        'Send me a message that you want to share with your subscribers.',
+        reply_markup=keyboards.back_markup('menu', 'start'),
     )
 
     return 1
@@ -28,7 +28,7 @@ def _notify_subscribers(bot, subs, message):
 
 @middleware
 def notify_subcribers(bot, update):
-    subs = Subscriber.objects.all()
+    subs = Subscriber.objects.filter(bot=bot.db_bot)
     message = update.message
     _notify_subscribers(bot, subs, message)
 

@@ -1,16 +1,8 @@
-from telegram.ext import Dispatcher
 from django.db import models
 
-from core.enums import CommandMessageType
+from core.enums import CommandMessageType, CommandStatus
 from core.models import CreatedUpdatedModel
 from main.models import User
-
-
-class BotAccessManager(models.Manager):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        bot = Dispatcher.get_instance().db_bot
-        return queryset.filter(bot=bot)
 
 
 class Bot(CreatedUpdatedModel):
@@ -29,54 +21,63 @@ class Bot(CreatedUpdatedModel):
 
 
 class BotAdmin(CreatedUpdatedModel):
-    objects = BotAccessManager()
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='bot_admins',
-    )
     bot = models.ForeignKey(
         Bot,
         on_delete=models.CASCADE,
         related_name='admins',
     )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bot_admins',
+    )
     is_owner = models.BooleanField(default=False)
 
 
 class Command(CreatedUpdatedModel):
-    objects = BotAccessManager()
-
     bot = models.ForeignKey(
         Bot,
         on_delete=models.CASCADE,
         related_name='commands',
     )
+    status = models.CharField(max_length=20, choices=CommandStatus)
     caller = models.CharField(max_length=40)
+    amswer_preview = models.CharField(max_length=80)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def update_answer_preview(self):
+        command_messages = self.command_messages.all()
+        max_text_length = 500
+        text_length = 0
+        answer_preview = []
+        text_count = 0
+        for message in command_messages:
+            if message.type == CommandMessageType.TEXT:
+                chars_left = max_text_length - text_length
+                if chars_left <= 0:
+                    text_count += 1
+                    continue
+                block = {
+                    'type': CommandMessageType.TEXT,
+                    'show': 'full',
+                    'limit': None
+                }
+                if len(message.text) > chars_left:
+                    block['show'] = 'part'
+                    block['limit'] = chars_left
+                text_length += len(message.text)
+                answer_preview.append(block)
+        if text_count:
+            block = {
+                'type': CommandMessageType.TEXT,
+                'show': 'count',
+                'count': text_count,
+            }
+            answer_preview.append(block)
+        self.answer_preview = answer_preview
+        self.save(update_fields=answer_preview)
 
     def get_answer_preview(self):
-        messages = self.command_messages.all()
-        answer = ''
-        if messages.exclude(type=CommandMessageType.TEXT).exists():
-            for key, value in CommandMessageType:
-                msgs_count = messages.filter(type=value).count()
-                if msgs_count:
-                    answer += f'[{msgs_count} {key.lower()} message{"s" if msgs_count > 1 else ""}]\n'
-        else:
-            text_message = messages.first()
-            if not text_message:
-                return r'\[No content]'
-            else:
-                answer += text_message.text[:50]
-                if text_message.text_length > 50:
-                    answer += '...'
-                msgs_count = messages.count()
-                if msgs_count > 1:
-                    answer += f'\n[and {msgs_count - 1} text message{"s" if msgs_count > 2 else ""} more...]'
-        return answer
+        return 'answer'
 
 
 class CommandMessage(CreatedUpdatedModel):
@@ -98,8 +99,6 @@ class CommandMessage(CreatedUpdatedModel):
 
 
 class Subscriber(CreatedUpdatedModel):
-    objects = BotAccessManager()
-
     bot = models.ForeignKey(
         Bot,
         on_delete=models.CASCADE,
