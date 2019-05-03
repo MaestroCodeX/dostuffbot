@@ -1,3 +1,5 @@
+import emoji
+
 from telegram import InlineKeyboardButton
 
 
@@ -23,3 +25,7 @@ def get_fullname(user):
     if user.last_name:
         fullname += ' ' + user.last_name
     return fullname
+
+
+def emojize(text):
+    return emoji.emojize(text, use_aliases=True)

@@ -1,17 +1,11 @@
 import re
-import emoji
 import logging
 
 from telegram import Message
 from django.conf import settings
 
-# from main.constants import BOT_CALL_PREFIX, BOT_ID_REGEX
 from main.models import User
 from member.models import Bot
-
-
-def emojize(text):
-    return emoji.emojize(text, use_aliases=True)
 
 
 def get_or_create_user(message: Message) -> User:

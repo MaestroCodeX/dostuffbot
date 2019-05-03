@@ -1,5 +1,5 @@
 from django.conf import settings as django_settings
-from main.utils import emojize
+from core.utils import emojize
 
 
 def donate_custom(n):
@@ -32,7 +32,7 @@ def settings(user):
     return text.format(lang=lang)
 
 
-START = _(
+START = (
     '***Dostuffbot*** is created to help you build your own bots without any coding. '
     'It\'s simple and absolutely free for use.'
 )

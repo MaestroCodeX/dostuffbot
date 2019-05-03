@@ -7,7 +7,11 @@ def middleware(func):
     def func_wrapper(bot, update):
         for middleware in MIDDLEWARES:
             middleware(bot, update)
-        return func(bot, update)
+
+        try:
+            return func(bot, update)
+        except Exception as e:
+            logging.error(e)
 
     return func_wrapper
 

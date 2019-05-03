@@ -11,9 +11,12 @@ from member.utils import (
     get_command_id_from_call,
 )
 
+SEND_CALLER, SEND_MESSAGE = range(2)
+
 
 @middleware
 def commands_list(bot, update):
+    ''' Callback function to show all commands. '''
     query = update.callback_query
     commands = Command.objects.filter(bot=bot.db_bot)
     query.edit_message_text(
@@ -25,6 +28,7 @@ def commands_list(bot, update):
 
 @middleware
 def command_menu(bot, update):
+    ''' Callback function to show command menu that was chosen from the list. '''
     query = update.callback_query
     command = get_command_from_call(bot, query.data)
     query.edit_message_text(
@@ -36,6 +40,7 @@ def command_menu(bot, update):
 
 @middleware
 def command_add(bot, update):
+    ''' Callback function to handle 'Add command' button. '''
     query = update.callback_query
 
     text = (
@@ -49,16 +54,21 @@ def command_add(bot, update):
         parse_mode='MARKDOWN',
     )
 
-    return 1
+    return SEND_CALLER
 
 
 @middleware
 def command_add_caller(bot, update):
+    ''' Callback function to handle message with command caller. '''
     caller = update.message.text
+
+    if len(caller) > 32:
+        update.message.reply_text(f'Ensure your command length is less than 32 characters.')
+        return SEND_CALLER
 
     if Command.objects.filter(bot=bot.db_bot, caller=caller).exists():
         update.message.reply_text(f'The command {caller} already exists.')
-        return 1
+        return SEND_CALLER
 
     Command.objects.create(bot=bot.db_bot, caller=caller)
 
@@ -66,19 +76,26 @@ def command_add_caller(bot, update):
         f'Now send me everything that bot will answer when user types {caller}',
     )
 
-    return 2
+    return SEND_MESSAGE
 
 
 @middleware
 def command_add_caller_invalid(bot, update):
-    update.message.reply_text(
-        'The command should start with / and can only contain [a-Z] letters, [0-9] numbers and [_] underscores',
+    ''' Callback function to handle message when command is invalid. '''
+    text = (
+        'The command should start with /\n'
+        'Max. length is 32 characters.\n'
+        'The command can only contain:'
+        '\n - [a-Z] letters\n - [0-9] numbers\n - [_] underscores'
     )
-    return 1
+    update.message.reply_text(text)
+
+    return SEND_CALLER
 
 
 @middleware
 def command_add_message(bot, update):
+    ''' Callback function to handle message for command. Returns its state to make the process repetitive. '''
     text = update.message.text
     command = Command.objects.latest('id')
     CommandMessage.objects.create(
@@ -90,11 +107,12 @@ def command_add_message(bot, update):
         'Message saved. Continue sending messsages or /complete to save the command.',
     )
 
-    return 2
+    return SEND_MESSAGE
 
 
 @middleware
 def command_add_complete(bot, update):
+    ''' Callback function to handle /complete command to finish command adding. '''
     update.message.reply_text(
         'Congratulations! The command was added to your bot.',
     )
@@ -128,6 +146,7 @@ def command_delete(bot, update):
 
 @middleware
 def command_edit_caller(bot, update):
+    ''' Callback function to handle edit command button. '''
     query = update.callback_query
 
     command_id = get_command_id_from_call(query.data)
@@ -140,6 +159,7 @@ def command_edit_caller(bot, update):
 
 @middleware
 def command_edit_caller_sent(bot, update):
+    ''' Callback function to handle editing commmand state when caller text was sent. '''
     caller = update.message.text
 
     if Command.objects.filter(bot=bot.db_bot, caller=caller).exists():
@@ -185,11 +205,11 @@ command_edit_caller_handler = CallbackQueryHandler(command_edit_caller, pattern=
 command_add_handler = ConversationHandler(
     entry_points=[CallbackQueryHandler(command_add, pattern='command_add')],
     states={
-        1: [
+        SEND_CALLER: [
             MessageHandler(Filters.command, command_add_caller),
             MessageHandler(Filters.text, command_add_caller_invalid),
         ],
-        2: [
+        SEND_MESSAGE: [
             MessageHandler(Filters.text, command_add_message),
             CommandHandler('complete', command_add_complete),
         ],

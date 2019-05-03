@@ -5,6 +5,8 @@ from member.handlers import start
 from member.middleware import middleware
 from member.models import Subscriber
 
+SEND_MESSAGE = range(1)
+
 
 @middleware
 def notify_claim(bot, update):
@@ -14,7 +16,7 @@ def notify_claim(bot, update):
         reply_markup=keyboards.back_markup('menu', 'start'),
     )
 
-    return 1
+    return SEND_MESSAGE
 
 
 def _notify_subscribers(bot, subs, message):
@@ -24,6 +26,7 @@ def _notify_subscribers(bot, subs, message):
         bot.send_message(chat_id=sub.id, text=message.text)
         text_status = texts.message_mailing_status(i, subs.count())
         status_message.edit_text(text_status)
+    status_message.edit_text(texts.notification_sent(subs.count(), subs.count()))
 
 
 @middleware
@@ -31,24 +34,18 @@ def notify_subcribers(bot, update):
     subs = Subscriber.objects.filter(bot=bot.db_bot)
     message = update.message
     _notify_subscribers(bot, subs, message)
+    start.start_command(bot, update)
 
-    update.message.reply_text(texts.notification_sent(subs))
-
-    return ConversationHandler.END
-
-
-@middleware
-def cancel_notification(bot, update):
-    start.start(bot, update)
     return ConversationHandler.END
 
 
 notify_handler = ConversationHandler(
     entry_points=[CallbackQueryHandler(notify_claim, pattern='^notify$')],
     states={
-        1: [
+        SEND_MESSAGE: [
             MessageHandler(Filters.text, notify_subcribers),
         ],
     },
-    fallbacks=[CallbackQueryHandler(cancel_notification, pattern='^start$')],
+    fallbacks=[],
+    allow_reentry=True,
 )
