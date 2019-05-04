@@ -34,7 +34,7 @@ def notify_subcribers(bot, update):
     subs = Subscriber.objects.filter(bot=bot.db_bot)
     message = update.message
     _notify_subscribers(bot, subs, message)
-    start.start_command(bot, update)
+    start.start(bot, update)
 
     return ConversationHandler.END
 

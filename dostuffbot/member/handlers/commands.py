@@ -1,6 +1,8 @@
 from telegram.ext import CallbackQueryHandler, Dispatcher, ConversationHandler, MessageHandler, Filters, CommandHandler
+from django.conf import settings
 
 from core.enums import CommandMessageType, CommandStatus
+from core.utils import get_reply_function
 from member import texts, keyboards
 from member.middleware import middleware
 from member.models import Command, CommandMessage
@@ -17,9 +19,12 @@ SEND_CALLER, SEND_MESSAGE = range(2)
 @middleware
 def commands_list(bot, update):
     ''' Callback function to show all commands. '''
-    query = update.callback_query
+    reply_func = get_reply_function(update)
+    if not reply_func:
+        return
+
     commands = Command.objects.filter(bot=bot.db_bot)
-    query.edit_message_text(
+    reply_func(
         'This is a list of your commands. Select command to see the details:',
         reply_markup=keyboards.commands_markup(commands),
         parse_mode='MARKDOWN',
@@ -184,6 +189,10 @@ def command_delete_confirm(bot, update):
     query = update.callback_query
 
     command = get_command_from_call(bot, query.data)
+    dp = Dispatcher.get_instance()
+    handlers = dp.handlers[settings.DEFAULT_HANDLER_GROUP]
+    for handler in handlers:
+        print(handler.filters)
     command.delete()
 
     query.answer('The command has disappeared...')

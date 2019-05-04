@@ -1,17 +1,26 @@
 import logging
+import inspect
 
-from core.utils import get_fullname
+from core.utils import get_fullname, get_telegram_user_from_update
 
 
 def middleware(func):
-    def func_wrapper(bot, update):
+    def func_wrapper(*args, **kwargs):
         for middleware in MIDDLEWARES:
-            middleware(bot, update)
+            middleware(*args, **kwargs)
 
         try:
-            return func(bot, update)
+            return func(*args, **kwargs)
         except Exception as e:
             logging.error(e)
+            kwargs = inspect.getcallargs(func, *args, **kwargs)
+            update = kwargs.get('update')
+            bot = kwargs.get('bot')
+            if not all((update, bot)):
+                logging.info(f'Exception of type {type(e)} was raised.')
+                return
+            user_id = get_telegram_user_from_update(update).id or 'unknown'
+            logging.info(f'Could not proceed the request for user {user_id}. Exception of type {type(e)} was raised.')
 
     return func_wrapper
 

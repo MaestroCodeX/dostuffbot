@@ -3,7 +3,7 @@ import re
 from telegram.ext import MessageHandler, Filters
 from django.conf import settings
 
-from member.models import BotAdmin, Command, Subscriber, Bot
+from member.models import BotAdmin, Command, Subscriber
 
 
 def admin_only(func):
