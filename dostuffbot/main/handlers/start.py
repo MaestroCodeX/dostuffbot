@@ -15,9 +15,10 @@ def start_command(bot, update):
     user = get_or_create_user(message)
     args = update.message.text.split()[1:]
     if args:
-        handle_deeplink(bot, update, args)
-        # break further execution as soon as user did't want to send start command
-        return
+        success = handle_deeplink(bot, update, args)
+        # break further execution if handler returned True as soon as user did't want to send start command
+        if success:
+            return
 
     context = {
         'text': texts.START,
@@ -50,7 +51,12 @@ def start(bot, update):
 def handle_deeplink(bot, update, args):
     command = args[0]
     if call_bot_regex('profile').match(command):
-        management.bot_profile_command(bot, update)
+        try:
+            management.bot_profile_command(bot, update)
+            return True
+        except Exception:
+            pass
+    return False
 
 
 start_command_handler = CommandHandler('start', start_command)
