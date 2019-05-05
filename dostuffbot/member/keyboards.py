@@ -13,7 +13,7 @@ def start_markup(bot):
     keyboard = [
         [InlineKeyboardButton('Commands', callback_data='commands_list')],
         [InlineKeyboardButton('Send notification', callback_data='notify')],
-        [InlineKeyboardButton('Settings', url=build_deeplink(env.BOT_USERNAME, call_bot(bot.id, 'settings')))],
+        [InlineKeyboardButton('Settings', url=build_deeplink(env.BOT_USERNAME, call_bot(bot.id, 'profile')))],
     ]
 
     return InlineKeyboardMarkup(keyboard)

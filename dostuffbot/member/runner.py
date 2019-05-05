@@ -7,7 +7,6 @@ from core import logger
 from member.handlers import start, commands, notifications
 from member.utils import command_handler
 
-ADMIN_GROUP = 1
 ADMIN_HANDLERS = [
     start.start_handler,
     start.start_command_handler,
@@ -30,7 +29,7 @@ def run_bot_with_handlers(instance):
 
     # Add handlers
     for handler in ADMIN_HANDLERS:
-        dp.add_handler(handler, group=ADMIN_GROUP)
+        dp.add_handler(handler, group=settings.ADMIN_HANDLER_GROUP)
 
     commands = instance.commands.all()
     for command in commands:

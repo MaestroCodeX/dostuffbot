@@ -104,7 +104,6 @@ def bot_profile_markup(bot):
     keyboard = [
         [
             InlineKeyboardButton('Manage commands', url=build_deeplink(bot.username, DeepCommand.COMMANDS)),
-            InlineKeyboardButton('Notify bot users', url=build_deeplink(bot.username, DeepCommand.NOTIFY)),
         ],
         [
             InlineKeyboardButton('Settings', callback_data=call_bot(bot.id, 'settings')),

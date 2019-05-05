@@ -35,6 +35,19 @@ def bot_profile(bot, update):
     )
 
 
+def bot_profile_command(bot, update):
+    ''' Show bot profile called with deeplink. '''
+    message = update.message
+
+    bot = get_bot_from_call(message.text, message.from_user.id)
+
+    message.reply_text(
+        text=texts.bot_profile(bot.name),
+        reply_markup=keyboards.bot_profile_markup(bot),
+        parse_mode='MARKDOWN',
+    )
+
+
 def bot_settings(bot, update):
     ''' Show bot settings '''
     query = update.callback_query

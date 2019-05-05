@@ -1,5 +1,4 @@
 from django.db import models
-from telegram.error import BadRequest
 
 from core.models import CreatedUpdatedModel
 
@@ -12,15 +11,16 @@ class User(CreatedUpdatedModel):
     is_bot = models.BooleanField(default=False)
     dialog_id = models.IntegerField(blank=True, null=True)
 
-    def update_dialog(self, bot, new_dialog_id):
-        """ Delete previous CallbackQuery dialog and save new one. """
+    def update_dialog(self, bot, func, context):
+        """ Delete previous CallbackQuery dialog and send new one. """
         if self.dialog_id:
             try:
                 bot.delete_message(chat_id=self.id, message_id=self.dialog_id)
-            except BadRequest:
-                pass
+            except Exception:
+                bot.edit_message_text(chat_id=self.id, message_id=self.dialog_id, text='-')
 
-        self.dialog_id = new_dialog_id
+        sent_message = func(**context)
+        self.dialog_id = sent_message.message_id
         self.save()
 
 

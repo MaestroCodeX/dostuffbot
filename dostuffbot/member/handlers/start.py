@@ -1,4 +1,4 @@
-from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher
+from telegram.ext import CallbackQueryHandler, CommandHandler
 
 from core.enums import DeepCommand
 from core.utils import get_reply_function
@@ -31,11 +31,9 @@ def start(bot, update):
 
 def handle_deeplink(bot, update, args):
     command = args[0]
+
     if command == DeepCommand.COMMANDS:
         commands.commands_list(bot, update)
-    elif command == DeepCommand.NOTIFY:
-        update.message.text = 'Send notification'
-        Dispatcher.get_instance().process_update(update)
 
 
 start_command_handler = CommandHandler('start', start)
