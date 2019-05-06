@@ -3,6 +3,7 @@ import env
 
 from django.utils.translation import ugettext_lazy as _
 
+DEBUG = True
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

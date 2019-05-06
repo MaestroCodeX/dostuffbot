@@ -92,6 +92,7 @@ class CommandMessage(CreatedUpdatedModel):
     files = models.CharField(max_length=40, blank=True, null=True)
     images = models.CharField(max_length=40, blank=True, null=True)
     videos = models.CharField(max_length=40, blank=True, null=True)
+    audios = models.CharField(max_length=40, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.text_length = len(self.text)

@@ -99,7 +99,7 @@ def command_add_caller_invalid(bot, update):
 
 
 @middleware
-def command_add_message(bot, update):
+def command_add_text(bot, update):
     ''' Callback function to handle message for command. Returns its state to make the process repetitive. '''
     text = update.message.text
     command = Command.objects.latest('id')
@@ -108,6 +108,38 @@ def command_add_message(bot, update):
         type=CommandMessageType.TEXT,
         text=text,
     )
+    return continue_command_adding(update)
+
+
+@middleware
+def command_add_photo(bot, update):
+    photos = update.message.photo
+    print(photos)
+    return continue_command_adding(update)
+
+
+@middleware
+def command_add_video(bot, update):
+    videos = update.message.video
+    print(videos)
+    return continue_command_adding(update)
+
+
+@middleware
+def command_add_document(bot, update):
+    documents = update.message.document
+    print(documents)
+    return continue_command_adding(update)
+
+
+@middleware
+def command_add_audio(bot, update):
+    audios = update.message.audio
+    print(audios)
+    return continue_command_adding(update)
+
+
+def continue_command_adding(update):
     update.message.reply_text(
         'Message saved. Continue sending messsages or /complete to save the command.',
     )
@@ -215,7 +247,11 @@ command_add_handler = ConversationHandler(
             MessageHandler(Filters.text, command_add_caller_invalid),
         ],
         SEND_MESSAGE: [
-            MessageHandler(Filters.text, command_add_message),
+            MessageHandler(Filters.text, command_add_text),
+            MessageHandler(Filters.photo, command_add_photo),
+            MessageHandler(Filters.video, command_add_video),
+            MessageHandler(Filters.document, command_add_document),
+            MessageHandler(Filters.audio, command_add_audio),
             CommandHandler('complete', command_add_complete),
         ],
     },

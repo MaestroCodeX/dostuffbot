@@ -1,6 +1,8 @@
 import logging
 import inspect
 
+from django.conf import settings
+
 from core.utils import get_fullname, get_telegram_user_from_update
 
 
@@ -12,6 +14,9 @@ def middleware(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
+            if settings.DEBUG:
+                raise e
+
             logging.error(e)
             kwargs = inspect.getcallargs(func, *args, **kwargs)
             update = kwargs.get('update')
