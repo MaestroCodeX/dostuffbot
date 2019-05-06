@@ -11,6 +11,8 @@ from member.utils import admin_only
 @admin_only
 @middleware
 def start(bot, update):
+    ''' Callback function when user sends /start or returns to main menu.
+    It also handles start command with arguments from main bot. '''
     if update.message:
         args = update.message.text.split()[1:]
         if args:

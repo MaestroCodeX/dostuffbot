@@ -136,10 +136,8 @@ def command_add_complete(bot, update):
 
 @middleware
 def command_delete(bot, update):
-    '''
-    Handle delete button in command menu.
-    Do not delete the command but send confirmation request.
-    '''
+    ''' Handle delete button in command menu.
+    Do not delete the command but send confirmation request. '''
     query = update.callback_query
 
     command = get_command_from_call(bot, query.data)
@@ -182,10 +180,8 @@ def command_edit_caller_sent(bot, update):
 
 @middleware
 def command_delete_confirm(bot, update):
-    '''
-    Handle delete confirmation button.
-    Delete the command and return user to commands list.
-    '''
+    ''' Handle delete confirmation button.
+    Delete the command and return user to commands list. '''
     query = update.callback_query
 
     command = get_command_from_call(bot, query.data)
