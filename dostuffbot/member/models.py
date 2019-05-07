@@ -88,15 +88,7 @@ class CommandMessage(CreatedUpdatedModel):
     )
     type = models.CharField(max_length=20, choices=CommandMessageType)
     text = models.TextField(blank=True, null=True)
-    text_length = models.IntegerField(default=0)
-    files = models.CharField(max_length=40, blank=True, null=True)
-    images = models.CharField(max_length=40, blank=True, null=True)
-    videos = models.CharField(max_length=40, blank=True, null=True)
-    audios = models.CharField(max_length=40, blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        self.text_length = len(self.text)
-        super().save(*args, **kwargs)
+    file_list = models.CharField(max_length=40)
 
 
 class Subscriber(CreatedUpdatedModel):

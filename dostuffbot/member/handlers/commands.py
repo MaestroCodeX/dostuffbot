@@ -23,9 +23,13 @@ def commands_list(bot, update):
     if not reply_func:
         return
 
-    commands = Command.objects.filter(bot=bot.db_bot)
+    commands = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE)
+    text = 'This is a list of your commands. Select command to see the details:'
+    if not commands:
+        text = 'Press "Add command" to create your first command.'
+
     reply_func(
-        'This is a list of your commands. Select command to see the details:',
+        text,
         reply_markup=keyboards.commands_markup(commands),
         parse_mode='MARKDOWN',
     )
@@ -75,7 +79,8 @@ def command_add_caller(bot, update):
         update.message.reply_text(f'The command {caller} already exists.')
         return SEND_CALLER
 
-    Command.objects.create(bot=bot.db_bot, caller=caller)
+    Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE).delete()
+    Command.objects.create(bot=bot.db_bot, caller=caller, status=CommandStatus.EDIT_ANSWER)
 
     update.message.reply_text(
         f'Now send me everything that bot will answer when user types {caller}',
@@ -98,11 +103,15 @@ def command_add_caller_invalid(bot, update):
     return SEND_CALLER
 
 
+def get_command_to_edit(bot):
+    return Command.objects.filter(bot=bot, status=CommandStatus.EDIT_ANSWER).last()
+
+
 @middleware
 def command_add_text(bot, update):
     ''' Callback function to handle message for command. Returns its state to make the process repetitive. '''
     text = update.message.text
-    command = Command.objects.latest('id')
+    command = get_command_to_edit(bot.db_bot)
     CommandMessage.objects.create(
         command=command,
         type=CommandMessageType.TEXT,
@@ -111,38 +120,63 @@ def command_add_text(bot, update):
     return continue_command_adding(update)
 
 
+def command_add_media_message(bot, update, file_id, media_type):
+    command = get_command_to_edit(bot.db_bot)
+    CommandMessage.objects.create(
+        command=command,
+        type=media_type,
+        text=update.message.caption,
+        file_list=file_id,
+    )
+
+
 @middleware
 def command_add_photo(bot, update):
-    photos = update.message.photo
-    print(photos)
+    photo = update.message.photo[-1]
+    command_add_media_message(bot, update, photo.file_id, CommandMessageType.PHOTO)
     return continue_command_adding(update)
 
 
 @middleware
 def command_add_video(bot, update):
-    videos = update.message.video
-    print(videos)
+    video = update.message.video
+    command_add_media_message(bot, update, video.file_id, CommandMessageType.VIDEO)
     return continue_command_adding(update)
 
 
 @middleware
 def command_add_document(bot, update):
-    documents = update.message.document
-    print(documents)
+    document = update.message.document
+    command_add_media_message(bot, update, document.file_id, CommandMessageType.DOCUMENT)
     return continue_command_adding(update)
 
 
 @middleware
 def command_add_audio(bot, update):
-    audios = update.message.audio
-    print(audios)
+    audio = update.message.audio
+    command_add_media_message(bot, update, audio.file_id, CommandMessageType.AUDIO)
     return continue_command_adding(update)
 
 
-def continue_command_adding(update):
+@middleware
+def command_add_voice(bot, update):
+    voice = update.message.voice
+    command_add_media_message(bot, update, voice.file_id, CommandMessageType.VOICE)
+    return continue_command_adding(update)
+
+
+@middleware
+def command_add_location(bot, update):
     update.message.reply_text(
-        'Message saved. Continue sending messsages or /complete to save the command.',
+        'The location messages are still being developed. It will be support at an early future.',
     )
+
+
+def continue_command_adding(update, silence=False):
+    if not silence:
+        update.message.reply_text(
+            'Message saved. Continue sending messsages or /complete to save the command.',
+        )
 
     return SEND_MESSAGE
 
@@ -153,11 +187,11 @@ def command_add_complete(bot, update):
     update.message.reply_text(
         'Congratulations! The command was added to your bot.',
     )
-    command = Command.objects.latest('id')
+    command = get_command_to_edit(bot.db_bot)
     handler = command_handler(command)
     dp = Dispatcher.get_instance()
     dp.add_handler(handler)
-    commands = Command.objects.all()
+    commands = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE)
     update.message.reply_text(
         'This is a list of your commands. Select command to see the details:',
         reply_markup=keyboards.commands_markup(commands),
@@ -252,6 +286,8 @@ command_add_handler = ConversationHandler(
             MessageHandler(Filters.video, command_add_video),
             MessageHandler(Filters.document, command_add_document),
             MessageHandler(Filters.audio, command_add_audio),
+            MessageHandler(Filters.voice, command_add_voice),
+            MessageHandler(Filters.location, command_add_location),
             CommandHandler('complete', command_add_complete),
         ],
     },

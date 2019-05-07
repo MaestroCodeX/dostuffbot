@@ -1,5 +1,4 @@
-from core.utils import emojize
-
+from core.utils import emojize    
 
 def command_menu(command):
     return (

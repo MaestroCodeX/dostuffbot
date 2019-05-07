@@ -29,9 +29,12 @@ class DeepCommand:
 
 class CommandMessageType(ChoicesEnum):
     TEXT = 'TEXT'
-    FILES = 'FILES'
-    IMAGES = 'IMAGES'
-    VIDEOS = 'VIDEOS'
+    PHOTO = 'PHOTO'
+    DOCUMENT = 'DOCUMENT'
+    VIDEO = 'VIDEO'
+    AUDIO = 'AUDIO'
+    VOICE = 'VOICE'
+    LOCATION = 'LOCATION'
 
 
 class CommandStatus(ChoicesEnum):
