@@ -126,7 +126,7 @@ def command_add_media_message(bot, update, file_id, media_type):
         command=command,
         type=media_type,
         text=update.message.caption,
-        file_list=file_id,
+        file_id=file_id,
     )
 
 
@@ -184,13 +184,18 @@ def continue_command_adding(update, silence=False):
 @middleware
 def command_add_complete(bot, update):
     ''' Callback function to handle /complete command to finish command adding. '''
-    update.message.reply_text(
-        'Congratulations! The command was added to your bot.',
-    )
     command = get_command_to_edit(bot.db_bot)
+    command.status = CommandStatus.DONE
+    command.save()
+
     handler = command_handler(command)
     dp = Dispatcher.get_instance()
     dp.add_handler(handler)
+
+    update.message.reply_text(
+        'Congratulations! The command was added to your bot.',
+    )
+
     commands = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE)
     update.message.reply_text(
         'This is a list of your commands. Select command to see the details:',

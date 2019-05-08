@@ -45,12 +45,7 @@ def get_command_from_call(bot, call):
 def get_handler(command):
     def handler(bot, update):
         Subscriber.objects.get_or_create(id=update.effective_user.id, bot=bot.db_bot)
-        messages = command.command_messages.all()
-        for message in messages:
-            update.message.reply_text(
-                message.text,
-                parse_mode='MARKDOWN',
-            )
+        command.reply_to(update.message)
 
     return handler
 

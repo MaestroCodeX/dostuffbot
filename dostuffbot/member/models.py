@@ -44,6 +44,13 @@ class Command(CreatedUpdatedModel):
     caller = models.CharField(max_length=40)
     amswer_preview = models.CharField(max_length=80)
 
+    def reply_to(self, message):
+        msg_qs = self.command_messages.all()
+        for msg in msg_qs:
+            context = msg.get_context()
+            func_name = msg.get_func_name()
+            getattr(message, func_name)(**context, parse_mode='MARKDOWN')
+
     def update_answer_preview(self):
         command_messages = self.command_messages.all()
         max_text_length = 500
@@ -88,7 +95,18 @@ class CommandMessage(CreatedUpdatedModel):
     )
     type = models.CharField(max_length=20, choices=CommandMessageType)
     text = models.TextField(blank=True, null=True)
-    file_list = models.CharField(max_length=40)
+    file_id = models.CharField(max_length=40)
+
+    def get_context(self):
+        if self.type == CommandMessageType.TEXT:
+            return {'text': self.text}
+
+        media_field = self.type.lower()
+        return {media_field: self.file_id, 'caption': self.text}
+
+    def get_func_name(self):
+        media_field = self.type.lower()
+        return f'reply_{media_field}'
 
 
 class Subscriber(CreatedUpdatedModel):
