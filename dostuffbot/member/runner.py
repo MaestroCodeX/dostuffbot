@@ -16,13 +16,15 @@ ADMIN_HANDLERS = [
     commands.command_delete_handler,
     commands.command_delete_confirm_handler,
     commands.command_edit_caller_handler,
+    commands.command_show_answer_handler,
     notifications.notify_handler,
 ]
 
 
 def run_bot_with_handlers(instance):
     # Configure bot
-    updater = Updater(instance.token)
+    # my_persistence = PicklePersistence(filename='my_file')
+    updater = Updater(instance.token, use_context=True)
     dp = updater.dispatcher
     dp.db_bot = instance
     dp.bot.db_bot = instance

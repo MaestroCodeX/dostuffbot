@@ -35,18 +35,12 @@ def command_menu_markup(command):
     keyboard = [
         [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit_caller'))],
         [InlineKeyboardButton('Edit answer', callback_data=call_command(command.id, 'edit_answer'))],
-    ]
-    if command.command_messages.exclude(type=CommandMessageType.TEXT).exists():
-        keyboard.append(
-            [InlineKeyboardButton('See full answer', callback_data=call_command(command.id, 'full_answer'))]
-        )
-
-    keyboard.append(
+        [InlineKeyboardButton('Show answer', callback_data=call_command(command.id, 'show_answer'))],
         [
             InlineKeyboardButton('Delete command', callback_data=call_command(command.id, 'delete')),
-            back_button('commands list')
+            back_button('commands list'),
         ]
-    )
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -60,6 +54,14 @@ def confirm_deletion_markup(command):
     back_to_bot_btn = back_button('command menu', call_command(command.id, 'menu'))
     keyboard.append([back_to_bot_btn])
 
+    return InlineKeyboardMarkup(keyboard)
+
+
+def command_shown_markup(command):
+    keyboard = [[
+            InlineKeyboardButton('Edit answer', callback_data=call_command(command.id, 'edit_answer')),
+            back_button('command menu', call_command(command.id, 'menu')),
+    ]]
     return InlineKeyboardMarkup(keyboard)
 
 

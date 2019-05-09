@@ -10,13 +10,13 @@ from member.utils import admin_only
 
 @admin_only
 @middleware
-def start(bot, update):
+def start(update, context):
     ''' Callback function when user sends /start or returns to main menu.
     It also handles start command with arguments from main bot. '''
     if update.message:
         args = update.message.text.split()[1:]
         if args:
-            handle_deeplink(bot, update, args)
+            handle_deeplink(context.bot, update, args)
             # break further execution as soon as user did't want to send start command
             return
 
@@ -26,7 +26,7 @@ def start(bot, update):
 
     reply_func(
         'Choose an option from the list below:',
-        reply_markup=keyboards.start_markup(bot.db_bot),
+        reply_markup=keyboards.start_markup(context.bot.db_bot),
         parse_mode='MARKDOWN',
     )
 

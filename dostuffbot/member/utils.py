@@ -7,12 +7,12 @@ from member.models import BotAdmin, Command, Subscriber
 
 
 def admin_only(func):
-    def func_wrapper(bot, update):
+    def func_wrapper(update, context):
         user_id = update.effective_user.id
-        if not BotAdmin.objects.filter(bot=bot.db_bot, user__id=user_id).exists():
+        if not BotAdmin.objects.filter(bot=context.bot.db_bot, user__id=user_id).exists():
             return
 
-        return func(bot, update)
+        return func(update, context)
 
     return func_wrapper
 

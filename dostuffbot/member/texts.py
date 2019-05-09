@@ -1,10 +1,8 @@
-from core.utils import emojize    
+from core.utils import emojize
+
 
 def command_menu(command):
-    return (
-        f'***Command***: {command.caller}\n'
-        f'***Answer***: {command.get_answer_preview()}'
-    )
+    return f'***Command***: {command.caller}\n\nSelect what you want to do:'
 
 
 def notification_sent(done_count, all_count):

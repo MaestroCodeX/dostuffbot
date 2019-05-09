@@ -266,6 +266,18 @@ def command_delete_confirm(bot, update):
     commands_list(bot, update)
 
 
+def command_show_answer(bot, update):
+    query = update.callback_query
+
+    command = get_command_from_call(bot, query.data)
+    command.reply_to(query.message)
+
+    query.message.reply_text(
+        'The full answer is shown. Select what you want to do next:',
+        reply_markup=keyboards.command_shown_markup(command)
+    )
+
+
 def idle(bot, update):
     pass
 
@@ -273,6 +285,7 @@ def idle(bot, update):
 commands_list_handler = CallbackQueryHandler(commands_list, pattern='commands_list')
 command_menu_handler = CallbackQueryHandler(command_menu, pattern=call_command_regex('menu'))
 command_delete_handler = CallbackQueryHandler(command_delete, pattern=call_command_regex('delete'))
+command_show_answer_handler = CallbackQueryHandler(command_show_answer, pattern=call_command_regex('show_answer'))
 command_delete_confirm_handler = CallbackQueryHandler(
     command_delete_confirm,
     pattern=call_command_regex('delete_confirm'),

@@ -30,7 +30,7 @@ def middleware(func):
     return func_wrapper
 
 
-def log_request(bot, update):
+def log_request(update, context):
     user = update.effective_user
     if not user:
         return
