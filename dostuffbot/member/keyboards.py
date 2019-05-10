@@ -1,6 +1,6 @@
 import random
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
 import env
 from core.enums import CommandMessageType
@@ -9,39 +9,40 @@ from main.utils import call_bot
 from member.utils import call_command
 
 
-def start_markup(bot):
+def to_keyboard(schema):
     keyboard = [
-        [InlineKeyboardButton('Commands', callback_data='commands_list')],
-        [InlineKeyboardButton('Send notification', callback_data='notify')],
-        [InlineKeyboardButton('Settings', url=build_deeplink(env.BOT_USERNAME, call_bot(bot.id, 'profile')))],
+        [KeyboardButton(text) for text in row]
+        for row in schema
     ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
-    return InlineKeyboardMarkup(keyboard)
+
+def start_markup():
+    schema = [
+        ['Commands'],
+        ['Send notification'],
+        ['Settings'],
+    ]
+    return to_keyboard(schema)
 
 
 def commands_markup(commands):
-    keyboard = [
-        [InlineKeyboardButton(c.caller, callback_data=call_command(c.id, 'menu'))]
-        for c in commands
+    schema = [
+        *[[c.caller] for c in commands],
+        ['Add command'],
+        ['Back to start'],
     ]
-    keyboard.append([
-        InlineKeyboardButton('Add command', callback_data='command_add'),
-        back_button('menu', 'start'),
-    ])
-    return InlineKeyboardMarkup(keyboard)
+    return to_keyboard(schema)
 
 
-def command_menu_markup(command):
-    keyboard = [
-        [InlineKeyboardButton('Edit command', callback_data=call_command(command.id, 'edit_caller'))],
-        [InlineKeyboardButton('Edit answer', callback_data=call_command(command.id, 'edit_answer'))],
-        [InlineKeyboardButton('Show answer', callback_data=call_command(command.id, 'show_answer'))],
-        [
-            InlineKeyboardButton('Delete command', callback_data=call_command(command.id, 'delete')),
-            back_button('commands list'),
-        ]
+def command_menu_markup():
+    schema = [
+        ['Edit command'],
+        ['Edit answer'],
+        ['Show answer'],
+        ['Delete command', 'Back to commands list']
     ]
-    return InlineKeyboardMarkup(keyboard)
+    return to_keyboard(schema)
 
 
 def confirm_deletion_markup(command):

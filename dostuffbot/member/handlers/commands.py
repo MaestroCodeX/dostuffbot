@@ -17,32 +17,31 @@ SEND_CALLER, SEND_MESSAGE = range(2)
 
 
 @middleware
-def commands_list(bot, update):
+def commands_list(update, context):
     ''' Callback function to show all commands. '''
-    reply_func = get_reply_function(update)
-    if not reply_func:
-        return
 
-    commands = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE)
+    commands = Command.objects.filter(bot=context.bot.db_bot, status=CommandStatus.DONE)
     text = 'This is a list of your commands. Select command to see the details:'
     if not commands:
         text = 'Press "Add command" to create your first command.'
 
-    reply_func(
+    update.message.reply_text(
         text,
         reply_markup=keyboards.commands_markup(commands),
         parse_mode='MARKDOWN',
     )
 
+    return 1
+
 
 @middleware
-def command_menu(bot, update):
+def command_menu(update, context):
     ''' Callback function to show command menu that was chosen from the list. '''
-    query = update.callback_query
-    command = get_command_from_call(bot, query.data)
-    query.edit_message_text(
+    caller = update.message.text
+    command = Command.objects.get(caller=caller)
+    update.message.reply_text(
         texts.command_menu(command),
-        reply_markup=keyboards.command_menu_markup(command),
+        reply_markup=keyboards.command_menu_markup(),
         parse_mode='MARKDOWN',
     )
 

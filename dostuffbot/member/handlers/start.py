@@ -1,4 +1,4 @@
-from telegram.ext import CallbackQueryHandler, CommandHandler
+from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandler, MessageHandler, Filters
 
 from core.enums import DeepCommand
 from core.utils import get_reply_function
@@ -6,6 +6,8 @@ from member import keyboards
 from member.handlers import commands
 from member.middleware import middleware
 from member.utils import admin_only
+
+START_MENU = range(1)
 
 
 @admin_only
@@ -26,9 +28,11 @@ def start(update, context):
 
     reply_func(
         'Choose an option from the list below:',
-        reply_markup=keyboards.start_markup(context.bot.db_bot),
+        reply_markup=keyboards.start_markup(),
         parse_mode='MARKDOWN',
     )
+
+    return START_MENU
 
 
 def handle_deeplink(bot, update, args):
@@ -38,5 +42,23 @@ def handle_deeplink(bot, update, args):
         commands.commands_list(bot, update)
 
 
-start_command_handler = CommandHandler('start', start)
-start_handler = CallbackQueryHandler(start, pattern='start')
+command_handler = ConversationHandler(
+    entry_points=[MessageHandler(Filters.regex('^Commands$'), commands.commands_list)],
+    states={
+        1: [
+            MessageHandler(Filters.command, commands.command_menu),
+        ],
+    },
+    fallbacks=[],
+)
+
+
+start_handler = ConversationHandler(
+    entry_points=[CommandHandler('start', start)],
+    states={
+        START_MENU: [
+            command_handler,
+        ],
+    },
+    fallbacks=[],
+)

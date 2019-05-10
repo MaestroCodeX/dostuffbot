@@ -9,7 +9,6 @@ from member.utils import command_handler
 
 ADMIN_HANDLERS = [
     start.start_handler,
-    start.start_command_handler,
     commands.commands_list_handler,
     commands.command_add_handler,
     commands.command_menu_handler,
