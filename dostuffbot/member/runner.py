@@ -4,19 +4,11 @@ from telegram.ext import Updater
 from django.conf import settings
 
 from core import logger
-from member.handlers import start, commands, notifications
-from member.utils import command_handler
+from member.handlers import start
+from member.utils import get_command_handler
 
 ADMIN_HANDLERS = [
-    start.start_handler,
-    commands.commands_list_handler,
-    commands.command_add_handler,
-    commands.command_menu_handler,
-    commands.command_delete_handler,
-    commands.command_delete_confirm_handler,
-    commands.command_edit_caller_handler,
-    commands.command_show_answer_handler,
-    notifications.notify_handler,
+    start.start_conversation,
 ]
 
 
@@ -34,7 +26,7 @@ def run_bot_with_handlers(instance):
 
     commands = instance.commands.all()
     for command in commands:
-        handler = command_handler(command)
+        handler = get_command_handler(command)
         dp.add_handler(handler, group=settings.DEFAULT_HANDLER_GROUP)
 
     # Log all errors

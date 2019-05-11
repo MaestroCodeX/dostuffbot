@@ -1,13 +1,12 @@
 from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandler, MessageHandler, Filters
 
 from core.enums import DeepCommand
+from core.handlers import ignore
 from core.utils import get_reply_function
-from member import keyboards
+from member import keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
 from member.utils import admin_only
-
-START_MENU = range(1)
 
 
 @admin_only
@@ -32,7 +31,7 @@ def start(update, context):
         parse_mode='MARKDOWN',
     )
 
-    return START_MENU
+    return states.START_MENU
 
 
 def handle_deeplink(bot, update, args):
@@ -42,23 +41,12 @@ def handle_deeplink(bot, update, args):
         commands.commands_list(bot, update)
 
 
-command_handler = ConversationHandler(
-    entry_points=[MessageHandler(Filters.regex('^Commands$'), commands.commands_list)],
-    states={
-        1: [
-            MessageHandler(Filters.command, commands.command_menu),
-        ],
-    },
-    fallbacks=[],
-)
-
-
-start_handler = ConversationHandler(
+start_conversation = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
     states={
-        START_MENU: [
-            command_handler,
+        states.START_MENU: [
+            commands.command_conversation,
         ],
     },
-    fallbacks=[],
+    fallbacks=[MessageHandler(Filters.all, ignore)],
 )

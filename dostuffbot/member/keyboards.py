@@ -47,15 +47,14 @@ def command_menu_markup():
 
 def confirm_deletion_markup(command):
     keyboard = [
-        [InlineKeyboardButton('No', callback_data=call_command(command.id, 'menu'))],
-        [InlineKeyboardButton('Nope, nevermind', callback_data=call_command(command.id, 'menu'))],
-        [InlineKeyboardButton('Yes, delete the command', callback_data=call_command(command.id, 'delete_confirm'))],
+        ['No'],
+        ['Nope, nevermind'],
+        ['Yes, delete the command'],
     ]
     random.shuffle(keyboard)
-    back_to_bot_btn = back_button('command menu', call_command(command.id, 'menu'))
-    keyboard.append([back_to_bot_btn])
+    keyboard.append(['Back to command menu.'])
 
-    return InlineKeyboardMarkup(keyboard)
+    return to_keyboard(schema)
 
 
 def command_shown_markup(command):

@@ -20,6 +20,14 @@ class Bot(CreatedUpdatedModel):
         return '@' + self.username
 
 
+class Subscriber(CreatedUpdatedModel):
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+    )
+
+
 class BotAdmin(CreatedUpdatedModel):
     bot = models.ForeignKey(
         Bot,
@@ -71,11 +79,3 @@ class CommandMessage(CreatedUpdatedModel):
     def get_func_name(self):
         media_field = self.type.lower()
         return f'reply_{media_field}'
-
-
-class Subscriber(CreatedUpdatedModel):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE,
-        related_name='subscribers',
-    )

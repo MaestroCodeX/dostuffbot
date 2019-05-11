@@ -43,12 +43,12 @@ def get_command_from_call(bot, call):
 
 
 def get_handler(command):
-    def handler(bot, update):
-        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=bot.db_bot)
+    def handler(update, context):
+        Subscriber.objects.get_or_create(id=update.effective_user.id, bot=context.bot.db_bot)
         command.reply_to(update.message)
 
     return handler
 
 
-def command_handler(command):
+def get_command_handler(command):
     return MessageHandler(Filters.regex(f'^{command.caller}$'), get_handler(command))
