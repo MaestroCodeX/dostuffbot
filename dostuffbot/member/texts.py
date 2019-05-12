@@ -15,3 +15,18 @@ def message_mailing_status(done_count, all_count):
 
 def delete_command(command):
     return f'You are about to delete the command ***{command.caller}***. Is that correct?'
+
+
+def back_text(section):
+    return f'« Back to {section}'
+
+
+DELETE_COMMAND = 'Delete command'
+SHOW_ANSWER = 'Show answer'
+COMMANDS = 'Commands'
+DELETE_COMMAND_CONFIRM = 'Yes, delete the command'
+SEND_NOTIFICATION = 'Send notification'
+SETTINGS = 'Settings'
+ADD_COMMAND = 'Add command'
+EDIT_COMMAND = 'Edit command'
+EDIT_ANSWER = 'Edit answer'

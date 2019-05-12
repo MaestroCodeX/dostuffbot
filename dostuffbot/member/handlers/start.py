@@ -1,4 +1,4 @@
-from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandler, MessageHandler, Filters
+from telegram.ext import CommandHandler, ConversationHandler, MessageHandler, Filters
 
 from core.enums import DeepCommand
 from core.handlers import ignore
@@ -14,6 +14,7 @@ from member.utils import admin_only
 def start(update, context):
     ''' Callback function when user sends /start or returns to main menu.
     It also handles start command with arguments from main bot. '''
+
     if update.message:
         args = update.message.text.split()[1:]
         if args:
@@ -44,9 +45,7 @@ def handle_deeplink(bot, update, args):
 start_conversation = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
     states={
-        states.START_MENU: [
-            commands.command_conversation,
-        ],
+        states.START_MENU: [commands.command_conversation],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],
 )
