@@ -10,7 +10,7 @@ from member.utils import get_command_handler
 
 @middleware
 def command_add(bot, update):
-    ''' Callback function to handle 'Add command' button. '''
+    """ Callback function to handle 'Add command' button. """
     query = update.callback_query
 
     text = (
@@ -29,7 +29,7 @@ def command_add(bot, update):
 
 @middleware
 def command_add_caller(bot, update):
-    ''' Callback function to handle message with command caller. '''
+    """ Callback function to handle message with command caller. """
     caller = update.message.text
 
     if len(caller) > 32:
@@ -52,7 +52,7 @@ def command_add_caller(bot, update):
 
 @middleware
 def command_add_caller_invalid(bot, update):
-    ''' Callback function to handle message when command is invalid. '''
+    """ Callback function to handle message when command is invalid. """
     text = (
         'The command should start with /\n'
         'Max. length is 32 characters.\n'
@@ -70,7 +70,7 @@ def get_command_to_edit(bot):
 
 @middleware
 def command_add_text(bot, update):
-    ''' Callback function to handle message for command. Returns its state to make the process repetitive. '''
+    """ Callback function to handle message for command. Returns its state to make the process repetitive. """
     text = update.message.text
     command = get_command_to_edit(bot.db_bot)
     CommandMessage.objects.create(
@@ -144,7 +144,7 @@ def continue_command_adding(update, silence=False):
 
 @middleware
 def command_add_complete(bot, update):
-    ''' Callback function to handle /complete command to finish command adding. '''
+    """ Callback function to handle /complete command to finish command adding. """
     command = get_command_to_edit(bot.db_bot)
     command.status = CommandStatus.DONE
     command.save()
@@ -190,8 +190,8 @@ command_add_conversation = ConversationHandler(
             MessageHandler(Filters.audio, command_add_audio),
             MessageHandler(Filters.voice, command_add_voice),
             MessageHandler(Filters.location, command_add_location),
-            MessageHandler('Complete', command_add_complete),
-            MessageHandler('Cancel', command_add_cancel),
+            MessageHandler(Filters.regex('Complete'), command_add_complete),
+            MessageHandler(Filters.regex('Cancel'), command_add_cancel),
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)]

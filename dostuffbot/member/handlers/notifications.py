@@ -10,7 +10,7 @@ SEND_MESSAGE = range(1)
 
 @middleware
 def notify_claim(bot, update):
-    ''' Callback function when user wants to send message to his subscribers. '''
+    """ Callback function when user wants to send message to his subscribers. """
 
     query = update.callback_query
     query.edit_message_text(
@@ -22,8 +22,8 @@ def notify_claim(bot, update):
 
 
 def notify_subscribers_with_text(bot, subs, message):
-    ''' Function to send notification to user from given queryset.
-    Also keeps editing a message for admin with counter. '''
+    """ Function to send notification to user from given queryset.
+    Also keeps editing a message for admin with counter. """
 
     text_status = texts.message_mailing_status(0, subs.count())
     status_message = message.reply_text(text_status)
@@ -36,8 +36,8 @@ def notify_subscribers_with_text(bot, subs, message):
 
 @middleware
 def notify_subcribers(bot, update):
-    ''' Callback function when user sent message with a text for a notification.
-    Send a message to all subscribers and return user to start menu. '''
+    """ Callback function when user sent message with a text for a notification.
+    Send a message to all subscribers and return user to start menu. """
 
     subs = Subscriber.objects.filter(bot=bot.db_bot)
     message = update.message

@@ -1,8 +1,4 @@
-import re
-
 from telegram.ext import MessageHandler, Filters
-from django.conf import settings
-
 from member.models import BotAdmin, Command, Subscriber
 
 
@@ -42,3 +38,7 @@ def get_command_handler(command):
 
 def to_filter_regex(text):
     return Filters.regex(f'^{text}$')
+
+
+def back_to_message_handler(pattern, callback):
+    pass

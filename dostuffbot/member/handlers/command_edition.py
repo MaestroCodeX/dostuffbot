@@ -1,6 +1,6 @@
 # @middleware
 # def command_edit_caller(update, context):
-#     ''' Callback function to handle edit command button. '''
+#     """ Callback function to handle edit command button. """
 #     query = update.callback_query
 #
 #     command_id = get_command_id_from_call(query.data)
@@ -13,7 +13,7 @@
 
 # @middleware
 # def command_edit_caller_sent(update, context):
-#     ''' Callback function to handle editing commmand state when caller text was sent. '''
+#     """ Callback function to handle editing commmand state when caller text was sent. """
 #     caller = update.message.text
 #     db_bot = context.bot.db_bot
 #

@@ -10,7 +10,7 @@ from main.utils import get_or_create_user, log_exception, call_bot_regex
 @log_exception
 @run_async
 def start_command(bot, update):
-    ''' The start was called with /start '''
+    """ The start was called with /start """
     message = update.message
     user = get_or_create_user(message)
     args = update.message.text.split()[1:]
@@ -31,11 +31,11 @@ def start_command(bot, update):
 
 
 def start(bot, update):
-    '''
+    """
     The start was called with inline keyboard.
     Delete old dialog message and send new one
     so that chat with the bot gets to the top of all chats list.
-    '''
+    """
     query = update.callback_query
 
     user = User.objects.get(id=update.effective_user.id)

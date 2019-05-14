@@ -7,7 +7,7 @@ from member.models import Bot
 
 
 def connect_bot(bot, update):
-    ''' Connect bot handler method called with inline keyboard '''
+    """ Connect bot handler method called with inline keyboard """
     query = update.callback_query
 
     query.answer()
@@ -17,11 +17,11 @@ def connect_bot(bot, update):
 
 
 def token(bot, update):
-    '''
+    """
     Add bot with sent token
     If token is invalid edit text with error
     Otherwise save bot to database and return bot profile
-    '''
+    """
     user = User.objects.get(id=update.effective_user.id)
     token = update.message.text
 

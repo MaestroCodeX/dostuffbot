@@ -6,7 +6,7 @@ from main.models import User
 
 
 def my_settings(bot, update, user=None):
-    ''' Settings with inline keyboard '''
+    """ Settings with inline keyboard """
     query = update.callback_query
 
     user = user or User.objects.get(id=query.from_user.id)
@@ -15,14 +15,14 @@ def my_settings(bot, update, user=None):
 
 
 def lang_list(bot, update):
-    ''' Send available languages list to user to change language interface. '''
+    """ Send available languages list to user to change language interface. """
     query = update.callback_query
 
     query.edit_message_text(text=texts.EDIT_LANG, reply_markup=keyboards.EDIT_LANG_M, parse_mode='MARKDOWN')
 
 
 def edit_lang(bot, update):
-    ''' Edit language interface with selected one from list. '''
+    """ Edit language interface with selected one from list. """
     query = update.callback_query
 
     user = User.objects.get(id=query.from_user.id)

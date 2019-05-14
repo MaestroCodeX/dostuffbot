@@ -6,7 +6,7 @@ from main.utils import call_bot_regex, get_bot_from_call
 
 
 def my_bots(bot, update):
-    ''' Show user bots list with inline keyboard '''
+    """ Show user bots list with inline keyboard """
     query = update.callback_query
     user = User.objects.get(id=query.from_user.id)
     bots = user.bot_set.all()
@@ -23,7 +23,7 @@ def my_bots(bot, update):
 
 
 def bot_profile(bot, update):
-    ''' Show bot profile '''
+    """ Show bot profile """
     query = update.callback_query
 
     bot = get_bot_from_call(query.data, query.from_user.id)
@@ -36,7 +36,7 @@ def bot_profile(bot, update):
 
 
 def bot_profile_command(bot, update):
-    ''' Show bot profile called with deeplink. '''
+    """ Show bot profile called with deeplink. """
     message = update.message
 
     bot = get_bot_from_call(message.text, message.from_user.id)
@@ -49,7 +49,7 @@ def bot_profile_command(bot, update):
 
 
 def bot_settings(bot, update):
-    ''' Show bot settings '''
+    """ Show bot settings """
     query = update.callback_query
 
     bot = get_bot_from_call(query.data, query.from_user.id)
@@ -62,10 +62,10 @@ def bot_settings(bot, update):
 
 
 def delete_bot(bot, update):
-    '''
+    """
     Handle delete button in bot profile.
     Do not delete bot and send confirmation request instead.
-    '''
+    """
     query = update.callback_query
 
     bot = get_bot_from_call(query.data, query.from_user.id)
@@ -76,10 +76,10 @@ def delete_bot(bot, update):
 
 
 def delete_bot_confirm(bot, update):
-    '''
+    """
     Handle delete confirmation button.
     Delete the bot and return user to bots list.
-    '''
+    """
     query = update.callback_query
 
     bot = get_bot_from_call(query.data, query.from_user.id)
