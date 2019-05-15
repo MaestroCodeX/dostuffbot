@@ -4,13 +4,9 @@ from django.conf import settings
 from core.enums import CommandStatus
 from core.handlers import ignore
 from member import texts, keyboards, states
-from member.handlers import command_addition, start
 from member.middleware import middleware
 from member.models import Command
-from member.utils import (
-    to_filter_regex,
-    back_to_message_handler
-)
+from member.utils import to_filter_regex
 
 
 @middleware
@@ -28,7 +24,7 @@ def commands_list(update, context):
         parse_mode='MARKDOWN',
     )
 
-    return states.BACK
+    return states.COMMAND_MENU
 
 
 @middleware
@@ -93,50 +89,3 @@ def command_show_answer(update, context):
         'The full answer is shown. Select what you want to do next:',
         reply_markup=keyboards.command_shown_markup()
     )
-
-
-@middleware
-def command_back_start(update, context):
-    print('asddsadasdfasfafsFASDGA')
-    dp = Dispatcher.get_instance()
-    update.message.text = '/start'
-    check = start.start_conversation.check_update(update)
-    start.start_conversation.handle_update(update, dp, check, context)
-    return ConversationHandler.END
-
-
-command_delete_conversation = ConversationHandler(
-    entry_points=[MessageHandler(to_filter_regex(texts.DELETE_COMMAND), command_delete)],
-    states={
-        states.DELETE_CONFIRM: [
-            MessageHandler(to_filter_regex(texts.DELETE_COMMAND_CONFIRM), command_delete),
-            MessageHandler(to_filter_regex(texts.SHOW_ANSWER), command_show_answer),
-        ],
-    },
-    fallbacks=[MessageHandler(Filters.all, ignore)],
-)
-
-
-command_menu_conversation = ConversationHandler(
-    entry_points=[MessageHandler(Filters.command, command_menu)],
-    states={
-        states.CHOOSE_COMMAND_OPTION: [
-            MessageHandler(to_filter_regex(texts.DELETE_COMMAND), command_delete_conversation),
-            MessageHandler(to_filter_regex(texts.SHOW_ANSWER), command_show_answer),
-        ],
-    },
-    fallbacks=[MessageHandler(Filters.all, ignore)],
-)
-
-
-command_conversation = ConversationHandler(
-    entry_points=[MessageHandler(Filters.all, commands_list)],
-    states={
-        states.COMMAND_MENU: [
-            # command_menu_conversation,
-            # command_addition.command_add_conversation,
-            # MessageHandler(to_filter_regex(texts.back_text('start')), command_back_start)
-        ],
-    },
-    fallbacks=[MessageHandler(Filters.all, ignore)],
-)

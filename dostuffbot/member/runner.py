@@ -4,11 +4,11 @@ from telegram.ext import Updater
 from django.conf import settings
 
 from core import logger
-from member.handlers import start
+from member.states import base_conversation
 from member.utils import get_command_handler
 
 ADMIN_HANDLERS = [
-    start.start_conversation,
+    base_conversation,
 ]
 
 

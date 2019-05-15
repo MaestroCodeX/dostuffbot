@@ -11,14 +11,12 @@ from member.utils import get_command_handler
 @middleware
 def command_add(bot, update):
     """ Callback function to handle 'Add command' button. """
-    query = update.callback_query
-
     text = (
         'Now send a command that you want to add.\n\n'
         'Here are some examples:\n'
         '/start\n/help\n/about\\_project\n/chapter\\_3'
     )
-    query.edit_message_text(
+    update.message.reply_text(
         text,
         reply_markup=keyboards.back_markup('commands list'),
         parse_mode='MARKDOWN',
