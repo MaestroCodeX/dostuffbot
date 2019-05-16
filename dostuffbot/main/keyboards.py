@@ -4,8 +4,16 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 
 from core.enums import DeepCommand
-from core.utils import back_button, emojize
+from core.utils import emojize
 from main.utils import build_deeplink, call_bot
+
+
+def back_button(section, callback_data=None):
+    callback_data = callback_data or section
+    return InlineKeyboardButton(
+        f'« Back to {section}',
+        callback_data=callback_data.replace(' ', '_'),
+    )
 
 
 BACK_TO_MENU_BTN = back_button('menu', 'start')

@@ -1,5 +1,4 @@
 from core.enums import DeepCommand
-from core.utils import get_reply_function
 from member import keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
@@ -16,15 +15,11 @@ def start(update, context):
         parts = update.message.text.split()
         args = parts[1:]
         if parts[0] == '/start' and args:
-            handle_deeplink(context.bot, update, args)
+            handle_deeplink(update, context, args)
             # break further execution as soon as user did't want to send start command
             return
 
-    reply_func = get_reply_function(update)
-    if not reply_func:
-        return
-
-    reply_func(
+    update.message.reply_text(
         'Choose an option from the list below:',
         reply_markup=keyboards.start_markup(),
         parse_mode='MARKDOWN',
@@ -33,8 +28,6 @@ def start(update, context):
     return states.START_MENU
 
 
-def handle_deeplink(bot, update, args):
-    command = args[0]
-
-    if command == DeepCommand.COMMANDS:
-        commands.commands_list(bot, update)
+def handle_deeplink(update, context, args):
+    if args[0] == DeepCommand.COMMANDS:
+        commands.commands_list(update, context)

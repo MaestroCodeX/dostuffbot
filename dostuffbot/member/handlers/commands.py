@@ -1,12 +1,10 @@
-from telegram.ext import Dispatcher, ConversationHandler, MessageHandler, Filters
+from telegram.ext import Dispatcher
 from django.conf import settings
 
 from core.enums import CommandStatus
-from core.handlers import ignore
 from member import texts, keyboards, states
 from member.middleware import middleware
 from member.models import Command
-from member.utils import to_filter_regex
 
 
 @middleware

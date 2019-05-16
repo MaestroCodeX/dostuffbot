@@ -1,29 +1,36 @@
-from telegram.ext import Filters, MessageHandler, ConversationHandler, CallbackQueryHandler
-
-from member import texts, keyboards
+from member import texts, keyboards, states
 from member.handlers import start
 from member.middleware import middleware
 from member.models import Subscriber
 
-SEND_MESSAGE = range(1)
+
+@middleware
+def notify_claim(update, context):
+    """ Callback function when user wants to send message to his subscribers. """
+
+    update.message.reply_text(
+        'Send me a message that you want to share with your subscribers.',
+        reply_markup=keyboards.back_markup('start'),
+    )
+
+    return states.SEND_NOTIFY_MESSAGE
 
 
 @middleware
-def notify_claim(bot, update):
-    """ Callback function when user wants to send message to his subscribers. """
+def notify_subcribers(update, context):
+    """ Callback function when user sent message with a text for a notification.
+    Send a message to all subscribers and return user to start menu. """
 
-    query = update.callback_query
-    query.edit_message_text(
-        'Send me a message that you want to share with your subscribers.',
-        reply_markup=keyboards.back_markup('menu', 'start'),
-    )
+    subs = Subscriber.objects.filter(bot=context.bot.db_bot)
+    notify_subscribers_with_text(context.bot, subs, update.message)
+    start.start(update, context)
 
-    return SEND_MESSAGE
+    return states.START_MENU
 
 
 def notify_subscribers_with_text(bot, subs, message):
-    """ Function to send notification to user from given queryset.
-    Also keeps editing a message for admin with counter. """
+    """ Send notification to user from queryset.
+    Also keep editing a message sending status with counter for admin. """
 
     text_status = texts.message_mailing_status(0, subs.count())
     status_message = message.reply_text(text_status)
@@ -32,28 +39,3 @@ def notify_subscribers_with_text(bot, subs, message):
         text_status = texts.message_mailing_status(i, subs.count())
         status_message.edit_text(text_status)
     status_message.edit_text(texts.notification_sent(subs.count(), subs.count()))
-
-
-@middleware
-def notify_subcribers(bot, update):
-    """ Callback function when user sent message with a text for a notification.
-    Send a message to all subscribers and return user to start menu. """
-
-    subs = Subscriber.objects.filter(bot=bot.db_bot)
-    message = update.message
-    notify_subscribers_with_text(bot, subs, message)
-    start.start(bot, update)
-
-    return ConversationHandler.END
-
-
-notify_handler = ConversationHandler(
-    entry_points=[CallbackQueryHandler(notify_claim, pattern='^notify$')],
-    states={
-        SEND_MESSAGE: [
-            MessageHandler(Filters.text, notify_subcribers),
-        ],
-    },
-    fallbacks=[],
-    allow_reentry=True,
-)

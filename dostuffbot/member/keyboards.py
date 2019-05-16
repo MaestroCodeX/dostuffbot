@@ -58,3 +58,8 @@ def command_shown_markup():
         texts.back_text('command menu'),
     ]]
     return to_keyboard(schema)
+
+
+def back_markup(section):
+    schema = [[texts.back_text(section)]]
+    return to_keyboard(schema)
