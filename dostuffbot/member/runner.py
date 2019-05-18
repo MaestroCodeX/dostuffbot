@@ -6,7 +6,7 @@ from django.conf import settings
 from core import logger
 from core.handlers import ignore
 from member import states, texts
-from member.handlers import commands, command_addition, notifications, start, bot_settings
+from member.handlers import commands, command_addition, command_edition, notifications, start, bot_settings
 from member.utils import get_command_handler, to_filter_regex
 
 
@@ -24,8 +24,9 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.regex(texts.back_text('start')), start.start),
         ],
         states.CHOOSE_COMMAND_OPTION: [
-            MessageHandler(to_filter_regex(texts.DELETE_COMMAND), commands.command_delete),
+            MessageHandler(to_filter_regex(texts.EDIT_COMMAND), command_edition.command_edit_caller),
             MessageHandler(to_filter_regex(texts.SHOW_ANSWER), commands.command_show_answer),
+            MessageHandler(to_filter_regex(texts.DELETE_COMMAND), commands.command_delete),
             MessageHandler(to_filter_regex(texts.back_text('commands list')), commands.commands_list),
         ],
         states.DELETE_CONFIRM: [
@@ -35,6 +36,10 @@ base_conversation = ConversationHandler(
         states.SEND_NOTIFY_MESSAGE: [
             MessageHandler(Filters.regex(texts.back_text('start')), start.start),
             MessageHandler(Filters.text, notifications.notify_subcribers),
+        ],
+        states.INPUT_CALLER: [
+            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.command_menu),
+            MessageHandler(Filters.command, command_edition.command_edit_caller_sent),
         ],
         states.BACK_START: [
             MessageHandler(Filters.regex(texts.back_text('start')), start.start),

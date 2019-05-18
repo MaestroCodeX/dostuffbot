@@ -9,7 +9,7 @@ from member.utils import get_command_handler
 
 
 @middleware
-def command_add(bot, update):
+def command_add(update, context):
     """ Callback function to handle 'Add command' button. """
     text = (
         'Now send a command that you want to add.\n\n'
@@ -18,11 +18,11 @@ def command_add(bot, update):
     )
     update.message.reply_text(
         text,
-        reply_markup=keyboards.back_markup('commands list'),
+        reply_markup=keyboards.back_markup('command menu'),
         parse_mode='MARKDOWN',
     )
 
-    return states.SEND_CALLER
+    return states.INPUT_CALLER
 
 
 @middleware

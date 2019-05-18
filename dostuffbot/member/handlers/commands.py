@@ -48,7 +48,7 @@ def command_delete(update, context):
 
     command = context.chat_data['cmd_instance']
     text = texts.delete_command(command)
-    markup = keyboards.confirm_deletion_markup(command)
+    markup = keyboards.confirm_deletion_markup()
 
     update.message.reply_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
 
@@ -63,8 +63,6 @@ def command_delete_confirm(update, context):
     command = context.chat_data['cmd_instance']
     dp = Dispatcher.get_instance()
     handlers = dp.handlers[settings.DEFAULT_HANDLER_GROUP]
-    for handler in handlers:
-        print(handler.filters)
     command.delete()
 
     update.message.reply_text('The command has disappeared...')
@@ -87,3 +85,6 @@ def command_show_answer(update, context):
         'The full answer is shown. Select what you want to do next:',
         reply_markup=keyboards.command_shown_markup()
     )
+
+    command_menu(update, context)
+    return states.COMMAND_MENU
