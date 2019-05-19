@@ -1,8 +1,8 @@
-from telegram.ext import CallbackQueryHandler, Dispatcher, ConversationHandler, MessageHandler, Filters
+from telegram.ext import Dispatcher
 
 from core.enums import CommandMessageType, CommandStatus
-from core.handlers import ignore
-from member import texts, keyboards, states
+from core.utils import escape_markdown
+from member import keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
 from member.models import Command, CommandMessage
@@ -19,7 +19,7 @@ def command_add(update, context):
     )
     update.message.reply_text(
         text,
-        reply_markup=keyboards.back_markup('command menu'),
+        reply_markup=keyboards.cancel_markup(),
         parse_mode='MARKDOWN',
     )
 
@@ -56,14 +56,47 @@ def command_add_caller(update, context):
 def command_add_caller_invalid(update, context):
     """ Callback function to handle message when command is invalid. """
     text = (
-        'The command should start with /\n'
-        'Max. length is 32 characters.\n'
-        'The command can only contain:'
-        '\n - letters\n - numbers\n - "_"'
+        'The __command__ should start with /\n\n'
+        '***The __command__ can only contain:***'
+        '\n - letters\n - numbers\n - _'
     )
-    update.message.reply_text(text)
+    update.message.reply_text(escape_markdown(text), parse_mode='MARKDOWN')
 
-    return states.SEND_CALLER
+    return states.INPUT_CALLER
+
+
+@middleware
+def command_add_complete(update, context):
+    """ Callback function to handle /complete command to finish command adding. """
+    command = context.chat_data['cmd_instance_edit']
+    if command.command_messages.count() == 0:
+        update.message.reply_text(
+            'Please, add at least one message before saving the command.',
+        )
+        return states.SEND_MESSAGE
+    command.status = CommandStatus.DONE
+    command.save()
+    del context.chat_data['cmd_instance_edit']
+
+    handler = get_command_handler(command)
+    dp = Dispatcher.get_instance()
+    dp.add_handler(handler)
+
+    update.message.reply_text(
+        'Congratulations! The command was added to your bot.',
+    )
+
+    return commands.command_list(update, context)
+
+
+def command_add_cancel(update, context):
+    command = context.chat_data.pop('cmd_instance_edit')
+    command.delete()
+    update.message.reply_text(
+        'The command addition was cancelled.',
+    )
+
+    return commands.commands_list(update, context)
 
 
 @middleware
@@ -138,31 +171,3 @@ def continue_command_adding(update, silence=False):
         )
 
     return states.SEND_MESSAGE
-
-
-@middleware
-def command_add_complete(update, context):
-    """ Callback function to handle /complete command to finish command adding. """
-    command = context.chat_data['cmd_instance_edit']
-    command.status = CommandStatus.DONE
-    command.save()
-
-    handler = get_command_handler(command)
-    dp = Dispatcher.get_instance()
-    dp.add_handler(handler)
-
-    update.message.reply_text(
-        'Congratulations! The command was added to your bot.',
-    )
-
-    return ConversationHandler.END
-
-
-def command_add_cancel(update, context):
-    command = context.chat_data['cmd_instance_edit']
-    command.delete()
-    update.message.reply_text(
-        'The command addition was cancelled.',
-    )
-
-    return commands.commands_list()

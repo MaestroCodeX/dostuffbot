@@ -38,16 +38,17 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.text, notifications.notify_subcribers),
         ],
         states.INPUT_CALLER: [
-            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.commands_list),
+            MessageHandler(to_filter_regex(texts.CANCEL), commands.commands_list),
             MessageHandler(Filters.command, command_addition.command_add_caller),
+            MessageHandler(Filters.all, command_addition.command_add_caller_invalid),
         ],
         states.INPUT_EDIT_CALLER: [
             MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.commands_list),
             MessageHandler(Filters.command, command_edition.command_edit_caller_sent),
         ],
         states.SEND_MESSAGE: [
-            MessageHandler(Filters.regex('Complete'), command_addition.command_add_complete),
-            MessageHandler(Filters.regex('Cancel'), command_addition.command_add_cancel),
+            MessageHandler(to_filter_regex(texts.COMPLETE), command_addition.command_add_complete),
+            MessageHandler(to_filter_regex(texts.CANCEL), command_addition.command_add_cancel),
             MessageHandler(Filters.text, command_addition.command_add_text),
             MessageHandler(Filters.photo, command_addition.command_add_photo),
             MessageHandler(Filters.video, command_addition.command_add_video),

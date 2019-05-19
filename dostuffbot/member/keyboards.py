@@ -21,8 +21,8 @@ def start_markup():
 def commands_markup(commands):
     schema = [
         *[[c.caller] for c in commands],
-        [texts.ADD_COMMAND],
-        [texts.back_text('start')],
+        [texts.ADD_COMMAND,
+            texts.back_text('start')],
     ]
     return to_keyboard(schema)
 
@@ -64,6 +64,13 @@ def command_adding_markup():
     schema = [[
         texts.COMPLETE,
         texts.CANCEL,
+    ]]
+    return to_keyboard(schema)
+
+
+def cancel_markup():
+    schema = [[
+        texts.CANCEL
     ]]
     return to_keyboard(schema)
 

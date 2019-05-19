@@ -24,5 +24,12 @@ def get_fullname(user):
     return fullname
 
 
+def escape_markdown(text):
+    return (text.replace("_", "\\_")
+            .replace("*", "\\*")
+            .replace("[", "\\[")
+            .replace("`", "\\`"))
+
+
 def emojize(text):
     return emoji.emojize(text, use_aliases=True)

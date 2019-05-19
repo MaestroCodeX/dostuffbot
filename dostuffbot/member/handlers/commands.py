@@ -11,7 +11,7 @@ from member.models import Command
 def commands_list(update, context):
     """ Callback function to show all commands. """
 
-    commands = Command.objects.filter(bot=context.bot.db_bot, status=CommandStatus.DONE)
+    commands = Command.objects.filter(bot=context.bot.db_bot)
     text = 'This is a list of your commands. Select command to see the details:'
     if not commands:
         text = 'Press "Add command" to create your first command.'
@@ -29,14 +29,16 @@ def commands_list(update, context):
 def command_menu(update, context):
     """ Callback function to show command menu that was chosen from the list. """
 
-    caller = update.message.text
-    command = Command.objects.get(caller=caller)
-    context.chat_data['cmd_instance'] = command
+    command = context.chat_data.get('cmd_instance')
+    if not command:
+        caller = update.message.text
+        command = Command.objects.get(caller=caller)
+        context.chat_data['cmd_instance'] = command
 
     update.message.reply_text(
         texts.command_menu(command),
         reply_markup=keyboards.command_menu_markup(),
-        parse_mode='MARKDOWN',
+        # parse_mode='MARKDOWN',
     )
     return states.CHOOSE_COMMAND_OPTION
 

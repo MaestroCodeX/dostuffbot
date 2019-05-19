@@ -5,6 +5,11 @@ from core.models import CreatedUpdatedModel
 from main.models import User
 
 
+class CommandManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=CommandStatus.DONE)
+
+
 class Bot(CreatedUpdatedModel):
     owner = models.ForeignKey(
         User,
@@ -43,6 +48,9 @@ class BotAdmin(CreatedUpdatedModel):
 
 
 class Command(CreatedUpdatedModel):
+
+    objects = CommandManager()
+
     bot = models.ForeignKey(
         Bot,
         on_delete=models.CASCADE,
