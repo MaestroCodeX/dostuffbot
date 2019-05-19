@@ -11,7 +11,7 @@ def command_edit_caller(update, context):
         reply_markup=keyboards.back_markup('command menu'),
         parse_mode='MARKDOWN',
     )
-    return states.INPUT_CALLER
+    return states.INPUT_EDIT_CALLER
 
 
 @middleware

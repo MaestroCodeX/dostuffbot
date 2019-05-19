@@ -60,6 +60,14 @@ def command_shown_markup():
     return to_keyboard(schema)
 
 
+def command_adding_markup():
+    schema = [[
+        texts.COMPLETE,
+        texts.CANCEL,
+    ]]
+    return to_keyboard(schema)
+
+
 def back_markup(section):
     schema = [[texts.back_text(section)]]
     return to_keyboard(schema)

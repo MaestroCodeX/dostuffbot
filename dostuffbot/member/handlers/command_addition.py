@@ -3,6 +3,7 @@ from telegram.ext import CallbackQueryHandler, Dispatcher, ConversationHandler, 
 from core.enums import CommandMessageType, CommandStatus
 from core.handlers import ignore
 from member import texts, keyboards, states
+from member.handlers import commands
 from member.middleware import middleware
 from member.models import Command, CommandMessage
 from member.utils import get_command_handler
@@ -26,30 +27,33 @@ def command_add(update, context):
 
 
 @middleware
-def command_add_caller(bot, update):
+def command_add_caller(update, context):
     """ Callback function to handle message with command caller. """
     caller = update.message.text
+    db_bot = context.bot.db_bot
 
     if len(caller) > 32:
         update.message.reply_text(f'Ensure your command length is less than 32 characters.')
         return states.SEND_CALLER
 
-    if Command.objects.filter(bot=bot.db_bot, caller=caller).exists():
+    if Command.objects.filter(bot=db_bot, caller=caller).exists():
         update.message.reply_text(f'The command {caller} already exists.')
         return states.SEND_CALLER
 
-    Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE).delete()
-    Command.objects.create(bot=bot.db_bot, caller=caller, status=CommandStatus.EDIT_ANSWER)
+    Command.objects.filter(bot=db_bot, status=CommandStatus.DONE).delete()
+    command = Command.objects.create(bot=db_bot, caller=caller, status=CommandStatus.EDIT_ANSWER)
+    context.chat_data['cmd_instance_edit'] = command
 
     update.message.reply_text(
         f'Now send me everything that bot will answer when user types {caller}',
+        reply_markup=keyboards.command_adding_markup()
     )
 
     return states.SEND_MESSAGE
 
 
 @middleware
-def command_add_caller_invalid(bot, update):
+def command_add_caller_invalid(update, context):
     """ Callback function to handle message when command is invalid. """
     text = (
         'The command should start with /\n'
@@ -62,15 +66,11 @@ def command_add_caller_invalid(bot, update):
     return states.SEND_CALLER
 
 
-def get_command_to_edit(bot):
-    return Command.objects.filter(bot=bot, status=CommandStatus.EDIT_ANSWER).last()
-
-
 @middleware
-def command_add_text(bot, update):
+def command_add_text(update, context):
     """ Callback function to handle message for command. Returns its state to make the process repetitive. """
     text = update.message.text
-    command = get_command_to_edit(bot.db_bot)
+    command = context.chat_data['cmd_instance_edit']
     CommandMessage.objects.create(
         command=command,
         type=CommandMessageType.TEXT,
@@ -79,8 +79,8 @@ def command_add_text(bot, update):
     return continue_command_adding(update)
 
 
-def command_add_media_message(bot, update, file_id, media_type):
-    command = get_command_to_edit(bot.db_bot)
+def command_add_media_message(context, update, file_id, media_type):
+    command = context.chat_data['cmd_instance_edit']
     CommandMessage.objects.create(
         command=command,
         type=media_type,
@@ -90,42 +90,42 @@ def command_add_media_message(bot, update, file_id, media_type):
 
 
 @middleware
-def command_add_photo(bot, update):
+def command_add_photo(update, context):
     photo = update.message.photo[-1]
-    command_add_media_message(bot, update, photo.file_id, CommandMessageType.PHOTO)
+    command_add_media_message(context, update, photo.file_id, CommandMessageType.PHOTO)
     return continue_command_adding(update)
 
 
 @middleware
-def command_add_video(bot, update):
+def command_add_video(update, context):
     video = update.message.video
-    command_add_media_message(bot, update, video.file_id, CommandMessageType.VIDEO)
+    command_add_media_message(context, update, video.file_id, CommandMessageType.VIDEO)
     return continue_command_adding(update)
 
 
 @middleware
-def command_add_document(bot, update):
+def command_add_document(update, context):
     document = update.message.document
-    command_add_media_message(bot, update, document.file_id, CommandMessageType.DOCUMENT)
+    command_add_media_message(context, update, document.file_id, CommandMessageType.DOCUMENT)
     return continue_command_adding(update)
 
 
 @middleware
-def command_add_audio(bot, update):
+def command_add_audio(update, context):
     audio = update.message.audio
-    command_add_media_message(bot, update, audio.file_id, CommandMessageType.AUDIO)
+    command_add_media_message(context, update, audio.file_id, CommandMessageType.AUDIO)
     return continue_command_adding(update)
 
 
 @middleware
-def command_add_voice(bot, update):
+def command_add_voice(update, context):
     voice = update.message.voice
-    command_add_media_message(bot, update, voice.file_id, CommandMessageType.VOICE)
+    command_add_media_message(context, update, voice.file_id, CommandMessageType.VOICE)
     return continue_command_adding(update)
 
 
 @middleware
-def command_add_location(bot, update):
+def command_add_location(update, context):
     update.message.reply_text(
         'The location messages are still being developed. It will be support at an early future.',
     )
@@ -134,16 +134,16 @@ def command_add_location(bot, update):
 def continue_command_adding(update, silence=False):
     if not silence:
         update.message.reply_text(
-            'Message saved. Continue sending messsages or /complete to save the command.',
+            'Message saved. Continue sending messsages or Complete to save the command.',
         )
 
     return states.SEND_MESSAGE
 
 
 @middleware
-def command_add_complete(bot, update):
+def command_add_complete(update, context):
     """ Callback function to handle /complete command to finish command adding. """
-    command = get_command_to_edit(bot.db_bot)
+    command = context.chat_data['cmd_instance_edit']
     command.status = CommandStatus.DONE
     command.save()
 
@@ -155,42 +155,14 @@ def command_add_complete(bot, update):
         'Congratulations! The command was added to your bot.',
     )
 
-    commands = Command.objects.filter(bot=bot.db_bot, status=CommandStatus.DONE)
-    update.message.reply_text(
-        'This is a list of your commands. Select command to see the details:',
-        reply_markup=keyboards.commands_markup(commands),
-        parse_mode='MARKDOWN',
-    )
     return ConversationHandler.END
 
 
 def command_add_cancel(update, context):
-    command = get_command_to_edit(context.bot.db_bot)
+    command = context.chat_data['cmd_instance_edit']
     command.delete()
     update.message.reply_text(
         'The command addition was cancelled.',
     )
-    return ConversationHandler.END
 
-
-command_add_conversation = ConversationHandler(
-    entry_points=[CallbackQueryHandler(command_add, pattern='command_add')],
-    states={
-        states.SEND_CALLER: [
-            MessageHandler(Filters.command, command_add_caller),
-            MessageHandler(Filters.text, command_add_caller_invalid),
-        ],
-        states.SEND_MESSAGE: [
-            MessageHandler(Filters.text, command_add_text),
-            MessageHandler(Filters.photo, command_add_photo),
-            MessageHandler(Filters.video, command_add_video),
-            MessageHandler(Filters.document, command_add_document),
-            MessageHandler(Filters.audio, command_add_audio),
-            MessageHandler(Filters.voice, command_add_voice),
-            MessageHandler(Filters.location, command_add_location),
-            MessageHandler(Filters.regex('Complete'), command_add_complete),
-            MessageHandler(Filters.regex('Cancel'), command_add_cancel),
-        ],
-    },
-    fallbacks=[MessageHandler(Filters.all, ignore)]
-)
+    return commands.commands_list()

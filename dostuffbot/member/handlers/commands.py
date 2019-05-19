@@ -31,13 +31,13 @@ def command_menu(update, context):
 
     caller = update.message.text
     command = Command.objects.get(caller=caller)
+    context.chat_data['cmd_instance'] = command
+
     update.message.reply_text(
         texts.command_menu(command),
         reply_markup=keyboards.command_menu_markup(),
         parse_mode='MARKDOWN',
     )
-
-    context.chat_data['cmd_instance'] = command
     return states.CHOOSE_COMMAND_OPTION
 
 
@@ -66,7 +66,7 @@ def command_delete_confirm(update, context):
     command.delete()
 
     update.message.reply_text('The command has disappeared...')
-    commands_list(update, context)
+    return commands_list(update, context)
 
 
 @middleware
@@ -86,5 +86,4 @@ def command_show_answer(update, context):
         reply_markup=keyboards.command_shown_markup()
     )
 
-    command_menu(update, context)
-    return states.COMMAND_MENU
+    return command_menu(update, context)

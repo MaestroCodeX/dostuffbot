@@ -34,12 +34,27 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.all, commands.command_menu),
         ],
         states.SEND_NOTIFY_MESSAGE: [
-            MessageHandler(Filters.regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
             MessageHandler(Filters.text, notifications.notify_subcribers),
         ],
         states.INPUT_CALLER: [
-            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.command_menu),
+            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.commands_list),
+            MessageHandler(Filters.command, command_addition.command_add_caller),
+        ],
+        states.INPUT_EDIT_CALLER: [
+            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.commands_list),
             MessageHandler(Filters.command, command_edition.command_edit_caller_sent),
+        ],
+        states.SEND_MESSAGE: [
+            MessageHandler(Filters.regex('Complete'), command_addition.command_add_complete),
+            MessageHandler(Filters.regex('Cancel'), command_addition.command_add_cancel),
+            MessageHandler(Filters.text, command_addition.command_add_text),
+            MessageHandler(Filters.photo, command_addition.command_add_photo),
+            MessageHandler(Filters.video, command_addition.command_add_video),
+            MessageHandler(Filters.document, command_addition.command_add_document),
+            MessageHandler(Filters.audio, command_addition.command_add_audio),
+            MessageHandler(Filters.voice, command_addition.command_add_voice),
+            MessageHandler(Filters.location, command_addition.command_add_location),
         ],
         states.BACK_START: [
             MessageHandler(Filters.regex(texts.back_text('start')), start.start),
