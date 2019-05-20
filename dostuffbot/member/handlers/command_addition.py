@@ -1,7 +1,7 @@
 from telegram.ext import Dispatcher
+from django.conf import settings
 
 from core.enums import CommandMessageType, CommandStatus
-from core.utils import escape_markdown
 from member import keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
@@ -12,6 +12,16 @@ from member.utils import get_command_handler
 @middleware
 def command_add(update, context):
     """ Callback function to handle 'Add command' button. """
+    commands_count = Command.objects.filter(bot=context.bot.db_bot).count()
+    if commands_count >= settings.MAX_MEMBER_COMMANDS:
+        update.message.reply_text((
+            'You have reached the maximum number of available commands. '
+            'If you want to add a new command, delete the old one or contact '
+            'the [support](https://t.me/Dostuffsupportbot) '
+            'to increase the limit of allowed commands.'
+        ), parse_mode='MARKDOWN')
+        return states.COMMAND_MENU
+
     text = (
         'Now send a command that you want to add.\n\n'
         'Here are some examples:\n'
@@ -34,13 +44,13 @@ def command_add_caller(update, context):
 
     if len(caller) > 32:
         update.message.reply_text(f'Ensure your command length is less than 32 characters.')
-        return states.SEND_CALLER
+        return states.INPUT_CALLER
 
     if Command.objects.filter(bot=db_bot, caller=caller).exists():
         update.message.reply_text(f'The command {caller} already exists.')
-        return states.SEND_CALLER
+        return states.INPUT_CALLER
 
-    Command.objects.filter(bot=db_bot, status=CommandStatus.DONE).delete()
+    Command.all.filter(bot=db_bot, status=CommandStatus.EDIT_ANSWER).delete()
     command = Command.objects.create(bot=db_bot, caller=caller, status=CommandStatus.EDIT_ANSWER)
     context.chat_data['cmd_instance_edit'] = command
 
@@ -58,9 +68,9 @@ def command_add_caller_invalid(update, context):
     text = (
         'The __command__ should start with /\n\n'
         '***The __command__ can only contain:***'
-        '\n - letters\n - numbers\n - _'
+        '\n - letters\n - numbers\n - \\_'
     )
-    update.message.reply_text(escape_markdown(text), parse_mode='MARKDOWN')
+    update.message.reply_text(text, parse_mode='MARKDOWN')
 
     return states.INPUT_CALLER
 
@@ -86,7 +96,7 @@ def command_add_complete(update, context):
         'Congratulations! The command was added to your bot.',
     )
 
-    return commands.command_list(update, context)
+    return commands.commands_list(update, context)
 
 
 def command_add_cancel(update, context):

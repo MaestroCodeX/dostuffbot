@@ -1,7 +1,6 @@
 from telegram.ext import Dispatcher
 from django.conf import settings
 
-from core.enums import CommandStatus
 from member import texts, keyboards, states
 from member.middleware import middleware
 from member.models import Command
@@ -38,7 +37,7 @@ def command_menu(update, context):
     update.message.reply_text(
         texts.command_menu(command),
         reply_markup=keyboards.command_menu_markup(),
-        # parse_mode='MARKDOWN',
+        parse_mode='MARKDOWN',
     )
     return states.CHOOSE_COMMAND_OPTION
 

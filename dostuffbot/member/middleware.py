@@ -1,32 +1,23 @@
 import logging
-import inspect
 
-from django.conf import settings
+from telegram.ext import ConversationHandler
 
 from core.utils import get_fullname, get_telegram_user_from_update
 
 
 def middleware(func):
-    def func_wrapper(*args, **kwargs):
+    def func_wrapper(update, context):
         for middleware in MIDDLEWARES:
-            middleware(*args, **kwargs)
+            middleware(update, context)
 
         try:
-            return func(*args, **kwargs)
+            return func(update, context)
         except Exception as e:
-            if settings.DEBUG:
-                raise e
-
             logging.error(e)
-            kwargs = inspect.getcallargs(func, *args, **kwargs)
-            update = kwargs.get('update')
-            bot = kwargs.get('bot')
-            if not all((update, bot)):
-                logging.info(f'Exception of type {type(e)} was raised.')
-                return
             user_id = get_telegram_user_from_update(update).id or 'unknown'
             logging.info(f'Could not proceed the request for user {user_id}. Exception of type {type(e)} was raised.')
-
+            update.message.reply_text('Unexpected error. /start')
+            return ConversationHandler.END
     return func_wrapper
 
 

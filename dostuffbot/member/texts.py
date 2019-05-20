@@ -1,8 +1,8 @@
-from core.utils import emojize
+from core.utils import emojize, escape_markdown
 
 
 def command_menu(command):
-    return f'***Command***: {command.caller}\n\nSelect what you want to do:'
+    return f'***Command***: {escape_markdown(command.caller)}\n\nSelect what you want to do:'
 
 
 def notification_sent(done_count, all_count):
@@ -14,7 +14,7 @@ def message_mailing_status(done_count, all_count):
 
 
 def delete_command(command):
-    return f'You are about to delete the command ***{command.caller}***. Is that correct?'
+    return f'You are about to delete the command ***{escape_markdown(command.caller)}***. Is that correct?'
 
 
 def back_text(section):

@@ -50,6 +50,7 @@ class BotAdmin(CreatedUpdatedModel):
 class Command(CreatedUpdatedModel):
 
     objects = CommandManager()
+    all = models.Manager()
 
     bot = models.ForeignKey(
         Bot,
