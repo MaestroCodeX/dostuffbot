@@ -23,8 +23,12 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.ADD_COMMAND), command_addition.command_add),
             MessageHandler(Filters.regex(texts.back_text('start')), start.start),
         ],
+        states.BACK_START: [
+            MessageHandler(Filters.regex(texts.back_text('start')), start.start),
+        ],
         states.CHOOSE_COMMAND_OPTION: [
             MessageHandler(to_filter_regex(texts.EDIT_COMMAND), command_edition.command_edit_caller),
+            MessageHandler(to_filter_regex(texts.EDIT_ANSWER), command_edition.command_edit_answer),
             MessageHandler(to_filter_regex(texts.SHOW_ANSWER), commands.command_show_answer),
             MessageHandler(to_filter_regex(texts.DELETE_COMMAND), commands.command_delete),
             MessageHandler(to_filter_regex(texts.back_text('commands list')), commands.commands_list),
@@ -42,10 +46,6 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.command, command_addition.command_add_caller),
             MessageHandler(Filters.all, command_addition.command_add_caller_invalid),
         ],
-        states.INPUT_EDIT_CALLER: [
-            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.commands_list),
-            MessageHandler(Filters.command, command_edition.command_edit_caller_sent),
-        ],
         states.SEND_MESSAGE: [
             MessageHandler(to_filter_regex(texts.COMPLETE), command_addition.command_add_complete),
             MessageHandler(to_filter_regex(texts.CANCEL), command_addition.command_add_cancel),
@@ -57,8 +57,15 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.voice, command_addition.command_add_voice),
             MessageHandler(Filters.location, command_addition.command_add_location),
         ],
-        states.BACK_START: [
-            MessageHandler(Filters.regex(texts.back_text('start')), start.start),
+        states.INPUT_EDIT_CALLER: [
+            MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.command_menu),
+            MessageHandler(Filters.command, command_edition.command_edit_caller_sent),
+        ],
+        states.SEND_EDIT_MESSAGE: [
+            MessageHandler(to_filter_regex(texts.DELETE_ALL_MESSAGES), command_edition.delete_all_messages),
+            MessageHandler(to_filter_regex(texts.DELETE_LAST_MESSAGE), command_edition.delete_last_message),
+            MessageHandler(to_filter_regex(texts.SAVE_CHANGES), command_edition.save_changes),
+            MessageHandler(to_filter_regex(texts.EXIT_NO_SAVE), command_edition.exit_no_save),
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],

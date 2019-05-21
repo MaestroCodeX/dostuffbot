@@ -13,7 +13,7 @@ def commands_list(update, context):
     commands = Command.objects.filter(bot=context.bot.db_bot)
     text = 'This is a list of your commands. Select command to see the details:'
     if not commands:
-        text = 'Press "Add command" to create your first command.'
+        text = 'Hit "Add command" to create your first command.'
 
     update.message.reply_text(
         text,
@@ -71,19 +71,12 @@ def command_delete_confirm(update, context):
 
 
 @middleware
-def command_delete_decline(update, context):
-    """ Handle delete dcline button.
-    Don't delete the command and return user to command menu. """
-    pass
-
-
-@middleware
 def command_show_answer(update, context):
     command = context.chat_data['cmd_instance']
     command.reply_to(update.message)
 
     update.message.reply_text(
-        'The full answer is shown. Select what you want to do next:',
+        'The full answer is shown.',
         reply_markup=keyboards.command_shown_markup()
     )
 

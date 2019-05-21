@@ -66,8 +66,8 @@ def command_add_caller(update, context):
 def command_add_caller_invalid(update, context):
     """ Callback function to handle message when command is invalid. """
     text = (
-        'The __command__ should start with /\n\n'
-        '***The __command__ can only contain:***'
+        'The ___command___ should start with /\n\n'
+        '***The command can only contain:***'
         '\n - letters\n - numbers\n - \\_'
     )
     update.message.reply_text(text, parse_mode='MARKDOWN')

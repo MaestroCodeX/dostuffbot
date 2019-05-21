@@ -75,6 +75,16 @@ def cancel_markup():
     return to_keyboard(schema)
 
 
+def edit_asnwer_markup():
+    schema = [
+        [texts.DELETE_ALL_MESSAGES],
+        [texts.DELETE_LAST_MESSAGE],
+        [texts.SAVE_CHANGES],
+        [texts.EXIT_NO_SAVE],
+    ]
+    return to_keyboard(schema)
+
+
 def back_markup(section):
     schema = [[texts.back_text(section)]]
     return to_keyboard(schema)
