@@ -77,6 +77,7 @@ class CommandMessage(CreatedUpdatedModel):
     type = models.CharField(max_length=20, choices=CommandMessageType)
     text = models.TextField(blank=True, null=True)
     file_id = models.CharField(max_length=40)
+    is_active = models.BooleanField(default=True)
 
     def get_context(self):
         if self.type == CommandMessageType.TEXT:
@@ -88,3 +89,8 @@ class CommandMessage(CreatedUpdatedModel):
     def get_func_name(self):
         media_field = self.type.lower()
         return f'reply_{media_field}'
+
+
+class ErrorReport(CreatedUpdatedModel):
+    user_id = models.IntegerField(blank=True, null=True)
+    context = models.TextField()

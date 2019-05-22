@@ -1,6 +1,9 @@
 from member import texts, keyboards, states
+from member.handlers import commands
 from member.middleware import middleware
-from member.models import Command
+from member.models import Command, CommandMessage
+
+ALL = '__all__'
 
 
 @middleware
@@ -53,32 +56,87 @@ def command_edit_answer(update, context):
         reply_markup=keyboards.edit_asnwer_markup(),
         parse_mode='MARKDOWN',
     )
-    command = context.chat_data['cmd_instance']
-    inform_number_of_commands(update, command)
+    context.chat_data['msgs_to_delete'] = []
+    inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def delete_all_messages(update, context):
-    pass
+    context.chat_data['msgs_to_delete'] = ALL
+    inform_number_of_commands(update, context)
+    return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def delete_last_message(update, context):
-    pass
+    command = context.chat_data['cmd_instance']
+    msgs_to_delete = context.chat_data['msgs_to_delete']
+    try:
+        msg = command.command_messages.exclude(id__in=msgs_to_delete).lastest('id')
+        context.chat_data['msgs_to_delete'].append(msg)
+    except CommandMessage.DoesNotExist:
+        pass
+    inform_number_of_commands(update, context)
+    return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def save_changes(update, context):
-    pass
+    msgs_to_delete = context.chat_data['msgs_to_delete']
+    if len(msgs_to_delete) > 0:
+        update.message.reply_text(
+            text='Are you sure you want to save changes?',
+            reply_markup=keyboards.confirm_yes_no_markup(),
+            parse_mode='MARKDOWN',
+        )
+    else:
+        save_changes_confirmed(update, context)
+
+    return states.EXIT_WITH_SAVE_CONFIRM
+
+
+@middleware
+def save_changes_confirmed(update, context):
+    command = context.chat_data['cmd_instance']
+    msgs_to_delete = context.chat_data.pop('msgs_to_delete')
+    if msgs_to_delete == ALL:
+        command.command_messages.all().update(is_active=False)
+    else:
+        for obj in msgs_to_delete:
+            obj.update(is_active=False)
+    update.message.reply_text('Selected messages were deleted.')
+    return commands.command_menu(update, context)
 
 
 @middleware
 def exit_no_save(update, context):
-    pass
+    update.message.reply_text(
+        text='Are you sure you want to exit without any changes?',
+        reply_markup=keyboards.confirm_yes_no_markup(),
+        parse_mode='MARKDOWN',
+    )
+
+    return states.EXIT_NO_SAVE_CONFIRM
 
 
-def inform_number_of_commands(update, command):
-    count = command.command_messages.count()
-    text = f'The command {command.caller} has {count} command{"s" if count > 1 else ""}.'
+@middleware
+def exit_no_save_confirmed(update, context):
+    del context.chat_data['msgs_to_delete']
+    return commands.command_menu(update, context)
+
+
+@middleware
+def exit_declined(update, context):
+    return command_edit_answer(update, context)
+
+
+def inform_number_of_commands(update, context):
+    command = context.chat_data['cmd_instance']
+    msgs_to_delete = context.chat_data['msgs_to_delete']
+    left_count = 0
+    if msgs_to_delete != ALL:
+        count = command.command_messages.count()
+        left_count = count - len(msgs_to_delete)
+    text = f'The command {command.caller} has {left_count} message{"s" if left_count > 1 else ""}.'
     update.message.reply_text(text=text)

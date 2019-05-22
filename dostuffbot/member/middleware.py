@@ -3,6 +3,7 @@ import logging
 from telegram.ext import ConversationHandler
 
 from core.utils import get_fullname, get_telegram_user_from_update
+from member.models import ErrorReport
 
 
 def middleware(func):
@@ -11,11 +12,20 @@ def middleware(func):
             middleware(update, context)
 
         try:
-            return func(update, context)
+            next_state = func(update, context)
+            context['state'] = next_state
+            return next_state
         except Exception as e:
             logging.error(e)
-            user_id = get_telegram_user_from_update(update).id or 'unknown'
-            logging.info(f'Could not proceed the request for user {user_id}. Exception of type {type(e)} was raised.')
+            user_id = get_telegram_user_from_update(update).id
+            ErrorReport.objects.create(
+                user_id=user_id,
+                context=context,
+            )
+            logging.info((
+                f'Could not proceed the request for user {user_id or "unknown"}. '
+                f'Exception of type {type(e)} was raised.'
+            ))
             update.message.reply_text('Unexpected error. /start')
             return ConversationHandler.END
     return func_wrapper

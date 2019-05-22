@@ -21,10 +21,10 @@ base_conversation = ConversationHandler(
         states.COMMAND_MENU: [
             MessageHandler(Filters.command, commands.command_menu),
             MessageHandler(to_filter_regex(texts.ADD_COMMAND), command_addition.command_add),
-            MessageHandler(Filters.regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
         ],
         states.BACK_START: [
-            MessageHandler(Filters.regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
         ],
         states.CHOOSE_COMMAND_OPTION: [
             MessageHandler(to_filter_regex(texts.EDIT_COMMAND), command_edition.command_edit_caller),
@@ -66,6 +66,14 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.DELETE_LAST_MESSAGE), command_edition.delete_last_message),
             MessageHandler(to_filter_regex(texts.SAVE_CHANGES), command_edition.save_changes),
             MessageHandler(to_filter_regex(texts.EXIT_NO_SAVE), command_edition.exit_no_save),
+        ],
+        states.EXIT_WITH_SAVE_CONFIRM: [
+            MessageHandler(to_filter_regex(texts.YES), command_edition.save_changes_confirmed),
+            MessageHandler(to_filter_regex(texts.NO), command_edition.exit_declined),
+        ],
+        states.EXIT_NO_SAVE_CONFIRM: [
+            MessageHandler(to_filter_regex(texts.YES), command_edition.exit_no_save_confirmed),
+            MessageHandler(to_filter_regex(texts.NO), command_edition.exit_declined),
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],

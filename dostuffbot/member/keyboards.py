@@ -88,3 +88,8 @@ def edit_asnwer_markup():
 def back_markup(section):
     schema = [[texts.back_text(section)]]
     return to_keyboard(schema)
+
+
+def confirm_yes_no_markup():
+    schema = [[texts.YES, texts.NO]]
+    return to_keyboard(schema)
