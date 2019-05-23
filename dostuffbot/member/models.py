@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.enums import CommandMessageType, CommandStatus
-from core.models import CreatedUpdatedModel
+from core.models import CreatedUpdatedModel, ManagerActive
 from main.models import User
 
 
@@ -69,6 +69,10 @@ class Command(CreatedUpdatedModel):
 
 
 class CommandMessage(CreatedUpdatedModel):
+
+    objects = ManagerActive()
+    all = models.Manager()
+
     command = models.ForeignKey(
         Command,
         on_delete=models.CASCADE,
@@ -93,4 +97,5 @@ class CommandMessage(CreatedUpdatedModel):
 
 class ErrorReport(CreatedUpdatedModel):
     user_id = models.IntegerField(blank=True, null=True)
+    error = models.TextField()
     context = models.TextField()

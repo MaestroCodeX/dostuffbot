@@ -1,9 +1,9 @@
 from telegram.ext import Dispatcher
 from django.conf import settings
 
-from core.enums import CommandMessageType, CommandStatus
+from core.enums import CommandMessageType, CommandStatus, CommandMutationMode
 from member import keyboards, states
-from member.handlers import commands
+from member.handlers import commands, command_edition
 from member.middleware import middleware
 from member.models import Command, CommandMessage
 from member.utils import get_command_handler
@@ -59,6 +59,8 @@ def command_add_caller(update, context):
         reply_markup=keyboards.command_adding_markup()
     )
 
+    context.chat_data['retutn_state'] = states.SEND_MESSAGE
+    context.chat_data['mode'] = CommandMutationMode.ADDING
     return states.SEND_MESSAGE
 
 
@@ -119,7 +121,7 @@ def command_add_text(update, context):
         type=CommandMessageType.TEXT,
         text=text,
     )
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 def command_add_media_message(context, update, file_id, media_type):
@@ -136,35 +138,35 @@ def command_add_media_message(context, update, file_id, media_type):
 def command_add_photo(update, context):
     photo = update.message.photo[-1]
     command_add_media_message(context, update, photo.file_id, CommandMessageType.PHOTO)
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 @middleware
 def command_add_video(update, context):
     video = update.message.video
     command_add_media_message(context, update, video.file_id, CommandMessageType.VIDEO)
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 @middleware
 def command_add_document(update, context):
     document = update.message.document
     command_add_media_message(context, update, document.file_id, CommandMessageType.DOCUMENT)
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 @middleware
 def command_add_audio(update, context):
     audio = update.message.audio
     command_add_media_message(context, update, audio.file_id, CommandMessageType.AUDIO)
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 @middleware
 def command_add_voice(update, context):
     voice = update.message.voice
     command_add_media_message(context, update, voice.file_id, CommandMessageType.VOICE)
-    return continue_command_adding(update)
+    return continue_command_adding(update, context)
 
 
 @middleware
@@ -174,10 +176,15 @@ def command_add_location(update, context):
     )
 
 
-def continue_command_adding(update, silence=False):
+def continue_command_adding(update, context, silence=False):
     if not silence:
-        update.message.reply_text(
-            'Message saved. Continue sending messsages or Complete to save the command.',
-        )
+        mode = context.chat_data.get('mode')
+        if mode == CommandMutationMode.ADDING:
+            update.message.reply_text(
+                'Message saved. Continue sending messsages or hit "Complete" to save the command.',
+            )
+        elif mode == CommandMutationMode.EDITING:
+            update.message.reply_text('Message saved.')
+            command_edition.inform_number_of_commands(update, context)
 
-    return states.SEND_MESSAGE
+    return context.chat_data.get('retutn_state')

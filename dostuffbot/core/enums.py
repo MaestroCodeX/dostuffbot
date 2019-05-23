@@ -41,3 +41,8 @@ class CommandStatus(ChoicesEnum):
     DONE = 'DONE'
     EDIT_CALLER = 'EDIT_CALLER'
     EDIT_ANSWER = 'EDIT_ANSWER'
+
+
+class CommandMutationMode(ChoicesEnum):
+    ADDING = 'ADDING'
+    EDITING = 'EDITING'

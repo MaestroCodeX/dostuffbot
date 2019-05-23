@@ -10,6 +10,16 @@ from member.handlers import commands, command_addition, command_edition, notific
 from member.utils import get_command_handler, to_filter_regex
 
 
+message_adding_filters = [
+    MessageHandler(Filters.text, command_addition.command_add_text),
+    MessageHandler(Filters.photo, command_addition.command_add_photo),
+    MessageHandler(Filters.video, command_addition.command_add_video),
+    MessageHandler(Filters.document, command_addition.command_add_document),
+    MessageHandler(Filters.audio, command_addition.command_add_audio),
+    MessageHandler(Filters.voice, command_addition.command_add_voice),
+    MessageHandler(Filters.location, command_addition.command_add_location),
+]
+
 base_conversation = ConversationHandler(
     entry_points=[CommandHandler('start', start.start)],
     states={
@@ -49,13 +59,7 @@ base_conversation = ConversationHandler(
         states.SEND_MESSAGE: [
             MessageHandler(to_filter_regex(texts.COMPLETE), command_addition.command_add_complete),
             MessageHandler(to_filter_regex(texts.CANCEL), command_addition.command_add_cancel),
-            MessageHandler(Filters.text, command_addition.command_add_text),
-            MessageHandler(Filters.photo, command_addition.command_add_photo),
-            MessageHandler(Filters.video, command_addition.command_add_video),
-            MessageHandler(Filters.document, command_addition.command_add_document),
-            MessageHandler(Filters.audio, command_addition.command_add_audio),
-            MessageHandler(Filters.voice, command_addition.command_add_voice),
-            MessageHandler(Filters.location, command_addition.command_add_location),
+            *message_adding_filters,
         ],
         states.INPUT_EDIT_CALLER: [
             MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.command_menu),
@@ -66,6 +70,7 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.DELETE_LAST_MESSAGE), command_edition.delete_last_message),
             MessageHandler(to_filter_regex(texts.SAVE_CHANGES), command_edition.save_changes),
             MessageHandler(to_filter_regex(texts.EXIT_NO_SAVE), command_edition.exit_no_save),
+            *message_adding_filters,
         ],
         states.EXIT_WITH_SAVE_CONFIRM: [
             MessageHandler(to_filter_regex(texts.YES), command_edition.save_changes_confirmed),
@@ -77,6 +82,7 @@ base_conversation = ConversationHandler(
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],
+    allow_reentry=True,
 )
 
 ADMIN_HANDLERS = [

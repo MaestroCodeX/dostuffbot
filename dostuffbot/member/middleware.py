@@ -1,3 +1,4 @@
+import json
 import logging
 
 from telegram.ext import ConversationHandler
@@ -13,14 +14,15 @@ def middleware(func):
 
         try:
             next_state = func(update, context)
-            context['state'] = next_state
+            context.chat_data['state'] = next_state
             return next_state
         except Exception as e:
             logging.error(e)
             user_id = get_telegram_user_from_update(update).id
             ErrorReport.objects.create(
                 user_id=user_id,
-                context=context,
+                error=str(e),
+                context=json.dumps(context.chat_data),
             )
             logging.info((
                 f'Could not proceed the request for user {user_id or "unknown"}. '

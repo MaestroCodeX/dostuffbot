@@ -1,3 +1,4 @@
+from core.enums import CommandMutationMode
 from member import texts, keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
@@ -57,6 +58,10 @@ def command_edit_answer(update, context):
         parse_mode='MARKDOWN',
     )
     context.chat_data['msgs_to_delete'] = []
+    context.chat_data['cmd_instance_edit'] = context.chat_data['cmd_instance']
+    context.chat_data['retutn_state'] = states.SEND_EDIT_MESSAGE
+    context.chat_data['mode'] = CommandMutationMode.EDITING
+
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
@@ -73,8 +78,8 @@ def delete_last_message(update, context):
     command = context.chat_data['cmd_instance']
     msgs_to_delete = context.chat_data['msgs_to_delete']
     try:
-        msg = command.command_messages.exclude(id__in=msgs_to_delete).lastest('id')
-        context.chat_data['msgs_to_delete'].append(msg)
+        msg = command.command_messages.exclude(id__in=msgs_to_delete).latest('id')
+        context.chat_data['msgs_to_delete'].append(msg.id)
     except CommandMessage.DoesNotExist:
         pass
     inform_number_of_commands(update, context)
@@ -103,8 +108,7 @@ def save_changes_confirmed(update, context):
     if msgs_to_delete == ALL:
         command.command_messages.all().update(is_active=False)
     else:
-        for obj in msgs_to_delete:
-            obj.update(is_active=False)
+        CommandMessage.objects.filter(id__in=msgs_to_delete).update(is_active=False)
     update.message.reply_text('Selected messages were deleted.')
     return commands.command_menu(update, context)
 

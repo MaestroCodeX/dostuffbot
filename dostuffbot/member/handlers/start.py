@@ -11,6 +11,8 @@ def start(update, context):
     """ Callback function when user sends /start or returns to main menu.
     It also handles start command with arguments from main bot. """
 
+    context.chat_data = {}
+
     if update.message:
         parts = update.message.text.split()
         args = parts[1:]
