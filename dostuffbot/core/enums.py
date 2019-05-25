@@ -43,6 +43,7 @@ class CommandStatus(ChoicesEnum):
     EDIT_ANSWER = 'EDIT_ANSWER'
 
 
-class CommandMutationMode(ChoicesEnum):
-    ADDING = 'ADDING'
-    EDITING = 'EDITING'
+class EditLastAction(ChoicesEnum):
+    DELETE_LAST = 'DELETE_LAST'
+    DELETE_ALL = 'DELETE_ALL'
+    ADD_MESSAGE = 'ADD_MESSAGE'

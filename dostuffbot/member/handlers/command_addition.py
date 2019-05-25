@@ -1,7 +1,7 @@
 from telegram.ext import Dispatcher
 from django.conf import settings
 
-from core.enums import CommandMessageType, CommandStatus, CommandMutationMode
+from core.enums import CommandMessageType, CommandStatus
 from member import keyboards, states
 from member.handlers import commands, command_edition
 from member.middleware import middleware
@@ -59,8 +59,6 @@ def command_add_caller(update, context):
         reply_markup=keyboards.command_adding_markup()
     )
 
-    context.chat_data['retutn_state'] = states.SEND_MESSAGE
-    context.chat_data['mode'] = CommandMutationMode.ADDING
     return states.SEND_MESSAGE
 
 
@@ -178,13 +176,8 @@ def command_add_location(update, context):
 
 def continue_command_adding(update, context, silence=False):
     if not silence:
-        mode = context.chat_data.get('mode')
-        if mode == CommandMutationMode.ADDING:
-            update.message.reply_text(
-                'Message saved. Continue sending messsages or hit "Complete" to save the command.',
-            )
-        elif mode == CommandMutationMode.EDITING:
-            update.message.reply_text('Message saved.')
-            command_edition.inform_number_of_commands(update, context)
+        update.message.reply_text(
+            'Message saved. Continue sending messsages or hit "Complete" to save the command.',
+        )
 
-    return context.chat_data.get('retutn_state')
+    return states.SEND_MESSAGE

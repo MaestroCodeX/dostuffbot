@@ -79,8 +79,10 @@ def edit_asnwer_markup():
     schema = [
         [texts.DELETE_ALL_MESSAGES],
         [texts.DELETE_LAST_MESSAGE],
-        [texts.SAVE_CHANGES],
-        [texts.EXIT_NO_SAVE],
+        [
+            texts.UNDO_LAST,
+            texts.back_text('command menu'),
+        ],
     ]
     return to_keyboard(schema)
 

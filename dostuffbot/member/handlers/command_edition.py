@@ -1,4 +1,4 @@
-from core.enums import CommandMutationMode
+from core.enums import CommandMessageType, EditLastAction
 from member import texts, keyboards, states
 from member.handlers import commands
 from member.middleware import middleware
@@ -59,27 +59,38 @@ def command_edit_answer(update, context):
     )
     context.chat_data['msgs_to_delete'] = []
     context.chat_data['cmd_instance_edit'] = context.chat_data['cmd_instance']
-    context.chat_data['retutn_state'] = states.SEND_EDIT_MESSAGE
-    context.chat_data['mode'] = CommandMutationMode.EDITING
+    context.chat_data['last_edit_action'] = None
 
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
+def commit_last_action(context):
+    last_action = context.chat_data.pop('last_edit_action', None)
+    command = context.chat_data['cmd_instance']
+    if last_action == EditLastAction.DELETE_ALL:
+        command.command_messages.all().update(is_active=False)
+    elif last_action == EditLastAction.DELETE_LAST:
+        last_message = context.chat_data('last_message')
+        if last_message:
+            last_message.delete()
+
+
 @middleware
 def delete_all_messages(update, context):
-    context.chat_data['msgs_to_delete'] = ALL
+    commit_last_action(context)
+    context.chat_data['last_edit_action'] = EditLastAction.DELETE_ALL
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def delete_last_message(update, context):
+    context.chat_data['last_edit_action'] = EditLastAction.DELETE_LAST
     command = context.chat_data['cmd_instance']
-    msgs_to_delete = context.chat_data['msgs_to_delete']
     try:
         msg = command.command_messages.exclude(id__in=msgs_to_delete).latest('id')
-        context.chat_data['msgs_to_delete'].append(msg.id)
+        context.chat_data['last_message'] = msg
     except CommandMessage.DoesNotExist:
         pass
     inform_number_of_commands(update, context)
@@ -87,34 +98,7 @@ def delete_last_message(update, context):
 
 
 @middleware
-def save_changes(update, context):
-    msgs_to_delete = context.chat_data['msgs_to_delete']
-    if len(msgs_to_delete) > 0:
-        update.message.reply_text(
-            text='Are you sure you want to save changes?',
-            reply_markup=keyboards.confirm_yes_no_markup(),
-            parse_mode='MARKDOWN',
-        )
-    else:
-        save_changes_confirmed(update, context)
-
-    return states.EXIT_WITH_SAVE_CONFIRM
-
-
-@middleware
-def save_changes_confirmed(update, context):
-    command = context.chat_data['cmd_instance']
-    msgs_to_delete = context.chat_data.pop('msgs_to_delete')
-    if msgs_to_delete == ALL:
-        command.command_messages.all().update(is_active=False)
-    else:
-        CommandMessage.objects.filter(id__in=msgs_to_delete).update(is_active=False)
-    update.message.reply_text('Selected messages were deleted.')
-    return commands.command_menu(update, context)
-
-
-@middleware
-def exit_no_save(update, context):
+def exit_edit_mode(update, context):
     update.message.reply_text(
         text='Are you sure you want to exit without any changes?',
         reply_markup=keyboards.confirm_yes_no_markup(),
@@ -124,23 +108,89 @@ def exit_no_save(update, context):
     return states.EXIT_NO_SAVE_CONFIRM
 
 
-@middleware
-def exit_no_save_confirmed(update, context):
-    del context.chat_data['msgs_to_delete']
-    return commands.command_menu(update, context)
-
-
-@middleware
-def exit_declined(update, context):
-    return command_edit_answer(update, context)
-
-
 def inform_number_of_commands(update, context):
     command = context.chat_data['cmd_instance']
-    msgs_to_delete = context.chat_data['msgs_to_delete']
-    left_count = 0
-    if msgs_to_delete != ALL:
-        count = command.command_messages.count()
-        left_count = count - len(msgs_to_delete)
-    text = f'The command {command.caller} has {left_count} message{"s" if left_count > 1 else ""}.'
+    last_action = context.chat_data.pop('last_edit_action', None)
+    count = command.command_messages.count()
+    if last_action == EditLastAction.DELETE_LAST:
+        count -= 1
+    elif last_action == EditLastAction.DELETE_ALL:
+        count = 0
+
+    text = f'The command {command.caller} has {count} message{"s" if count > 1 else ""}.'
     update.message.reply_text(text=text)
+
+
+@middleware
+def command_add_text(update, context):
+    """ Callback function to handle message for command. Returns its state to make the process repetitive. """
+    text = update.message.text
+    command = context.chat_data['cmd_instance_edit']
+    CommandMessage.objects.create(
+        command=command,
+        type=CommandMessageType.TEXT,
+        text=text,
+    )
+    return continue_command_adding(update, context)
+
+
+def command_add_media_message(context, update, file_id, media_type):
+    command = context.chat_data['cmd_instance_edit']
+    CommandMessage.objects.create(
+        command=command,
+        type=media_type,
+        text=update.message.caption,
+        file_id=file_id,
+    )
+
+
+@middleware
+def command_add_photo(update, context):
+    photo = update.message.photo[-1]
+    command_add_media_message(context, update, photo.file_id, CommandMessageType.PHOTO)
+    return continue_command_adding(update, context)
+
+
+@middleware
+def command_add_video(update, context):
+    video = update.message.video
+    command_add_media_message(context, update, video.file_id, CommandMessageType.VIDEO)
+    return continue_command_adding(update, context)
+
+
+@middleware
+def command_add_document(update, context):
+    document = update.message.document
+    command_add_media_message(context, update, document.file_id, CommandMessageType.DOCUMENT)
+    return continue_command_adding(update, context)
+
+
+@middleware
+def command_add_audio(update, context):
+    audio = update.message.audio
+    command_add_media_message(context, update, audio.file_id, CommandMessageType.AUDIO)
+    return continue_command_adding(update, context)
+
+
+@middleware
+def command_add_voice(update, context):
+    voice = update.message.voice
+    command_add_media_message(context, update, voice.file_id, CommandMessageType.VOICE)
+    return continue_command_adding(update, context)
+
+
+@middleware
+def command_add_location(update, context):
+    update.message.reply_text(
+        'The location messages are still being developed. It will be support at an early future.',
+    )
+
+
+def continue_command_adding(update, context, silence=False):
+    context.chat_data['last_edit_action'] = EditLastAction.ADD_MESSAGE
+    if not silence:
+        update.message.reply_text(
+            'Message saved. Continue sending messsages or hit "Complete" to save the command.',
+        )
+
+    return context.chat_data.get('retutn_state')
