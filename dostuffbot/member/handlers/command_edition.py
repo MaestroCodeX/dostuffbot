@@ -58,7 +58,6 @@ def command_edit_answer(update, context):
         parse_mode='MARKDOWN',
     )
     context.chat_data['msgs_to_delete'] = []
-    context.chat_data['cmd_instance_edit'] = context.chat_data['cmd_instance']
     context.chat_data['last_edit_action'] = None
 
     inform_number_of_commands(update, context)
@@ -71,13 +70,37 @@ def commit_last_action(context):
     if last_action == EditLastAction.DELETE_ALL:
         command.command_messages.all().update(is_active=False)
     elif last_action == EditLastAction.DELETE_LAST:
-        last_message = context.chat_data('last_message')
-        if last_message:
-            last_message.delete()
+        try:
+            command.command_messages.latest('id').delete()
+        except CommandMessage.DoesNotExist:
+            pass
+
+
+@middleware
+def undo_last_action(update, context):
+    last_action = context.chat_data.pop('last_edit_action', None)
+    command = context.chat_data['cmd_instance']
+    response = 'No last action found.'
+
+    if last_action == EditLastAction.DELETE_ALL:
+        response = 'All deleted messages were recovered.'
+    elif last_action == EditLastAction.DELETE_LAST:
+        response = 'Last deleted message was recovered.'
+    elif last_action == EditLastAction.ADD_MESSAGE:
+        response = 'Last added message was deleted.'
+        try:
+            command.command_messages.latest('id').delete()
+        except CommandMessage.DoesNotExist:
+            pass
+
+    update.message.reply_text(response)
+    inform_number_of_commands(update, context)
+    return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def delete_all_messages(update, context):
+    print(context.chat_data)
     commit_last_action(context)
     context.chat_data['last_edit_action'] = EditLastAction.DELETE_ALL
     inform_number_of_commands(update, context)
@@ -86,13 +109,9 @@ def delete_all_messages(update, context):
 
 @middleware
 def delete_last_message(update, context):
+    print(context.chat_data)
+    commit_last_action(context)
     context.chat_data['last_edit_action'] = EditLastAction.DELETE_LAST
-    command = context.chat_data['cmd_instance']
-    try:
-        msg = command.command_messages.exclude(id__in=msgs_to_delete).latest('id')
-        context.chat_data['last_message'] = msg
-    except CommandMessage.DoesNotExist:
-        pass
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
@@ -110,7 +129,7 @@ def exit_edit_mode(update, context):
 
 def inform_number_of_commands(update, context):
     command = context.chat_data['cmd_instance']
-    last_action = context.chat_data.pop('last_edit_action', None)
+    last_action = context.chat_data.get('last_edit_action')
     count = command.command_messages.count()
     if last_action == EditLastAction.DELETE_LAST:
         count -= 1
@@ -125,7 +144,7 @@ def inform_number_of_commands(update, context):
 def command_add_text(update, context):
     """ Callback function to handle message for command. Returns its state to make the process repetitive. """
     text = update.message.text
-    command = context.chat_data['cmd_instance_edit']
+    command = context.chat_data['cmd_instance']
     CommandMessage.objects.create(
         command=command,
         type=CommandMessageType.TEXT,
@@ -135,7 +154,7 @@ def command_add_text(update, context):
 
 
 def command_add_media_message(context, update, file_id, media_type):
-    command = context.chat_data['cmd_instance_edit']
+    command = context.chat_data['cmd_instance']
     CommandMessage.objects.create(
         command=command,
         type=media_type,
@@ -184,6 +203,7 @@ def command_add_location(update, context):
     update.message.reply_text(
         'The location messages are still being developed. It will be support at an early future.',
     )
+    return continue_command_adding(update, context)
 
 
 def continue_command_adding(update, context, silence=False):
@@ -193,4 +213,4 @@ def continue_command_adding(update, context, silence=False):
             'Message saved. Continue sending messsages or hit "Complete" to save the command.',
         )
 
-    return context.chat_data.get('retutn_state')
+    return states.SEND_EDIT_MESSAGE

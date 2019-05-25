@@ -68,17 +68,9 @@ base_conversation = ConversationHandler(
         states.SEND_EDIT_MESSAGE: [
             MessageHandler(to_filter_regex(texts.DELETE_ALL_MESSAGES), command_edition.delete_all_messages),
             MessageHandler(to_filter_regex(texts.DELETE_LAST_MESSAGE), command_edition.delete_last_message),
-            MessageHandler(to_filter_regex(texts.SAVE_CHANGES), command_edition.save_changes),
-            MessageHandler(to_filter_regex(texts.EXIT_NO_SAVE), command_edition.exit_no_save),
+            MessageHandler(to_filter_regex(texts.UNDO_LAST), command_edition.undo_last_action),
+            MessageHandler(to_filter_regex(texts.back_text('menu')), command_edition.exit_edit_mode),
             *message_adding_filters,
-        ],
-        states.EXIT_WITH_SAVE_CONFIRM: [
-            MessageHandler(to_filter_regex(texts.YES), command_edition.save_changes_confirmed),
-            MessageHandler(to_filter_regex(texts.NO), command_edition.exit_declined),
-        ],
-        states.EXIT_NO_SAVE_CONFIRM: [
-            MessageHandler(to_filter_regex(texts.YES), command_edition.exit_no_save_confirmed),
-            MessageHandler(to_filter_regex(texts.NO), command_edition.exit_declined),
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],

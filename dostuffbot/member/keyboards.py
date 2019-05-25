@@ -81,7 +81,7 @@ def edit_asnwer_markup():
         [texts.DELETE_LAST_MESSAGE],
         [
             texts.UNDO_LAST,
-            texts.back_text('command menu'),
+            texts.back_text('menu'),
         ],
     ]
     return to_keyboard(schema)
