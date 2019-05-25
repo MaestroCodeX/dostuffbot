@@ -100,7 +100,6 @@ def undo_last_action(update, context):
 
 @middleware
 def delete_all_messages(update, context):
-    print(context.chat_data)
     commit_last_action(context)
     context.chat_data['last_edit_action'] = EditLastAction.DELETE_ALL
     inform_number_of_commands(update, context)
@@ -109,7 +108,6 @@ def delete_all_messages(update, context):
 
 @middleware
 def delete_last_message(update, context):
-    print(context.chat_data)
     commit_last_action(context)
     context.chat_data['last_edit_action'] = EditLastAction.DELETE_LAST
     inform_number_of_commands(update, context)
@@ -118,13 +116,10 @@ def delete_last_message(update, context):
 
 @middleware
 def exit_edit_mode(update, context):
-    update.message.reply_text(
-        text='Are you sure you want to exit without any changes?',
-        reply_markup=keyboards.confirm_yes_no_markup(),
-        parse_mode='MARKDOWN',
-    )
-
-    return states.EXIT_NO_SAVE_CONFIRM
+    commit_last_action(context)
+    del context.chat_data['msgs_to_delete']
+    del context.chat_data['last_edit_action']
+    return commands.command_menu()
 
 
 def inform_number_of_commands(update, context):
