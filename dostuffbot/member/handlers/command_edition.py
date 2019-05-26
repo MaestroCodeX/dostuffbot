@@ -4,8 +4,6 @@ from member.handlers import commands
 from member.middleware import middleware
 from member.models import Command, CommandMessage
 
-ALL = '__all__'
-
 
 @middleware
 def command_edit_caller(update, context):
@@ -45,53 +43,74 @@ def command_edit_caller_sent(update, context):
 @middleware
 def command_edit_answer(update, context):
     """ Callback function to handle edit command button. """
+    chat_data = context.chat_data
+
     text = (
         '___DESCRIPTION___: You are in command editting mode. '
         'You can either send new messages to add them '
         'or delete your previous messages.\n\n'
         '___ATTEINTION___: No changes will be affected unless you hit '
-        f'___{"Save changes"}___ button.'
+        '___Save changes___ button.'
     )
     update.message.reply_text(
         text=text,
         reply_markup=keyboards.edit_asnwer_markup(),
         parse_mode='MARKDOWN',
     )
-    context.chat_data['msgs_to_delete'] = []
-    context.chat_data['last_edit_action'] = None
+    command = chat_data['cmd_instance']
+    chat_data['edit_actions_log'] = []
+    chat_data['msgs_count'] = command.command_messages.count()
 
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
-def commit_last_action(context):
-    last_action = context.chat_data.pop('last_edit_action', None)
-    command = context.chat_data['cmd_instance']
-    if last_action == EditLastAction.DELETE_ALL:
-        command.command_messages.all().update(is_active=False)
-    elif last_action == EditLastAction.DELETE_LAST:
-        try:
-            command.command_messages.latest('id').delete()
-        except CommandMessage.DoesNotExist:
-            pass
+def commit_all_actions(context):
+    chat_data = context.chat_data
+
+    actions_to_commit = chat_data['edit_actions_log']
+    command = chat_data['cmd_instance']
+    for action in actions_to_commit:
+        if action == EditLastAction.DELETE_ALL:
+            command.command_messages.all().update(is_active=False)
+
+        elif action == EditLastAction.DELETE_LAST:
+            try:
+                command.command_messages.latest('id').delete()
+            except CommandMessage.DoesNotExist:
+                pass
 
 
 @middleware
 def undo_last_action(update, context):
-    last_action = context.chat_data.pop('last_edit_action', None)
-    command = context.chat_data['cmd_instance']
-    response = 'No last action found.'
+    chat_data = context.chat_data
 
-    if last_action == EditLastAction.DELETE_ALL:
-        response = 'All deleted messages were recovered.'
-    elif last_action == EditLastAction.DELETE_LAST:
-        response = 'Last deleted message was recovered.'
-    elif last_action == EditLastAction.ADD_MESSAGE:
-        response = 'Last added message was deleted.'
-        try:
-            command.command_messages.latest('id').delete()
-        except CommandMessage.DoesNotExist:
-            pass
+    action_logs = chat_data['edit_actions_log']
+    command = chat_data['cmd_instance']
+    try:
+        action = action_logs.pop()
+    except IndexError:
+        response = 'No last action found.'
+    else:
+        if action == EditLastAction.DELETE_ALL:
+            response = 'All deleted messages were recovered.'
+            last_deletes_count = 0
+            for a in action_logs:
+                if a == EditLastAction.DELETE_LAST:
+                    last_deletes_count += 1
+            chat_data['msgs_count'] = command.command_messages.count() - last_deletes_count
+
+        elif action == EditLastAction.DELETE_LAST:
+            response = 'Last deleted message was recovered.'
+            chat_data['msgs_count'] += 1
+
+        elif action == EditLastAction.ADD_MESSAGE:
+            response = 'Last added message was deleted.'
+            try:
+                command.command_messages.latest('id').update(is_active=False)
+                chat_data['msgs_count'] -= 1
+            except CommandMessage.DoesNotExist:
+                pass
 
     update.message.reply_text(response)
     inform_number_of_commands(update, context)
@@ -100,37 +119,44 @@ def undo_last_action(update, context):
 
 @middleware
 def delete_all_messages(update, context):
-    commit_last_action(context)
-    context.chat_data['last_edit_action'] = EditLastAction.DELETE_ALL
+    chat_data = context.chat_data
+
+    if chat_data['msgs_count'] == 0:
+        update.message.reply_text('The command has no messages.')
+        return states.SEND_EDIT_MESSAGE
+
+    chat_data['edit_actions_log'].append(EditLastAction.DELETE_ALL)
+    chat_data['msgs_count'] = 0
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def delete_last_message(update, context):
-    commit_last_action(context)
-    context.chat_data['last_edit_action'] = EditLastAction.DELETE_LAST
+    chat_data = context.chat_data
+
+    if chat_data['msgs_count'] == 0:
+        update.message.reply_text('The command has no messages.')
+        return states.SEND_EDIT_MESSAGE
+
+    chat_data['edit_actions_log'].append(EditLastAction.DELETE_LAST)
+    chat_data['msgs_count'] -= 1
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
 
 @middleware
 def exit_edit_mode(update, context):
-    commit_last_action(context)
-    del context.chat_data['msgs_to_delete']
-    del context.chat_data['last_edit_action']
-    return commands.command_menu()
+    commit_all_actions(context)
+    del context.chat_data['edit_actions_log']
+    return commands.command_menu(update, context)
 
 
 def inform_number_of_commands(update, context):
-    command = context.chat_data['cmd_instance']
-    last_action = context.chat_data.get('last_edit_action')
-    count = command.command_messages.count()
-    if last_action == EditLastAction.DELETE_LAST:
-        count -= 1
-    elif last_action == EditLastAction.DELETE_ALL:
-        count = 0
+    chat_data = context.chat_data
 
+    command = chat_data['cmd_instance']
+    count = chat_data['msgs_count']
     text = f'The command {command.caller} has {count} message{"s" if count > 1 else ""}.'
     update.message.reply_text(text=text)
 
@@ -138,24 +164,30 @@ def inform_number_of_commands(update, context):
 @middleware
 def command_add_text(update, context):
     """ Callback function to handle message for command. Returns its state to make the process repetitive. """
+    chat_data = context.chat_data
+
     text = update.message.text
-    command = context.chat_data['cmd_instance']
+    command = chat_data['cmd_instance']
     CommandMessage.objects.create(
         command=command,
         type=CommandMessageType.TEXT,
         text=text,
     )
+    chat_data['msgs_count'] += 1
     return continue_command_adding(update, context)
 
 
 def command_add_media_message(context, update, file_id, media_type):
-    command = context.chat_data['cmd_instance']
+    chat_data = context.chat_data
+
+    command = chat_data['cmd_instance']
     CommandMessage.objects.create(
         command=command,
         type=media_type,
         text=update.message.caption,
         file_id=file_id,
     )
+    chat_data['msgs_count'] += 1
 
 
 @middleware

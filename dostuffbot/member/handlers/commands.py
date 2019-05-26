@@ -10,6 +10,10 @@ from member.models import Command
 def commands_list(update, context):
     """ Callback function to show all commands. """
 
+    chat_data = context.chat_data
+    if 'cmd_instance' in chat_data:
+        del chat_data['cmd_instance']
+
     commands = Command.objects.filter(bot=context.bot.db_bot)
     text = 'This is a list of your commands. Select command to see the details:'
     if not commands:

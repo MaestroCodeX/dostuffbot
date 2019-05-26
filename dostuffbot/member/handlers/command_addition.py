@@ -3,7 +3,7 @@ from django.conf import settings
 
 from core.enums import CommandMessageType, CommandStatus
 from member import keyboards, states
-from member.handlers import commands, command_edition
+from member.handlers import commands
 from member.middleware import middleware
 from member.models import Command, CommandMessage
 from member.utils import get_command_handler
