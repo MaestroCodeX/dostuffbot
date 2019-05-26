@@ -8,6 +8,7 @@ from member.models import Command, CommandMessage
 @middleware
 def command_edit_caller(update, context):
     """ Callback function to handle edit command button. """
+
     update.message.reply_text(
         text='Okay, send me a new command.',
         reply_markup=keyboards.back_markup('command menu'),
@@ -19,6 +20,7 @@ def command_edit_caller(update, context):
 @middleware
 def command_edit_caller_sent(update, context):
     """ Callback function to handle editing commmand state when caller text was sent. """
+
     caller = update.message.text
     db_bot = context.bot.db_bot
 
@@ -43,6 +45,7 @@ def command_edit_caller_sent(update, context):
 @middleware
 def command_edit_answer(update, context):
     """ Callback function to handle edit command button. """
+
     chat_data = context.chat_data
 
     text = (
@@ -66,9 +69,12 @@ def command_edit_answer(update, context):
 
 
 def commit_all_actions(context):
+    """ Commit all action that were added to logs and remove them. """
+
     chat_data = context.chat_data
 
     actions_to_commit = chat_data['edit_actions_log']
+    chat_data['edit_actions_log'] = []
     command = chat_data['cmd_instance']
     for action in actions_to_commit:
         if action == EditLastAction.DELETE_ALL:
@@ -83,6 +89,8 @@ def commit_all_actions(context):
 
 @middleware
 def undo_last_action(update, context):
+    """ Undo last action that was added to the logs. """
+
     chat_data = context.chat_data
 
     action_logs = chat_data['edit_actions_log']
@@ -119,6 +127,8 @@ def undo_last_action(update, context):
 
 @middleware
 def delete_all_messages(update, context):
+    """ Set messages counter to 0 and inform user how much messages left. """
+
     chat_data = context.chat_data
 
     if chat_data['msgs_count'] == 0:
@@ -133,6 +143,8 @@ def delete_all_messages(update, context):
 
 @middleware
 def delete_last_message(update, context):
+    """ Decrease messages counter by 1 and inform user how much messages left. """
+
     chat_data = context.chat_data
 
     if chat_data['msgs_count'] == 0:
@@ -147,12 +159,16 @@ def delete_last_message(update, context):
 
 @middleware
 def exit_edit_mode(update, context):
+    """ Return user to command menu and commit all actions in logs. """
+
     commit_all_actions(context)
     del context.chat_data['edit_actions_log']
     return commands.command_menu(update, context)
 
 
 def inform_number_of_commands(update, context):
+    """ Sends down to user the number of messages left. """
+
     chat_data = context.chat_data
 
     command = chat_data['cmd_instance']
@@ -164,6 +180,7 @@ def inform_number_of_commands(update, context):
 @middleware
 def command_add_text(update, context):
     """ Callback function to handle message for command. Returns its state to make the process repetitive. """
+
     chat_data = context.chat_data
 
     text = update.message.text
@@ -178,6 +195,8 @@ def command_add_text(update, context):
 
 
 def command_add_media_message(context, update, file_id, media_type):
+    """ Helper function to save media message to the database. """
+
     chat_data = context.chat_data
 
     command = chat_data['cmd_instance']
@@ -234,6 +253,8 @@ def command_add_location(update, context):
 
 
 def continue_command_adding(update, context, silence=False):
+    """ Inform client that the sent command was saved. """
+
     context.chat_data['last_edit_action'] = EditLastAction.ADD_MESSAGE
     if not silence:
         update.message.reply_text(
