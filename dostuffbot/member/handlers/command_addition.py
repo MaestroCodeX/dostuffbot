@@ -12,6 +12,7 @@ from member.utils import get_command_handler
 @middleware
 def command_add(update, context):
     """ Callback function to handle 'Add command' button. """
+
     commands_count = Command.objects.filter(bot=context.bot.db_bot).count()
     if commands_count >= settings.MAX_MEMBER_COMMANDS:
         update.message.reply_text((
@@ -39,6 +40,7 @@ def command_add(update, context):
 @middleware
 def command_add_caller(update, context):
     """ Callback function to handle message with command caller. """
+
     caller = update.message.text
     db_bot = context.bot.db_bot
 
@@ -65,6 +67,7 @@ def command_add_caller(update, context):
 @middleware
 def command_add_caller_invalid(update, context):
     """ Callback function to handle message when command is invalid. """
+
     text = (
         'The ___command___ should start with /\n\n'
         '***The command can only contain:***'
@@ -78,8 +81,9 @@ def command_add_caller_invalid(update, context):
 @middleware
 def command_add_complete(update, context):
     """ Callback function to handle /complete command to finish command adding. """
+
     command = context.chat_data['cmd_instance_edit']
-    if command.command_messages.count() == 0:
+    if command.message_set.count() == 0:
         update.message.reply_text(
             'Please, add at least one message before saving the command.',
         )
@@ -112,6 +116,7 @@ def command_add_cancel(update, context):
 @middleware
 def command_add_text(update, context):
     """ Callback function to handle message for command. Returns its state to make the process repetitive. """
+
     text = update.message.text
     command = context.chat_data['cmd_instance_edit']
     CommandMessage.objects.create(
@@ -170,7 +175,7 @@ def command_add_voice(update, context):
 @middleware
 def command_add_location(update, context):
     update.message.reply_text(
-        'The location messages are still being developed. It will be support at an early future.',
+        'The location messages are still being developed. It will be supported at an early future.',
     )
 
 

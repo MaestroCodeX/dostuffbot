@@ -59,7 +59,13 @@ base_conversation = ConversationHandler(
         states.SEND_MESSAGE: [
             MessageHandler(to_filter_regex(texts.COMPLETE), command_addition.command_add_complete),
             MessageHandler(to_filter_regex(texts.CANCEL), command_addition.command_add_cancel),
-            *message_adding_filters,
+            MessageHandler(Filters.text, command_addition.command_add_text),
+            MessageHandler(Filters.photo, command_addition.command_add_photo),
+            MessageHandler(Filters.video, command_addition.command_add_video),
+            MessageHandler(Filters.document, command_addition.command_add_document),
+            MessageHandler(Filters.audio, command_addition.command_add_audio),
+            MessageHandler(Filters.voice, command_addition.command_add_voice),
+            MessageHandler(Filters.location, command_addition.command_add_location),
         ],
         states.INPUT_EDIT_CALLER: [
             MessageHandler(to_filter_regex(texts.back_text('command menu')), commands.command_menu),
@@ -70,7 +76,13 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.DELETE_LAST_MESSAGE), command_edition.delete_last_message),
             MessageHandler(to_filter_regex(texts.UNDO_LAST), command_edition.undo_last_action),
             MessageHandler(to_filter_regex(texts.back_text('menu')), command_edition.exit_edit_mode),
-            *message_adding_filters,
+            MessageHandler(Filters.text, command_edition.command_add_text),
+            MessageHandler(Filters.photo, command_edition.command_add_photo),
+            MessageHandler(Filters.video, command_edition.command_add_video),
+            MessageHandler(Filters.document, command_edition.command_add_document),
+            MessageHandler(Filters.audio, command_edition.command_add_audio),
+            MessageHandler(Filters.voice, command_edition.command_add_voice),
+            MessageHandler(Filters.location, command_edition.command_add_location),
         ],
     },
     fallbacks=[MessageHandler(Filters.all, ignore)],
@@ -94,7 +106,7 @@ def run_bot_with_handlers(instance):
     for handler in ADMIN_HANDLERS:
         dp.add_handler(handler, group=settings.ADMIN_HANDLER_GROUP)
 
-    commands = instance.commands.all()
+    commands = instance.command_set.all()
     for command in commands:
         handler = get_command_handler(command)
         dp.add_handler(handler, group=settings.DEFAULT_HANDLER_GROUP)

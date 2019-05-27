@@ -30,7 +30,7 @@ def get_handler(command):
 
 
 def get_command_handler(command):
-    return MessageHandler(Filters.regex(f'^{command.caller}$'), get_handler(command))
+    return MessageHandler(to_filter_regex(command.caller), get_handler(command))
 
 
 def to_filter_regex(text):

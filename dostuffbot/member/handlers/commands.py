@@ -1,9 +1,10 @@
-from telegram.ext import Dispatcher
+from telegram.ext import Dispatcher, MessageHandler
 from django.conf import settings
 
 from member import texts, keyboards, states
 from member.middleware import middleware
 from member.models import Command
+from member.utils import to_filter_regex
 
 
 @middleware
@@ -54,9 +55,7 @@ def command_delete(update, context):
     command = context.chat_data['cmd_instance']
     text = texts.delete_command(command)
     markup = keyboards.confirm_deletion_markup()
-
     update.message.reply_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
-
     return states.DELETE_CONFIRM
 
 
@@ -68,7 +67,13 @@ def command_delete_confirm(update, context):
     command = context.chat_data['cmd_instance']
     dp = Dispatcher.get_instance()
     handlers = dp.handlers[settings.DEFAULT_HANDLER_GROUP]
-    command.delete()
+    for h in handlers:
+        if not isinstance(h, MessageHandler):
+            continue
+        print(h.filters)
+        if to_filter_regex(command.caller) == h.filters:
+            print(True)
+    # command.delete()
 
     update.message.reply_text('The command has disappeared...')
     return commands_list(update, context)
@@ -78,10 +83,4 @@ def command_delete_confirm(update, context):
 def command_show_answer(update, context):
     command = context.chat_data['cmd_instance']
     command.reply_to(update.message)
-
-    update.message.reply_text(
-        'The full answer is shown.',
-        reply_markup=keyboards.command_shown_markup()
-    )
-
     return command_menu(update, context)

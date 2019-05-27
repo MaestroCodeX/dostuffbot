@@ -62,7 +62,7 @@ def command_edit_answer(update, context):
     )
     command = chat_data['cmd_instance']
     chat_data['edit_actions_log'] = []
-    chat_data['msgs_count'] = command.command_messages.count()
+    chat_data['msgs_count'] = command.message_set.count()
 
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
@@ -78,11 +78,11 @@ def commit_all_actions(context):
     command = chat_data['cmd_instance']
     for action in actions_to_commit:
         if action == EditLastAction.DELETE_ALL:
-            command.command_messages.all().update(is_active=False)
+            command.message_set.all().update(is_active=False)
 
         elif action == EditLastAction.DELETE_LAST:
             try:
-                command.command_messages.latest('id').delete()
+                command.message_set.latest('id').delete()
             except CommandMessage.DoesNotExist:
                 pass
 
@@ -98,27 +98,29 @@ def undo_last_action(update, context):
     try:
         action = action_logs.pop()
     except IndexError:
-        response = 'No last action found.'
-    else:
-        if action == EditLastAction.DELETE_ALL:
-            response = 'All deleted messages were recovered.'
-            last_deletes_count = 0
-            for a in action_logs:
-                if a == EditLastAction.DELETE_LAST:
-                    last_deletes_count += 1
-            chat_data['msgs_count'] = command.command_messages.count() - last_deletes_count
+        update.message.reply_text('No last action found.')
+        return states.SEND_EDIT_MESSAGE
 
-        elif action == EditLastAction.DELETE_LAST:
-            response = 'Last deleted message was recovered.'
-            chat_data['msgs_count'] += 1
+    response = ''
+    if action == EditLastAction.DELETE_ALL:
+        response = 'All deleted messages were recovered.'
+        last_deletes_count = 0
+        for a in action_logs:
+            if a == EditLastAction.DELETE_LAST:
+                last_deletes_count += 1
+        chat_data['msgs_count'] = command.message_set.count() - last_deletes_count
 
-        elif action == EditLastAction.ADD_MESSAGE:
-            response = 'Last added message was deleted.'
-            try:
-                command.command_messages.latest('id').update(is_active=False)
-                chat_data['msgs_count'] -= 1
-            except CommandMessage.DoesNotExist:
-                pass
+    elif action == EditLastAction.DELETE_LAST:
+        response = 'Last deleted message was recovered.'
+        chat_data['msgs_count'] += 1
+
+    elif action == EditLastAction.ADD_MESSAGE:
+        response = 'Last added message was deleted.'
+        try:
+            command.message_set.latest('id').update(is_active=False)
+            chat_data['msgs_count'] -= 1
+        except CommandMessage.DoesNotExist:
+            pass
 
     update.message.reply_text(response)
     inform_number_of_commands(update, context)
@@ -247,7 +249,7 @@ def command_add_voice(update, context):
 @middleware
 def command_add_location(update, context):
     update.message.reply_text(
-        'The location messages are still being developed. It will be support at an early future.',
+        'The location messages are still being developed. It will be supported at an early future.',
     )
     return continue_command_adding(update, context)
 
@@ -255,10 +257,9 @@ def command_add_location(update, context):
 def continue_command_adding(update, context, silence=False):
     """ Inform client that the sent command was saved. """
 
-    context.chat_data['last_edit_action'] = EditLastAction.ADD_MESSAGE
+    context.chat_data['edit_actions_log'].append(EditLastAction.ADD_MESSAGE)
     if not silence:
-        update.message.reply_text(
-            'Message saved. Continue sending messsages or hit "Complete" to save the command.',
-        )
+        update.message.reply_text('Message saved.')
+        inform_number_of_commands(update, context)
 
     return states.SEND_EDIT_MESSAGE
