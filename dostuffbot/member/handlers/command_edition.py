@@ -168,14 +168,20 @@ def exit_edit_mode(update, context):
     return commands.command_menu(update, context)
 
 
-def inform_number_of_commands(update, context):
-    """ Sends down to user the number of messages left. """
-
+def get_inform_message(update, context):
+    """ Returns the text to inform the number of messages left. """
     chat_data = context.chat_data
 
     command = chat_data['cmd_instance']
     count = chat_data['msgs_count']
     text = f'The command {command.caller} has {count} message{"s" if count > 1 else ""}.'
+    return text
+
+
+def inform_number_of_commands(update, context):
+    """ Sends down to user the number of messages left. """
+
+    text = get_inform_message(update, context)
     update.message.reply_text(text=text)
 
 
@@ -259,7 +265,7 @@ def continue_command_adding(update, context, silence=False):
 
     context.chat_data['edit_actions_log'].append(EditLastAction.ADD_MESSAGE)
     if not silence:
-        update.message.reply_text('Message saved.')
-        inform_number_of_commands(update, context)
+        text = 'Message saved. ' + get_inform_message(update, context)
+        update.message.reply_text(text)
 
     return states.SEND_EDIT_MESSAGE
