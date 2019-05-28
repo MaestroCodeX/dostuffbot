@@ -10,6 +10,7 @@ class User(CreatedUpdatedModel):
     lang = models.CharField(max_length=10, blank=True, null=True)
     is_bot = models.BooleanField(default=False)
     dialog_id = models.IntegerField(blank=True, null=True)
+    is_dialog_on_top = models.BooleanField(default=True)
 
     def update_dialog(self, bot, func, context):
         """ Delete previous CallbackQuery dialog and send new one. """
@@ -21,6 +22,11 @@ class User(CreatedUpdatedModel):
 
         sent_message = func(**context)
         self.dialog_id = sent_message.message_id
+        self.is_dialog_on_top = True
+        self.save()
+
+    def not_on_top(self):
+        self.is_dialog_on_top = False
         self.save()
 
 

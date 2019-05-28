@@ -16,7 +16,7 @@ from main.handlers import (
 
 def main():
     # Configure bot
-    updater = Updater(env.TOKEN)
+    updater = Updater(env.TOKEN, use_context=True)
     dp = updater.dispatcher
 
     # Add handlers
@@ -51,3 +51,7 @@ def main():
     updater.start_polling()
     logging.info('Bot is running.')
     updater.idle()
+
+
+if __name__ == '__main__':
+    main()

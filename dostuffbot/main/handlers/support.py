@@ -6,19 +6,19 @@ from main import texts, keyboards
 from main.models import Faq, FaqRate, User
 
 
-def help(bot, update):
+def help(update, context):
     """ Help section handler method called with inline keyboard """
     query = update.callback_query
     query.edit_message_text(text=texts.HELP, reply_markup=keyboards.HELP_M, parse_mode='MARKDOWN')
 
 
-def about(bot, update):
+def about(update, context):
     """ About section handler method called with inline keyboard """
     query = update.callback_query
     query.edit_message_text(text=texts.ABOUT, reply_markup=keyboards.ABOUT_M)
 
 
-def faq(bot, update):
+def faq(update, context):
     """ FAQs section handler method called with inline keyboard """
     query = update.callback_query
     queryset = Faq.objects.all()
@@ -29,7 +29,7 @@ def faq(bot, update):
     )
 
 
-def faq_by_id(bot, update):
+def faq_by_id(update, context):
     """
     Handler selected faq with inline keyboard.
     Send full question, answer and propose to rate the issue.
@@ -48,7 +48,7 @@ def faq_by_id(bot, update):
     query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
 
 
-def faq_rate(bot, update):
+def faq_rate(update, context):
     """
     Handler selected faq with inline keyboard.
     Send full question, answer and propose to rate the issue.
@@ -70,19 +70,19 @@ def faq_rate(bot, update):
     query.edit_message_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
 
 
-def donate(bot, update):
+def donate(update, context):
     """ Donate section handler method called with inline keyboard """
     query = update.callback_query
     query.edit_message_text(text=texts.DONATE, reply_markup=keyboards.DONATE_M)
 
 
-def donate_custom(bot, update):
+def donate_custom(update, context):
     """ Donate with custome amount section handler method called with inline keyboard """
     query = update.callback_query
     query.edit_message_text(text=texts.donate_custom(0), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
-def donate_add(bot, update):
+def donate_add(update, context):
     """ Handle buttons on the custom donate amount keyboard. """
     query = update.callback_query
     current_amount = int(query.message.text[:-1])
@@ -91,7 +91,7 @@ def donate_add(bot, update):
     query.edit_message_text(text=texts.donate_custom(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
-def donate_erase(bot, update):
+def donate_erase(update, context):
     """ Handle erase button on the custom donate amount keyboard. """
     query = update.callback_query
     current_amount = int(query.message.text[:-1])
@@ -99,25 +99,25 @@ def donate_erase(bot, update):
     query.edit_message_text(text=texts.donate_custom(new_amount), reply_markup=keyboards.DONATE_CUSTOM_M)
 
 
-def donate_submit(bot, update):
+def donate_submit(update, context):
     """ Handle submit button on the custom donate amount keyboard. """
     query = update.callback_query
     chat_id = query.message.chat_id
     amount = int(query.message.text[:-1])
 
-    send_invoice(bot, chat_id, amount)
+    send_invoice(context, chat_id, amount)
 
 
-def donate_predefined(bot, update):
+def donate_predefined(update, context):
     """ Handle predefined amount button and send a payment invoice. """
     query = update.callback_query
     chat_id = query.message.chat_id
     amount = int(query.data.split('__')[1])
 
-    send_invoice(bot, chat_id, amount)
+    send_invoice(context, chat_id, amount)
 
 
-def send_invoice(bot, chat_id, amount):
+def send_invoice(context, chat_id, amount):
     """ Send invoice with the given amount to the given chat. """
     title = 'Payment Invoice'
     description = 'Support Dostuffbot 🤖.'
@@ -129,7 +129,7 @@ def send_invoice(bot, chat_id, amount):
     # price * 100 so as to include 2 d.p.
     prices = [LabeledPrice('Support', amount * 100)]
 
-    bot.send_invoice(
+    context.bot.send_invoice(
         chat_id, title, description, payload, provider_token, start_parameter, currency, prices
     )
 

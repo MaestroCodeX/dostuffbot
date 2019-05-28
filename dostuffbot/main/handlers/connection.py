@@ -6,7 +6,7 @@ from main.models import User
 from member.models import Bot
 
 
-def connect_bot(bot, update):
+def connect_bot(update, context):
     """ Connect bot handler method called with inline keyboard """
     query = update.callback_query
 
@@ -16,7 +16,7 @@ def connect_bot(bot, update):
     return 1
 
 
-def token(bot, update):
+def token(update, context):
     """
     Add bot with sent token
     If token is invalid edit text with error
@@ -24,6 +24,7 @@ def token(bot, update):
     """
     user = User.objects.get(id=update.effective_user.id)
     token = update.message.text
+    bot = context.bot
 
     bot.edit_message_text(
         chat_id=user.id,
@@ -76,4 +77,5 @@ connect_bot_handler = ConversationHandler(
         1: [MessageHandler(Filters.regex(r'\d*:.*'), token)],
     },
     fallbacks=[],
+    allow_reentry=True,
 )

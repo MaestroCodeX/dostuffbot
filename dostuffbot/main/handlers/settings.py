@@ -5,7 +5,7 @@ from main import keyboards, texts
 from main.models import User
 
 
-def my_settings(bot, update, user=None):
+def my_settings(update, context, user=None):
     """ Settings with inline keyboard """
     query = update.callback_query
 
@@ -14,14 +14,14 @@ def my_settings(bot, update, user=None):
     query.edit_message_text(text=texts.settings(user), reply_markup=keyboards.SETTINGS_M, parse_mode='MARKDOWN')
 
 
-def lang_list(bot, update):
+def lang_list(update, context):
     """ Send available languages list to user to change language interface. """
     query = update.callback_query
 
     query.edit_message_text(text=texts.EDIT_LANG, reply_markup=keyboards.EDIT_LANG_M, parse_mode='MARKDOWN')
 
 
-def edit_lang(bot, update):
+def edit_lang(update, context):
     """ Edit language interface with selected one from list. """
     query = update.callback_query
 
@@ -33,7 +33,7 @@ def edit_lang(bot, update):
         user.lang = lang
         user.save()
 
-    my_settings(bot, update, user)
+    my_settings(update, context, user)
 
 
 settings_handler = CallbackQueryHandler(my_settings, pattern='settings')
