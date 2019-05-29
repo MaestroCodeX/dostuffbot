@@ -3,7 +3,7 @@ from telegram.ext import Filters, CallbackQueryHandler, MessageHandler, Conversa
 
 from main import texts, keyboards
 from main.models import User
-from member.models import Bot
+from member.models import Bot, BotAdmin
 
 
 def connect_bot(update, context):
@@ -54,6 +54,11 @@ def token(update, context):
                 username=bot_user.username,
             )
         text = texts.BOT_CONNECTED + texts.bot_profile(connected_bot.name)
+
+        bot_admin, _ = BotAdmin.objets.get_or_create(bot=connected_bot, user=user)
+        bot_admin.is_owner = True
+        bot_admin.save()
+
         markup = keyboards.bot_profile_markup(connected_bot)
 
     try:

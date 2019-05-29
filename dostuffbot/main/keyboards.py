@@ -25,9 +25,9 @@ START_KB = [
     [CONNECT_BOT_BTN],
     [InlineKeyboardButton('My bots', callback_data='my_bots')],
     [
-        InlineKeyboardButton('Settings ⚙️', callback_data='settings'),
-        InlineKeyboardButton(emojize('Help :question:'), callback_data='help'),
-        InlineKeyboardButton(emojize('About :pencil2:'), callback_data='about'),
+        InlineKeyboardButton('Settings', callback_data='settings'),
+        InlineKeyboardButton('Help', callback_data='help'),
+        InlineKeyboardButton('About', callback_data='about'),
     ]
 ]
 CANCEL_START_KB = [[
