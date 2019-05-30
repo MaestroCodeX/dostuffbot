@@ -18,7 +18,7 @@ def back_button(section, callback_data=None):
 
 BACK_TO_MENU_BTN = back_button('menu', 'start')
 CONNECT_BOT_BTN = InlineKeyboardButton(emojize('Connect my bot :heavy_plus_sign:'), callback_data='connect_bot')
-CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/dostuffsupportbot')
+CONTACT_ME_BTN = InlineKeyboardButton('Help Community', url='https://t.me/' + settings.SUPPORT_BOT_NAME)
 
 
 START_KB = [

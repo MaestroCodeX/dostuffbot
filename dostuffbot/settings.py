@@ -30,6 +30,9 @@ LOCALE_PATHS = (
 )
 
 SECRET_KEY = env.SECRET_KEY
+
+MAIN_BOT_NAME = 'Dostuffbot'
+SUPPORT_BOT_NAME = 'Dostuffsupportbot'
 BOT_CALL_PREFIX = 'bot_'
 BOT_ID_REGEX = BOT_CALL_PREFIX + r'(\d*)__.*'
 DEFAULT_HANDLER_GROUP = 0

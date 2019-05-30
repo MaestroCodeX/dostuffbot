@@ -18,7 +18,7 @@ def command_add(update, context):
         update.message.reply_text((
             'You have reached the maximum number of available commands. '
             'If you want to add a new command, delete the old one or contact '
-            'the [support](https://t.me/Dostuffsupportbot) '
+            f'the [support](https://t.me/{settings.SUPPORT_BOT_NAME}) '
             'to increase the limit of allowed commands.'
         ), parse_mode='MARKDOWN')
         return states.COMMAND_MENU

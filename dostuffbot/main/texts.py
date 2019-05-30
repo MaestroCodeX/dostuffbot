@@ -33,7 +33,7 @@ def settings(user):
 
 
 START = (
-    '***Dostuffbot*** is created to help you build your own bots without any coding. '
+    f'***{django_settings.MAIN_BOT_NAME}*** is created to help you build your own bots without any coding. '
     'It\'s simple and absolutely free for use.'
 )
 BOT_CONNECT = emojize(
@@ -51,14 +51,14 @@ HELP = (
     'I try to customize every bot for their needs as much as possible.\n\n'
     '***To start*** go to menu and add your first bot. Then follow the inctructions to manage it.\n\n'
     'If you still have any question feel free to check out FAQs '
-    'or contact us at @dostuffsupportbot.'
+    f'or contact us at @{settings.SUPPORT_BOT_NAME}.'
 )
 ABOUT = (
     'I am bot who lives together with my creator @serhii_beznisko. '
     'My creator is a typical student who likes to code and drink enormous cups of tea.\n\n'
     'If you like me you can support my creator by donating a small amout of money. '
     'He will pay servers and buy better computers so I can work even faster!\n\n'
-    'Feel free to contact us at @dostuffsupportbot.'
+    f'Feel free to contact us at @{settings.SUPPORT_BOT_NAME}.'
 )
 DONATE = (
     'Your help is significant. Select an amount you want to donate or hit custom.'
