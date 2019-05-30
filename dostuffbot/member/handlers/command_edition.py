@@ -51,9 +51,7 @@ def command_edit_answer(update, context):
     text = (
         '___DESCRIPTION___: You are in command editting mode. '
         'You can either send new messages to add them '
-        'or delete your previous messages.\n\n'
-        '___ATTEINTION___: No changes will be affected unless you hit '
-        '___Save changes___ button.'
+        'or delete your previous messages.'
     )
     update.message.reply_text(
         text=text,
@@ -63,6 +61,8 @@ def command_edit_answer(update, context):
     command = chat_data['cmd_instance']
     chat_data['edit_actions_log'] = []
     chat_data['msgs_count'] = command.message_set.count()
+    chat_data['msgs_last_id'] = 0
+    chat_data['msgs_to_delete'] = []
 
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
@@ -72,19 +72,16 @@ def commit_all_actions(context):
     """ Commit all action that were added to logs and remove them. """
 
     chat_data = context.chat_data
-
-    actions_to_commit = chat_data['edit_actions_log']
-    chat_data['edit_actions_log'] = []
     command = chat_data['cmd_instance']
-    for action in actions_to_commit:
-        if action == EditLastAction.DELETE_ALL:
-            command.message_set.all().update(is_active=False)
 
-        elif action == EditLastAction.DELETE_LAST:
-            try:
-                command.message_set.latest('id').delete()
-            except CommandMessage.DoesNotExist:
-                pass
+    if EditLastAction.DELETE_ALL in chat_data['edit_actions_log']:
+        command.message_set.filter(
+            id__lte=chat_data['msgs_last_id']
+        ).update(is_active=False)
+    else:
+        for msg in chat_data['msgs_to_delete']:
+            msg.is_active = False
+            msg.save()
 
 
 @middleware
@@ -132,6 +129,7 @@ def delete_all_messages(update, context):
     """ Set messages counter to 0 and inform user how much messages left. """
 
     chat_data = context.chat_data
+    command = chat_data['cmd_instance']
 
     if chat_data['msgs_count'] == 0:
         update.message.reply_text('The command has no messages.')
@@ -139,6 +137,7 @@ def delete_all_messages(update, context):
 
     chat_data['edit_actions_log'].append(EditLastAction.DELETE_ALL)
     chat_data['msgs_count'] = 0
+    chat_data['msgs_last_id'] = command.message_set.latest('id').id
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
@@ -148,6 +147,7 @@ def delete_last_message(update, context):
     """ Decrease messages counter by 1 and inform user how much messages left. """
 
     chat_data = context.chat_data
+    command = chat_data['cmd_instance']
 
     if chat_data['msgs_count'] == 0:
         update.message.reply_text('The command has no messages.')
@@ -155,6 +155,8 @@ def delete_last_message(update, context):
 
     chat_data['edit_actions_log'].append(EditLastAction.DELETE_LAST)
     chat_data['msgs_count'] -= 1
+    msg_to_delete = command.message_set.latest('id')
+    chat_data['msgs_to_delete'].append(msg_to_delete)
     inform_number_of_commands(update, context)
     return states.SEND_EDIT_MESSAGE
 
