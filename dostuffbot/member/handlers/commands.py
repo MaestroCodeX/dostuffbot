@@ -1,15 +1,11 @@
-from telegram.ext import Dispatcher, MessageHandler
-from django.conf import settings
-
 from member import texts, keyboards, states
 from member.middleware import middleware
 from member.models import Command
-from member.utils import to_filter_regex
 
 
 @middleware
 def commands_list(update, context):
-    """ Callback function to show all commands. """
+    """ Show a list of all commands. """
 
     chat_data = context.chat_data
     if 'cmd_instance' in chat_data:
@@ -31,7 +27,7 @@ def commands_list(update, context):
 
 @middleware
 def command_menu(update, context):
-    """ Callback function to show command menu that was chosen from the list. """
+    """ Show command menu that was chosen from the list. """
 
     command = context.chat_data.get('cmd_instance')
     if not command:
@@ -48,39 +44,7 @@ def command_menu(update, context):
 
 
 @middleware
-def command_delete(update, context):
-    """ Handle delete button in command menu.
-    Do not delete the command but send confirmation request. """
-
-    command = context.chat_data['cmd_instance']
-    text = texts.delete_command(command)
-    markup = keyboards.confirm_deletion_markup()
-    update.message.reply_text(text=text, reply_markup=markup, parse_mode='MARKDOWN')
-    return states.DELETE_CONFIRM
-
-
-@middleware
-def command_delete_confirm(update, context):
-    """ Handle delete confirmation button.
-    Delete the command and return user to commands list. """
-
-    command = context.chat_data['cmd_instance']
-    dp = Dispatcher.get_instance()
-    handlers = dp.handlers[settings.DEFAULT_HANDLER_GROUP]
-    for h in handlers:
-        if not isinstance(h, MessageHandler):
-            continue
-        print(h.filters)
-        if to_filter_regex(command.caller) == h.filters:
-            print(True)
-    # command.delete()
-
-    update.message.reply_text('The command has disappeared...')
-    return commands_list(update, context)
-
-
-@middleware
 def command_show_answer(update, context):
     command = context.chat_data['cmd_instance']
     command.reply_to(update.message)
-    return command_menu(update, context)
+    return states.CHOOSE_COMMAND_OPTION

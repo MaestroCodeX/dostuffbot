@@ -17,9 +17,7 @@ def start(update, context):
         parts = update.message.text.split()
         args = parts[1:]
         if parts[0] == '/start' and args:
-            handle_deeplink(update, context, args)
-            # break further execution as soon as user did't want to send start command
-            return
+            return handle_deeplink(update, context, args)
 
     update.message.reply_text(
         'Choose an option from the list below:',
@@ -32,4 +30,4 @@ def start(update, context):
 
 def handle_deeplink(update, context, args):
     if args[0] == DeepCommand.COMMANDS:
-        commands.commands_list(update, context)
+        return commands.commands_list(update, context)

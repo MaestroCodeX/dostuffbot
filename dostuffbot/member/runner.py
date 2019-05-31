@@ -6,19 +6,17 @@ from django.conf import settings
 from core import logger
 from core.handlers import ignore
 from member import states, texts
-from member.handlers import commands, command_addition, command_edition, notifications, start, bot_settings
+from member.handlers import (
+    commands,
+    command_addition,
+    command_edition,
+    command_deletion,
+    notifications,
+    start,
+    bot_settings,
+)
 from member.utils import get_command_handler, to_filter_regex
 
-
-message_adding_filters = [
-    MessageHandler(Filters.text, command_addition.command_add_text),
-    MessageHandler(Filters.photo, command_addition.command_add_photo),
-    MessageHandler(Filters.video, command_addition.command_add_video),
-    MessageHandler(Filters.document, command_addition.command_add_document),
-    MessageHandler(Filters.audio, command_addition.command_add_audio),
-    MessageHandler(Filters.voice, command_addition.command_add_voice),
-    MessageHandler(Filters.location, command_addition.command_add_location),
-]
 
 base_conversation = ConversationHandler(
     entry_points=[CommandHandler('start', start.start)],
@@ -40,11 +38,11 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.EDIT_COMMAND), command_edition.command_edit_caller),
             MessageHandler(to_filter_regex(texts.EDIT_ANSWER), command_edition.command_edit_answer),
             MessageHandler(to_filter_regex(texts.SHOW_ANSWER), commands.command_show_answer),
-            MessageHandler(to_filter_regex(texts.DELETE_COMMAND), commands.command_delete),
+            MessageHandler(to_filter_regex(texts.DELETE_COMMAND), command_deletion.command_delete),
             MessageHandler(to_filter_regex(texts.back_text('commands list')), commands.commands_list),
         ],
         states.DELETE_CONFIRM: [
-            MessageHandler(to_filter_regex(texts.DELETE_COMMAND_CONFIRM), commands.command_delete_confirm),
+            MessageHandler(to_filter_regex(texts.DELETE_COMMAND_CONFIRM), command_deletion.command_delete_confirm),
             MessageHandler(Filters.all, commands.command_menu),
         ],
         states.SEND_NOTIFY_MESSAGE: [
@@ -96,7 +94,6 @@ ADMIN_HANDLERS = [
 
 def run_bot_with_handlers(instance):
     # Configure bot
-    # my_persistence = PicklePersistence(filename='my_file')
     updater = Updater(instance.token, use_context=True)
     dp = updater.dispatcher
     dp.db_bot = instance

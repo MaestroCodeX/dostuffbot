@@ -1,8 +1,22 @@
+from core.enums import CommandMessageType
 from core.utils import emojize, escape_markdown
 
 
 def command_menu(command):
-    return f'***Command***: {escape_markdown(command.caller)}\n\nSelect what you want to do:'
+    msgs = command.message_set.all()
+    msgs_count = msgs.count()
+    first_msg = msgs.first()
+    answer = 'No answer'
+    if msgs_count == 1 and first_msg.type == CommandMessageType.TEXT:
+        answer = first_msg.text
+    elif msgs_count:
+        answer = f'{msgs_count} message{"s" if msgs_count != 1 else ""}'
+
+    return (
+        f'***Command***: {escape_markdown(command.caller)}\n'
+        f'***Answer***: {escape_markdown(answer)}\n\n'
+        'Select what you want to do:'
+    )
 
 
 def notification_sent(done_count, all_count):
