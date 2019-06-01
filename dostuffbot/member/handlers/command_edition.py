@@ -114,7 +114,9 @@ def undo_last_action(update, context):
     elif action == EditLastAction.ADD_MESSAGE:
         response = 'Last added message was deleted.'
         try:
-            command.message_set.latest('id').update(is_active=False)
+            instance = command.message_set.latest('id')
+            instance.is_active = False
+            instance.save()
             chat_data['msgs_count'] -= 1
         except CommandMessage.DoesNotExist:
             pass
