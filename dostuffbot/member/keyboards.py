@@ -13,7 +13,7 @@ def start_markup():
     schema = [
         [texts.COMMANDS],
         [texts.SEND_NOTIFICATION],
-        [texts.SETTINGS],
+        [texts.SETTINGS, texts.HELP],
     ]
     return to_keyboard(schema)
 

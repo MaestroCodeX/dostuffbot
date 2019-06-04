@@ -32,7 +32,10 @@ def command_menu(update, context):
     command = context.chat_data.get('cmd_instance')
     if not command:
         caller = update.message.text
-        command = Command.objects.get(caller=caller)
+        try:
+            command = Command.objects.get(caller=caller)
+        except Command.DoesNotExist:
+            return states.COMMAND_MENU
         context.chat_data['cmd_instance'] = command
 
     update.message.reply_text(

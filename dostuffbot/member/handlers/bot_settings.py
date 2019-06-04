@@ -15,8 +15,8 @@ def settings(update, context):
     settings_link = build_deeplink(django_settings.MAIN_BOT_NAME, call_bot(db_bot.id, 'profile'))
     update.message.reply_text(
         f'To manage {db_bot.name} settings go to its [profile]({settings_link}).',
-        reply_markup=keyboards.back_markup('start'),
+        reply_markup=keyboards.start_markup(),
         parse_mode='MARKDOWN',
     )
 
-    return states.BACK_START
+    return states.START_MENU

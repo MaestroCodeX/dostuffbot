@@ -25,13 +25,11 @@ base_conversation = ConversationHandler(
             MessageHandler(to_filter_regex(texts.COMMANDS), commands.commands_list),
             MessageHandler(to_filter_regex(texts.SEND_NOTIFICATION), notifications.notify_claim),
             MessageHandler(to_filter_regex(texts.SETTINGS), bot_settings.settings),
+            MessageHandler(to_filter_regex(texts.HELP), base.help),
         ],
         states.COMMAND_MENU: [
             MessageHandler(Filters.command, commands.command_menu),
             MessageHandler(to_filter_regex(texts.ADD_COMMAND), command_addition.command_add),
-            MessageHandler(to_filter_regex(texts.back_text('start')), base.start),
-        ],
-        states.BACK_START: [
             MessageHandler(to_filter_regex(texts.back_text('start')), base.start),
         ],
         states.CHOOSE_COMMAND_OPTION: [
