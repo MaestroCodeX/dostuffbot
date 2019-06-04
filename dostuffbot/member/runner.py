@@ -7,19 +7,19 @@ from core import logger
 from core.handlers import ignore
 from member import states, texts
 from member.handlers import (
+    base,
     commands,
     command_addition,
     command_edition,
     command_deletion,
     notifications,
-    start,
     bot_settings,
 )
 from member.utils import get_command_handler, to_filter_regex
 
 
 base_conversation = ConversationHandler(
-    entry_points=[CommandHandler('start', start.start)],
+    entry_points=[CommandHandler('start', base.start)],
     states={
         states.START_MENU: [
             MessageHandler(to_filter_regex(texts.COMMANDS), commands.commands_list),
@@ -29,10 +29,10 @@ base_conversation = ConversationHandler(
         states.COMMAND_MENU: [
             MessageHandler(Filters.command, commands.command_menu),
             MessageHandler(to_filter_regex(texts.ADD_COMMAND), command_addition.command_add),
-            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), base.start),
         ],
         states.BACK_START: [
-            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), base.start),
         ],
         states.CHOOSE_COMMAND_OPTION: [
             MessageHandler(to_filter_regex(texts.EDIT_COMMAND), command_edition.command_edit_caller),
@@ -46,7 +46,7 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.all, commands.command_menu),
         ],
         states.SEND_NOTIFY_MESSAGE: [
-            MessageHandler(to_filter_regex(texts.back_text('start')), start.start),
+            MessageHandler(to_filter_regex(texts.back_text('start')), base.start),
             MessageHandler(Filters.text, notifications.notify_subcribers),
         ],
         states.INPUT_CALLER: [
@@ -83,13 +83,12 @@ base_conversation = ConversationHandler(
             MessageHandler(Filters.location, command_edition.command_add_location),
         ],
     },
-    fallbacks=[MessageHandler(Filters.all, ignore)],
+    fallbacks=[
+        CommandHandler('help', base.help),
+        MessageHandler(Filters.all, ignore),
+    ],
     allow_reentry=True,
 )
-
-ADMIN_HANDLERS = [
-    base_conversation,
-]
 
 
 def run_bot_with_handlers(instance):
@@ -99,9 +98,8 @@ def run_bot_with_handlers(instance):
     dp.db_bot = instance
     dp.bot.db_bot = instance
 
-    # Add handlers
-    for handler in ADMIN_HANDLERS:
-        dp.add_handler(handler, group=settings.ADMIN_HANDLER_GROUP)
+    # Add admin conversation handler
+    dp.add_handler(base_conversation, group=settings.ADMIN_HANDLER_GROUP)
 
     commands = instance.command_set.all()
     for command in commands:
