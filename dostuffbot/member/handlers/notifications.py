@@ -1,5 +1,5 @@
 from member import texts, keyboards, states
-from member.handlers import start
+from member.handlers import base
 from member.middleware import middleware
 
 
@@ -29,9 +29,8 @@ def notify_subcribers(update, context):
 
     subs = context.bot.db_bot.subscriber_set.all()
     notify_subscribers_with_text(context.bot, subs, update.message)
-    start.start(update, context)
 
-    return states.START_MENU
+    return base.start(update, context)
 
 
 def notify_subscribers_with_text(bot, subs, message):
